@@ -1,7 +1,8 @@
-import streamlit as st
 import pandas as pd
-import hashlib
+import streamlit as st
+import matplotlib.pyplot as plt
 from datetime import datetime
+import hashlib
 
 #costom css
 st.markdown(
@@ -48,72 +49,139 @@ st.markdown(
 unsafe_allow_html=True
 )
 
+# Sample data (Replace with your actual data)
+data = {
+    'Village': ['Hydom', 'Dongobesh', 'Mbulu'],
+    'Farmers': [20, 15, 5],
+    'Acres': [50, 30, 10],
+    'Yield (kg)': [1500, 750, 300]
+}
+
+df = pd.DataFrame(data)
 
 
+# Slideshow data
+product_images = [
+    {"file": "product1.png", "caption": "Sunflower Oil - Pure and Organic"},
+    {"file": "product1.png", "caption": "Natural Beeswax Lotion"},
+    {"file": "product1.png", "caption": "Handmade Soap Bars from Sunflower Oil"},
+    {"file": "product1.png", "caption": "Eco-friendly Biomass Briquettes"}
+]
 
+# Initialize session state to keep track of the slide index
+if 'slide_index'not in st.session_state:
+    st.session_state.slide_index = 0
 
+# Function to go to the previous slide
+def previous_slide():
+    if st.session_state.slide_index > 0:
+        st.session_state.slide_index -= 1
+    else:
+        st.session_state.slide_index = len(product_images) - 1
 
+# Function to go to the next slide
+def next_slide():
+    if st.session_state.slide_index < len(product_images) - 1:
+        st.session_state.slide_index += 1
+    else:
+        st.session_state.slide_index = 0
 
-# Encrypt password
-def encrypt_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+# Title of the app
+st.title('Bridge Gap Transparency')
+st.header('Welcome to Bridge Gap Transparency—Connecting Impact with Integrity')
 
-# Check credentials
-def check_credentials(email, password):
-    try:
-        # Load all registrations
-        df = pd.read_csv("registrations.csv")
-
-        # Normalize emails to lower case to avoid mismatch due to case
-        df['Email'] = df['Email'].str.strip().str.lower()
-        email = email.strip().lower()
-
-        # Find the matching email
-        user_row = df[df['Email'] == email]
-
-        # Debugging - check what rows are found
-        # st.write("User row found:", user_row)
-
-        if not user_row.empty:
-            encrypted_input_password = encrypt_password(password)
-            stored_password = user_row.iloc[0]['Encrypted Password']
-
-            # Debugging - compare passwords
-            # st.write("Encrypted input:", encrypted_input_password)
-            # st.write("Stored password:", stored_password)
-
-            if encrypted_input_password == stored_password:
-                full_name = user_row.iloc[0]['Full Name']
-                role = user_row.iloc[0]['Role']
-                return True, full_name, role
-            else:
-                return False, None, None
-        else:
-            return False, None, None
-    except FileNotFoundError:
-        st.error("Registrations file not found.")
-        return False, None, None
-
-
-# Session state
-if 'logged_in' not in st.session_state: 
-    st.session_state.logged_in = False
-    st.session_state.user_name = ""
-    st.session_state.role = ""
-
-# Sidebar Navigation
-st.sidebar.image("ase_logo.jpg", width=200)
+# Sidebar for navigation
+st.sidebar.image("ase_logo.JPG", width=100)
 st.sidebar.title("Navigation")
+selection = st.sidebar.radio("Go to", ["Home", "Donor Reports", "Project Updates", "Community Stories", "Impact Metrics", "Register"])
 
-# Conditional menu
 if not st.session_state.logged_in:
     menu = st.sidebar.radio("Menu", ["Login", "Register"])
 else:
     menu = st.sidebar.radio("Menu", ["Dashboard", "Logout"])
 
-# REGISTRATION FORM
-if menu == "Register":
-    st.subheader("Register for ASE Dashboard")
+
+
+
+# Main content based on selection
+if selection == "Donor Reports":
+    st.subheader("Donor Reports")
+    # You can add content or visuals for the donor reports here
+    # Example donor data
+    donor_data = {
+    "Donor": ["Alice", "Bob", "Charlie"],
+    "Amount": [500,1000, 1500], 
+    "Project": ["Sunflower Farming", "Beekeeping", "Sunflower Farming"]
+    }
+
+    df = pd.DataFrame(donor_data)
+
+    # Display the donor report
+    st.dataframe(df)
+    
+elif selection == "Project Updates":
+    #st.subheader("Project Updates")
+    # You can add content for project updates here
+    # Example updates
+    updates = [
+        {"date": "2025-03-01", "update": "Successfully planted sunflowers on 5 acres."},
+        {"date": "2025-03-10", "update": "Started beekeeping training for 30 women."}
+    ]
+
+    st.write("### Project Updates")
+    for update in updates:
+        st.write(f"**{update['date']}**: {update['update']}")
+    # Displaying a bar chart
+    st.subheader('Farmers Per Village')
+    st.bar_chart(df.set_index('Village')['Farmers'])
+    # Displaying a line chart for acres
+    st.subheader('Acres Under Cultivation')
+    st.line_chart(df.set_index('Village')['Acres'])
+    # Displaying a pie chart for total yield
+    st.subheader('Total Yield (kg)')
+    fig, ax = plt.subplots()
+    ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
+    st.pyplot(fig)
+    
+
+elif selection == "Community Stories":
+    st.subheader("Community Stories")
+    # You can add content for community stories here
+    stories = [
+    {"name": "Jane Doe", "story": "The beekeeping project has transformed my life..."},
+    {"name": "Mary Smith", "story": "With the sunflower farming project, I can now support my family..."}
+    ]
+
+    
+    for story in stories:
+        st.write(f"**{story['name']}**: {story['story']}")
+
+  
+    
+elif selection == "Impact Metrics":
+    st.subheader("Impact Metrics")
+    # You can add visualizations for impact metrics here
+    # Example metrics
+    metrics = {
+    "Women Empowered": 200,
+    "Acres Farmed": 30,
+    "Briquettes Produced": 5000
+    }
+
+    # Display metrics
+    st.write("### Impact Metrics")
+    for metric, value in metrics.items():
+        st.write(f"**{metric}**: {value}")
+    
+    # Optional: Add a chart for visualizing impact
+    fig, ax = plt.subplots()
+    ax.bar(metrics.keys(), metrics.values())
+    st.pyplot(fig)
+
+
+# Registration Form Section
+if selection == "Register":
+    st.subheader("Join Our ASE Community")
 
     with st.form("registration_form", clear_on_submit=True):
         full_name = st.text_input("Full Name")
@@ -132,18 +200,18 @@ if menu == "Register":
             elif password != confirm_password:
                 st.error("Passwords do not match.")
             else:
-                encrypted_password = encrypt_password(password)
-
+                # Save to CSV or Database (Here we save to CSV as an example)
                 user_data = {
                     "Full Name": full_name,
                     "Email": email,
                     "Phone": phone,
                     "Organization": organization,
                     "Role": role,
-                    "Encrypted Password": encrypted_password,
+                    "Password": password,
                     "Registration Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
 
+                # Save to CSV
                 try:
                     df_existing = pd.read_csv("registrations.csv")
                     df_new = pd.DataFrame([user_data])
@@ -153,7 +221,52 @@ if menu == "Register":
                     df_new = pd.DataFrame([user_data])
                     df_new.to_csv("registrations.csv", index=False)
 
-                st.success(f"Registration successful! You can now log in.")
+                st.success(f"Thank you {full_name}, you have successfully registered!")
+
+# You can continue with your other sections here...
+elif selection == "Home":
+    st.subheader("Welcome to ASE Dashboard Home")
+
+elif selection == "Donor Reports":
+    st.subheader("Donor Reports")
+
+elif selection == "Project Updates":
+    st.subheader("Project Updates")
+
+elif selection == "Community Stories":
+    st.subheader("Community Stories")
+
+elif selection == "Impact Metrics":
+    st.subheader("Impact Metrics")
+
+
+# Encrypt password using SHA-256
+def encrypt_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+# Check credentials during login
+def check_credentials(email, password):
+    try:
+        df = pd.read_csv("registrations.csv")
+        user_row = df[df['Email'] == email]
+        if not user_row.empty:
+            encrypted_input_password = encrypt_password(password)
+            if encrypted_input_password == user_row.iloc[0]['Encrypted Password']:
+                return True, user_row.iloc[0]['Full Name'], user_row.iloc[0]['Role']
+        return False, None, None
+    except FileNotFoundError:
+        return False, None, None
+
+# Initialize session state variables
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+    st.session_state.user_name = ""
+    st.session_state.role = ""
+
+
+
+
+
 
 # LOGIN FORM
 if menu == "Login" and not st.session_state.logged_in:
@@ -174,40 +287,13 @@ if menu == "Login" and not st.session_state.logged_in:
             else:
                 st.error("Invalid email or password.")
 
-# DASHBOARD ROLE-BASED VIEWS
+
+# DASHBOARD AFTER LOGIN
 if st.session_state.logged_in and menu == "Dashboard":
     st.subheader(f"Welcome, {st.session_state.user_name}!")
     st.write(f"You are logged in as **{st.session_state.role}**.")
 
-    role = st.session_state.role
-
-    # Donor Dashboard
-    if role == "Donor":
-        st.header("Donor Dashboard")
-        st.info("Thank you for your contributions!")
-        st.write("Here you can view donor reports, funding impact, and financial transparency.")
-        # Add more donor-related content
-
-    # Volunteer Dashboard
-    elif role == "Volunteer":
-        st.header("Volunteer Dashboard")
-        st.info("Thanks for your dedication!")
-        st.write("Access volunteer tasks, schedules, and community events here.")
-        # Add volunteer-related content
-
-    # Partner Dashboard
-    elif role == "Partner":
-        st.header("Partner Dashboard")
-        st.info("Collaborating for greater impact!")
-        st.write("View partnership opportunities, joint projects, and reports here.")
-        # Add partner-related content
-
-    # Community Member Dashboard
-    elif role == "Community Member":
-        st.header("Community Member Dashboard")
-        st.info("Empowering our communities!")
-        st.write("Explore community stories, learning materials, and resources.")
-        # Add community member content
+    st.info("This is your ASE Dashboard. More features coming soon!")
 
 # LOGOUT
 if st.session_state.logged_in and menu == "Logout":
@@ -215,43 +301,4 @@ if st.session_state.logged_in and menu == "Logout":
     st.session_state.user_name = ""
     st.session_state.role = ""
     st.success("You have been logged out.")
-
-def donor_dashboard():
-    st.header("Donor Dashboard")
-    st.info("Thank you for your contributions!")
-    
-    donor_menu = st.sidebar.selectbox("Donor Menu", ["Overview", "Donor Reports", "Impact Metrics"])
-    
-    if donor_menu == "Overview":
-        st.subheader("Donor Overview")
-        st.write("Here is your donor dashboard overview.")
-        
-    elif donor_menu == "Donor Reports":
-        st.subheader("Your Donor Reports")
-        st.write("Display donation reports here.")
-        
-    elif donor_menu == "Impact Metrics":
-        st.subheader("Impact Metrics")
-        st.write("Impact metrics graphs and analytics.")
-
-def volunteer_dashboard():
-    st.header("Volunteer Dashboard")
-    volunteer_menu = st.sidebar.selectbox("Volunteer Menu", ["Overview", "Tasks", "Events"])
-    
-    if volunteer_menu == "Overview":
-        st.subheader("Volunteer Overview")
-        
-    elif volunteer_menu == "Tasks":
-        st.subheader("Volunteer Tasks")
-        
-    elif volunteer_menu == "Events":
-        st.subheader("Community Events")
-
-def partner_dashboard():
-    st.header("Partner Dashboard")
-    st.write("Welcome, Partner! Collaborate with us here.")
-
-def community_dashboard():
-    st.header("Community Member Dashboard")
-    st.write("Explore community stories and updates.")
 
