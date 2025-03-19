@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
+import matplotlib as plt
 from datetime import datetime
 import hashlib
 
