@@ -1,7 +1,8 @@
-import streamlit as st
 import pandas as pd
-import hashlib
+import streamlit as st
+import matplotlib.pyplot as plt
 from datetime import datetime
+import hashlib
 
 #costom css
 st.markdown(
@@ -47,10 +48,6 @@ st.markdown(
 """,
 unsafe_allow_html=True
 )
-
-
-
-
 
 
 
@@ -174,6 +171,9 @@ if menu == "Login" and not st.session_state.logged_in:
             else:
                 st.error("Invalid email or password.")
 
+# Sample data (Replace with your actual data)
+
+
 # DASHBOARD ROLE-BASED VIEWS
 if st.session_state.logged_in and menu == "Dashboard":
     st.subheader(f"Welcome, {st.session_state.user_name}!")
@@ -187,6 +187,84 @@ if st.session_state.logged_in and menu == "Dashboard":
         st.info("Thank you for your contributions!")
         st.write("Here you can view donor reports, funding impact, and financial transparency.")
         # Add more donor-related content
+        # You can add content or visuals for the donor reports here
+        # Example donor data
+        donor_data = {
+        "Donor": ["Alice", "Bob", "Charlie"],
+        "Amount": [500,1000, 1500], 
+        "Project": ["Sunflower Farming", "Beekeeping", "Sunflower Farming"]
+        }
+
+        df = pd.DataFrame(donor_data)
+
+        # Sample data (Replace with your actual data)
+       
+
+        # Display the donor report
+        updates = [
+        {"date": "2025-03-01", "update": "Successfully planted sunflowers on 5 acres."},
+        {"date": "2025-03-10", "update": "Started beekeeping training for 30 women."}
+        ]
+        st.write("### Project Updates")
+        data = {
+        'Village': ['Hydom', 'Dongobesh', 'Mbulu'],
+        'Farmers': [20, 15, 5],
+        'Acres': [50, 30, 10],
+        'Yield (kg)': [1500, 750, 300]
+        }
+
+        df = pd.DataFrame(data)
+
+        for update in updates:
+            st.write(f"**{update['date']}**: {update['update']}")
+            #Displaying a bar chart
+            st.subheader('Farmers Per Village')
+            st.bar_chart(df.set_index('Village')['Farmers'])
+            #Displaying a line chart for acres
+            st.subheader('Acres Under Cultivation')
+            st.line_chart(df.set_index('Village')['Acres'])
+            #Displaying a pie chart for total yield
+            st.subheader('Total Yield (kg)')
+            fig, ax = plt.subplots()
+            ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
+            st.pyplot(fig)
+
+
+        st.dataframe(df)
+
+        
+
+
+
+        st.subheader("Community Stories")
+        # You can add content for community stories here
+        stories = [
+        {"name": "Jane Doe", "story": "The beekeeping project has transformed my life..."},
+        {"name": "Mary Smith", "story": "With the sunflower farming project, I can now support my family..."}
+        ]
+
+        
+        for story in stories:
+            st.write(f"**{story['name']}**: {story['story']}")
+
+
+        st.subheader("Impact Metrics")
+        # You can add visualizations for impact metrics here
+        # Example metrics
+        metrics = {
+        "Women Empowered": 200,
+        "Acres Farmed": 30,
+        "Briquettes Produced": 5000
+        }
+
+        # Display metrics
+        for metric, value in metrics.items():
+            st.write(f"**{metric}**: {value}")
+        
+        # Optional: Add a chart for visualizing impact
+        fig, ax = plt.subplots()
+        ax.bar(metrics.keys(), metrics.values())
+        st.pyplot(fig)
 
     # Volunteer Dashboard
     elif role == "Volunteer":
