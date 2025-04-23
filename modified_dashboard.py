@@ -1,8 +1,11 @@
 import pandas as pd
 import streamlit as st
-#import matplotlib.pyplot as plt
-from datetime import datetime
+import matplotlib.pyplot as plt
+import datetime
+from datetime import datetime 
+current_time=datetime.now 
 import hashlib
+import os
 
 #costom css
 st.markdown(
@@ -110,7 +113,7 @@ else:
 
 # REGISTRATION FORM
 if menu == "Register":
-    st.subheader("Register for ASE Dashboard")
+    st.subheader("Register for ASE Dashboard.")
 
     with st.form("registration_form", clear_on_submit=True):
         full_name = st.text_input("Full Name")
@@ -154,7 +157,7 @@ if menu == "Register":
 
 # LOGIN FORM
 if menu == "Login" and not st.session_state.logged_in:
-    st.subheader("Login to ASE Dashboard")
+    st.subheader("Login to ASE Dashboard\n- Home of Entreprenuers")
 
     with st.form("login_form"):
         email = st.text_input("Email Address")
@@ -171,6 +174,7 @@ if menu == "Login" and not st.session_state.logged_in:
             else:
                 st.error("Invalid email or password.")
 
+    st.subheader("Bridge Gap Transparency\n- The leading digital hub that equips and connects grassroots Entreprenuers from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
 # Sample data (Replace with your actual data)
 
 
@@ -180,91 +184,128 @@ if st.session_state.logged_in and menu == "Dashboard":
     st.write(f"You are logged in as **{st.session_state.role}**.")
 
     role = st.session_state.role
+    
+
 
     # Donor Dashboard
     if role == "Donor":
-        st.header("Donor Dashboard")
-        st.info("Thank you for your contributions!")
-        st.write("Here you can view donor reports, funding impact, and financial transparency.")
+        #Donors sidebar
+        menu1 = st.sidebar.radio("Donors Links", [
+            "Home",
+            "Donor Reports",
+            "Project Updates",
+            "Community Stories",
+            "Impact Metrics",
+            "All Production Records"
+        ])
+
         # Add more donor-related content
         # You can add content or visuals for the donor reports here
         # Example donor data
-        donor_data = {
-        "Donor": ["Alice", "Bob", "Charlie"],
-        "Amount": [500,1000, 1500], 
-        "Project": ["Sunflower Farming", "Beekeeping", "Sunflower Farming"]
-        }
 
-        df = pd.DataFrame(donor_data)
+        if menu1 == "Donor Reports":
+            st.subheader("Donor Reports")
+            st.info("This section includes summarized reports for donors.")
+            st.markdown("- Funding used in Q1\n- Women trained: 1500\n- Beehives installed: 10\n- Briquettes made: 1,200kg")
+
+            donor_data = {
+            "Donor": ["Alice", "Bob", "Charlie"],
+            "Amount": [500,1000, 1500], 
+            "Project": ["Sunflower Farming", "Beekeeping", "Sunflower Farming"]
+            }
+
+            df = pd.DataFrame(donor_data)
 
         # Sample data (Replace with your actual data)
-       
 
-        # Display the donor report
-        updates = [
-        {"date": "2025-03-01", "update": "Successfully planted sunflowers on 5 acres."},
-        {"date": "2025-03-10", "update": "Started beekeeping training for 30 women."}
-        ]
-        st.write("### Project Updates")
-        data = {
-        'Village': ['Hydom', 'Dongobesh', 'Mbulu'],
-        'Farmers': [20, 15, 5],
-        'Acres': [50, 30, 10],
-        'Yield (kg)': [1500, 750, 300]
-        }
+        elif menu1=="Home":
+            st.header("Donor Dashboard")
+            st.info("Thank you for your contributions!")
+            st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
 
-        df = pd.DataFrame(data)
 
-        for update in updates:
-            st.write(f"**{update['date']}**: {update['update']}")
+        elif menu1 == "Project Updates":
+            st.subheader("Project Updates")
+            st.success("Recent activities in Dongobesh and Yaeda Kati:")
+            st.markdown("- Sunflower pressing workshop completed\n- Organic lotion production training done\n- Mobile app 'Bridge Gap Transparency' launched")
+
+            updates = [
+            {"date": "2025-03-01", "update": "Successfully planted sunflowers on 5 acres."},
+            {"date": "2025-03-10", "update": "Started beekeeping training for 30 women."}
+            ]
+            st.write("### Project Updates Visualization")
+            data = {
+            'Zone': ['Hydom', 'Dongobesh', 'Mbulu'],
+            'Women': [5, 20, 15],
+            'Acres': [10, 50, 30],
+            'Yield (kg)': [500, 1750, 1000]
+            }
+
+            df = pd.DataFrame(data)
+
+                
             #Displaying a bar chart
-            st.subheader('Farmers Per Village')
-            st.bar_chart(df.set_index('Village')['Farmers'])
+            st.subheader('Women Farmers Per Zone')
+            st.bar_chart(df.set_index('Zone')['Women'])
             #Displaying a line chart for acres
             st.subheader('Acres Under Cultivation')
-            st.line_chart(df.set_index('Village')['Acres'])
+            st.line_chart(df.set_index('Zone')['Acres'])
+            st.dataframe(df)
+
+
+        elif menu1 == "Community Stories":
+            # You can add content for community stories here
+            st.subheader("Community Stories")
+            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
+            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+            stories = [
+            {"name": "Jane Doe", "story": "The beekeeping project has transformed my life..."},
+            {"name": "Mary Smith", "story": "With the sunflower farming project, I can now support my family..."}
+            ]
+
+            
+            for story in stories:
+                st.write(f"**{story['name']}**: {story['story']}")
+
+        elif menu1 == "Impact Metrics":
+            st.subheader("Impacts Metrics")
+            # You can add visualizations for impact metrics here
+            # Example metrics
+            metrics = {
+            "Women Empowered": 200,
+            "Acres Farmed": 30,
+            "Briquettes Produced": 5000
+            }
+
+            # Display metrics
+            for metric, value in metrics.items():
+                st.write(f"**{metric}**: {value}")
+            
+            # Optional: Add a chart for visualizing impact
+            fig, ax = plt.subplots()
+            ax.bar(metrics.keys(), metrics.values())
+            st.pyplot(fig)
+
+        elif menu1 == "All Production Records":
+            st.subheader("All Community Production Entries")
+            try:
+                prod_df = pd.read_csv("production_records.csv")
+                st.dataframe(prod_df)
+            except FileNotFoundError:
+                st.warning("No production records found.")
+            data = {
+            'Village': ['Hydom', 'Dongobesh', 'Mbulu'],
+            'Farmers': [5, 20, 15],
+            'Acres': [10, 50, 30],
+            'Yield (kg)': [500, 1750, 1000]
+            }
+
+            df = pd.DataFrame(data)
             #Displaying a pie chart for total yield
             st.subheader('Total Yield (kg)')
             fig, ax = plt.subplots()
             ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
             st.pyplot(fig)
-
-
-        st.dataframe(df)
-
-        
-
-
-
-        st.subheader("Community Stories")
-        # You can add content for community stories here
-        stories = [
-        {"name": "Jane Doe", "story": "The beekeeping project has transformed my life..."},
-        {"name": "Mary Smith", "story": "With the sunflower farming project, I can now support my family..."}
-        ]
-
-        
-        for story in stories:
-            st.write(f"**{story['name']}**: {story['story']}")
-
-
-        st.subheader("Impact Metrics")
-        # You can add visualizations for impact metrics here
-        # Example metrics
-        metrics = {
-        "Women Empowered": 200,
-        "Acres Farmed": 30,
-        "Briquettes Produced": 5000
-        }
-
-        # Display metrics
-        for metric, value in metrics.items():
-            st.write(f"**{metric}**: {value}")
-        
-        # Optional: Add a chart for visualizing impact
-        fig, ax = plt.subplots()
-        ax.bar(metrics.keys(), metrics.values())
-        st.pyplot(fig)
 
     # Volunteer Dashboard
     elif role == "Volunteer":
@@ -282,10 +323,75 @@ if st.session_state.logged_in and menu == "Dashboard":
 
     # Community Member Dashboard
     elif role == "Community Member":
-        st.header("Community Member Dashboard")
-        st.info("Empowering our communities!")
-        st.write("Explore community stories, learning materials, and resources.")
+        #This is side bar
+        menu = st.sidebar.radio("Karibu Chagua viunganishi", [
+            "Home",
+            "Learning Materials",
+            "Community Stories",
+            "Daily Production Entry Form",
+            "All Production Records"
+        ])
         # Add community member content
+        # Community member sees daily production form
+
+
+        if menu == "Home":
+            st.header("Community Member Dashboard")
+            st.info("Empowering our communities! Together we can make greater impacts")
+            st.markdown("- Explore Community stories\n- Learning materials\n- Resources\n- Daily production reports and \n- Your Production Entries Records.")
+
+        elif menu == "Learning Materials":
+            st.subheader("Learning Materials")
+            st.success("Recent Learning Materials available:")
+            st.markdown("- Soap bar making\n- Liquid Soap production\n- Organic lotion production\n- Organic Skin care Cream\n- Cleaning Beeswax\n- Biomass Briquettes Production")
+
+        elif menu == "Community Stories":
+            st.subheader("Community Stories")
+            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
+            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+
+        elif menu == "Daily Production Entry Form":
+            #Start Daily production entry form
+            st.subheader("Daily Production Entry Form")
+
+            zones = ["Dongobesh", "Hydom", "Mbulu"]
+            zone = st.selectbox("Chagua Kanda yako", zones)
+
+            product_name = st.selectbox("Jina la Bidhaa", ["Liquid Soap", "Soap Bars", "Biomass Briquettes", "Skin Care Cream", "Lotion"])
+            unit_price = st.number_input("Bei yake", min_value=0.0, step=0.01)
+            quantity = st.number_input("Kiasi ulichozalisha", min_value=0, step=1)
+            comments = st.text_area("Maoni, Tafadhali weka maoni yako hapa (Optional)")
+
+            total_earnings = unit_price * quantity
+
+            if st.button("Wasilisha Taarifa"):
+                today = datetime.date.today()
+                data = {
+                    "Date": today,
+                    "Zone": zone,
+                    "Name": st.session_state.user_name,
+                    "Product": product_name,
+                    "Unit Price": unit_price,
+                    "Quantity": quantity,
+                    "Total Earnings": total_earnings,
+                    "Comments": comments
+                }
+                df = pd.DataFrame([data])
+                filename = f"production_records.csv"
+                if os.path.exists(filename):
+                    df.to_csv(filename, mode='a', index=False, header=False)
+                else:
+                    df.to_csv(filename, index=False)
+                st.success("Hongera umefanikiwa kuingiza taarifa zako!")
+
+        elif menu == "All Production Records":
+            st.subheader("All Your Production Entries")
+            try:
+                prod_df = pd.read_csv("production_records.csv")
+                st.dataframe(prod_df)
+            except FileNotFoundError:
+                st.warning("No production records found.")
+        #End of Daily production entry form
 
 # LOGOUT
 if st.session_state.logged_in and menu == "Logout":
