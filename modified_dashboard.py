@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
 import datetime
 from datetime import datetime 
 current_time=datetime.now 
@@ -282,9 +281,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                 st.write(f"**{metric}**: {value}")
             
             # Optional: Add a chart for visualizing impact
-            fig, ax = plt.subplots()
-            ax.bar(metrics.keys(), metrics.values())
-            st.pyplot(fig)
+            #fig, ax = plt.subplots()
+            #ax.bar(metrics.keys(), metrics.values())
+            #st.pyplot(fig)
 
         elif menu1 == "All Production Records":
             st.subheader("All Community Production Entries")
@@ -303,9 +302,9 @@ if st.session_state.logged_in and menu == "Dashboard":
             df = pd.DataFrame(data)
             #Displaying a pie chart for total yield
             st.subheader('Total Yield (kg)')
-            fig, ax = plt.subplots()
-            ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
-            st.pyplot(fig)
+            #fig, ax = plt.subplots()
+            #ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
+            #st.pyplot(fig)
 
     # Volunteer Dashboard
     elif role == "Volunteer":
