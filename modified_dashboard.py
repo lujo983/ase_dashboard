@@ -364,7 +364,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             total_earnings = unit_price * quantity
 
             if st.button("Wasilisha Taarifa"):
-                today2 = datetime.date.today()
+                today2 = datetime.date.today2()
                 data = {
                     "Date": today2,
                     "Zone": zone,
