@@ -12,9 +12,11 @@ st.markdown(
 
  <style>
 [data-testid="stSidebar"]{
-    background: linear-gradient(135deg, #4CAF50, #FFEB3B);
+    background: linear-gradient(white, #4CAF50, #FFEB3B);
    
 }
+
+
 [data-testid="stSidebarRadio"]{
     background-color:#061fab;
     color:white;
@@ -101,7 +103,7 @@ if 'logged_in' not in st.session_state:
     st.session_state.role = ""
 
 # Sidebar Navigation
-st.sidebar.image("ase_logo.jpg", width=200)
+st.sidebar.image("bridge gap tra.jpg", width=200)
 st.sidebar.title("Navigation")
 
 # Conditional menu
@@ -118,7 +120,7 @@ if menu == "Register":
         full_name = st.text_input("Full Name")
         email = st.text_input("Email Address")
         phone = st.text_input("Phone Number")
-        organization = st.text_input("Organization (Optional)")
+        organization = st.text_input("Mtaa (Optional)")
         role = st.selectbox("Role", ["Donor", "Volunteer", "Partner", "Community Member"])
         password = st.text_input("Password", type="password")
         confirm_password = st.text_input("Confirm Password", type="password")
@@ -173,7 +175,7 @@ if menu == "Login" and not st.session_state.logged_in:
             else:
                 st.error("Invalid email or password.")
 
-    st.subheader("Bridge Gap Transparency\n- The leading digital hub that equips and connects grassroots Entreprenuers from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
+    st.subheader("Community connect\n- The leading digital hub that equips and connects grassroots Entreprenuers, NGOs and CBO from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
 # Sample data (Replace with your actual data)
 
 
@@ -355,6 +357,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
             zones = ["Dongobesh", "Hydom", "Mbulu"]
             zone = st.selectbox("Chagua Kanda yako", zones)
+            
 
             product_name = st.selectbox("Jina la Bidhaa", ["Liquid Soap", "Soap Bars", "Biomass Briquettes", "Skin Care Cream", "Lotion"])
             unit_price = st.number_input("Bei yake", min_value=0.0, step=0.01)
@@ -364,9 +367,10 @@ if st.session_state.logged_in and menu == "Dashboard":
             total_earnings = unit_price * quantity
 
             if st.button("Wasilisha Taarifa"):
-                today2 = datetime.date.today2()
+                today= " 02-04-2026"
                 data = {
-                    "Date": today2,
+
+                    "Date": today,
                     "Zone": zone,
                     "Name": st.session_state.user_name,
                     "Product": product_name,
@@ -437,4 +441,3 @@ def partner_dashboard():
 def community_dashboard():
     st.header("Community Member Dashboard")
     st.write("Explore community stories and updates.")
-
