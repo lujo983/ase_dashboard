@@ -59,17 +59,9 @@ st.markdown(
 unsafe_allow_html=True
 )
 
-if st.button("Test Save Data"):
-    data = {
-        "name": "Test User",
-        "zone": "Mbulu",
-        "product_name": "Soap",
-        "quantity": 5,
-        "unit_price": 2000,
-        "total_earnings": 10000
-    }
-    supabase.table("records").insert(data).execute()
-    st.success("Data saved successfully!")
+response = supabase.table("records").select("*").execute()
+
+data = response.data
 
 # Encrypt password
 def encrypt_password(password):
