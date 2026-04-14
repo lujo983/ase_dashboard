@@ -59,9 +59,7 @@ st.markdown(
 unsafe_allow_html=True
 )
 
-response = supabase.table("records").select("*").execute()
 
-data = response.data
 
 # Encrypt password
 def encrypt_password(password):
@@ -167,6 +165,10 @@ if menu == "Register":
 # LOGIN FORM
 if menu == "Login" and not st.session_state.logged_in:
     st.subheader("Login to ASE Dashboard\n- Home of Entreprenuers")
+
+ response = supabase.table("records").select("*").execute()
+
+data = response.data
 
     with st.form("login_form"):
         email = st.text_input("Email Address")
