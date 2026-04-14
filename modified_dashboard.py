@@ -206,7 +206,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
 
             except Exception as e:
                 # This catches wrong passwords or non-existent emails
-                st.error("Invalid email or password.")
+                st.error("Umekosea email or password.")
 
 
     st.subheader("Community connect\n- The leading digital hub that equips and connects grassroots Entreprenuers, NGOs and CBO from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
