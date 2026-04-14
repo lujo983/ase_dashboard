@@ -11,31 +11,21 @@ url = st.secrets["SUPABASE_URL"]
 key = st.secrets["SUPABASE_KEY"]
 supabase = create_client(url, key)
 from st_supabase_connection import SupabaseConnection
-
 # Initialize connection
-st_supabase = st.connection("supabase", type=SupabaseConnection)
-
-# Query your table
-rows = st_supabase.table("records").select("*").execute()
-
-st.write(rows.data)
-
-# Initialize connection using secrets from .streamlit/secrets.toml
 conn = st.connection("supabase", type=SupabaseConnection)
-st.title("Supabase Connection Test")
 
-if st.button("Insert Test Data"):
+def register_user(email, password):
     try:
-        # Replace 'mytable' and the column names with your actual table structure
-        data = {"name": "Test User", "pet": "Dog"}
-        
-        # Perform the insertion
-        response = conn.table("test").insert(data).execute()
-        
-        st.success("Successfully inserted data!")
-        st.write("Response:", response.data)
+        # This creates the user in Supabase Auth
+        response = conn.client.auth.sign_up({
+            "email": email, 
+            "password": password
+        })
+        st.success("Registration successful! Check your email for a confirmation link.")
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Registration failed: {e}")
+
+# Use this inside your 'if st.button("Register"):' block
 
 
 
