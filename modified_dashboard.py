@@ -441,7 +441,7 @@ if st.sidebar.button("Logout"):
     st.session_state.logged_in = False
     st.session_state.clear()
     st.rerun()
-    st.success("You have been logged out.")
+    st.success("You have been logged out successful.")
 
 
 def donor_dashboard():
