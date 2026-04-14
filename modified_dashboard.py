@@ -18,7 +18,7 @@ st_supabase = st.connection("supabase", type=SupabaseConnection)
 # Query your table
 rows = st_supabase.table("records").select("*").execute()
 
-st.write(data)
+st.write(rows.data)
 
 
 #costom css
