@@ -430,12 +430,6 @@ if st.session_state.logged_in and menu == "Dashboard":
         #End of Daily production entry form
 
 # LOGOUT
-if st.session_state.logged_in and menu == "Logout":
-    st.session_state.logged_in = False
-    st.session_state.user_name = ""
-    st.session_state.role = ""
-    st.success("You have been logged out.")
-
 if st.sidebar.button("Logout"):
     conn.client.auth.sign_out()
     st.session_state.logged_in = False
