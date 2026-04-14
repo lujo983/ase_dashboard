@@ -121,23 +121,38 @@ else:
     menu = st.sidebar.radio("Menu", ["Dashboard", "Logout"])
 
 # REGISTRATION FORM
-         if submitted:
+# REGISTRATION FORM
+if menu == "Register":
+    st.subheader("Register for ASE Dashboard.")
+
+    with st.form("registration_form", clear_on_submit=True):
+        full_name = st.text_input("Full Name")
+        email = st.text_input("Email Address")
+        phone = st.text_input("Phone Number")
+        organization = st.text_input("Mtaa (Optional)")
+        role = st.selectbox("Role", ["Donor", "Volunteer", "Partner", "Community Member"])
+        password = st.text_input("Password", type="password")
+        confirm_password = st.text_input("Confirm Password", type="password")
+
+        submitted = st.form_submit_button("Register")
+
+        # THIS SECTION MUST BE INDENTED TO MATCH THE INPUTS ABOVE
+        if submitted:
             if not full_name or not email or not phone or not password:
                 st.warning("Please fill in all required fields.")
             elif password != confirm_password:
                 st.error("Passwords do not match.")
             else:
                 try:
-                    # 1. Create the Auth Account (Handles encryption for you)
+                    # 1. Sign up the user in Supabase Auth
                     auth_res = conn.client.auth.sign_up({
                         "email": email, 
                         "password": password
                     })
                     
-                    # Get the unique ID created by Supabase
                     user_id = auth_res.user.id
 
-                    # 2. Save additional profile data to the 'profiles' table
+                    # 2. Insert profile data into your table
                     profile_data = {
                         "id": user_id,
                         "full_name": full_name,
@@ -147,13 +162,10 @@ else:
                     }
                     
                     conn.table("profiles").insert(profile_data).execute()
-
                     st.success("Registration successful! You can now log in.")
                     
                 except Exception as e:
-                    # Handle errors like 'Email already registered'
                     st.error(f"Registration error: {e}")
-
 
 
 
