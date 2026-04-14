@@ -21,6 +21,23 @@ rows = st_supabase.table("records").select("*").execute()
 st.write(rows.data)
 
 
+st.title("Supabase Connection Test")
+
+if st.button("Insert Test Data"):
+    try:
+        # Replace 'mytable' and the column names with your actual table structure
+        data = {"name": "Test User", "pet": "Dog"}
+        
+        # Perform the insertion
+        response = conn.table("test").insert(data).execute()
+        
+        st.success("Successfully inserted data!")
+        st.write("Response:", response.data)
+    except Exception as e:
+        st.error(f"Error: {e}")
+
+
+
 #costom css
 st.markdown(
 """
