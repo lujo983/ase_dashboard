@@ -121,7 +121,7 @@ else:
     menu = st.sidebar.radio("Menu", ["Dashboard", "Logout"])
 
 # REGISTRATION FORM
-        if submitted:
+         if submitted:
             if not full_name or not email or not phone or not password:
                 st.warning("Please fill in all required fields.")
             elif password != confirm_password:
@@ -153,6 +153,8 @@ else:
                 except Exception as e:
                     # Handle errors like 'Email already registered'
                     st.error(f"Registration error: {e}")
+
+
 
 
 # LOGIN FORM
