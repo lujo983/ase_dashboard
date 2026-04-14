@@ -10,6 +10,15 @@ from supabase import create_client
 url = st.secrets["SUPABASE_URL"] 
 key = st.secrets["SUPABASE_KEY"]
 supabase = create_client(url, key)
+from st_supabase_connection import SupabaseConnection
+
+# Initialize connection
+st_supabase = st.connection("supabase", type=SupabaseConnection)
+
+# Query your table
+rows = st_supabase.table("records").select("*").execute()
+
+st.write(rows.data)
 
 
 #costom css
