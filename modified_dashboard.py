@@ -14,21 +14,6 @@ from st_supabase_connection import SupabaseConnection
 # Initialize connection
 conn = st.connection("supabase", type=SupabaseConnection)
 
-def register_user(email, password):
-    try:
-        # This creates the user in Supabase Auth
-        response = conn.client.auth.sign_up({
-            "email": email, 
-            "password": password
-        })
-        st.success("Registration successful! Check your email for a confirmation link.")
-    except Exception as e:
-        st.error(f"Registration failed: {e}")
-
-# Use this inside your 'if st.button("Register"):' block
-
-
-
 #costom css
 st.markdown(
 """
