@@ -61,7 +61,7 @@ unsafe_allow_html=True
 
 if st.button("Test Save Data"):
     data = {
-        "name": "Test User",
+        "name2": "Test User",
         "zone": "Mbulu",
         "product_name": "Soap",
         "quantity": 5,
