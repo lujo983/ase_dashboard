@@ -165,11 +165,6 @@ if menu == "Register":
 # LOGIN FORM
 if menu == "Login" and not st.session_state.logged_in:
     st.subheader("Login to ASE Dashboard\n- Home of Entreprenuers")
-
- response = supabase.table("records").select("*").execute()
-
-data = response.data
-
     with st.form("login_form"):
         email = st.text_input("Email Address")
         password = st.text_input("Password", type="password")
