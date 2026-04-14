@@ -170,22 +170,44 @@ if menu == "Register":
 
 
 # LOGIN FORM
-if menu == "Login" and not st.session_state.logged_in:
-    st.subheader("Login to ASE Dashboard\n- Home of Entreprenuers")
+if menu == "Login" and not st.session_state.get("logged_in", False):
+    st.subheader("Login to ASE Dashboard\n- Home of Entrepreneurs")
+    
     with st.form("login_form"):
         email = st.text_input("Email Address")
         password = st.text_input("Password", type="password")
         login_submit = st.form_submit_button("Login")
 
         if login_submit:
-            success, name, role = check_credentials(email, password)
-            if success:
-                st.session_state.logged_in = True
-                st.session_state.user_name = name
-                st.session_state.role = role
-                st.success(f"Welcome {name}! You are logged in as {role}.")
-            else:
+            try:
+                # 1. Authenticate with Supabase
+                res = conn.client.auth.sign_in_with_password({
+                    "email": email,
+                    "password": password
+                })
+                
+                # 2. Get the User ID from the successful login
+                user_id = res.user.id
+                
+                # 3. Fetch the profile details (Name and Role) from your table
+                profile = conn.table("profiles").select("full_name, role").eq("id", user_id).single().execute()
+                
+                if profile.data:
+                    # 4. Save to session state
+                    st.session_state.logged_in = True
+                    st.session_state.user_id = user_id
+                    st.session_state.user_name = profile.data["full_name"]
+                    st.session_state.role = profile.data["role"]
+                    
+                    st.success(f"Welcome {st.session_state.user_name}! You are logged in as {st.session_state.role}.")
+                    st.rerun() # Refresh to update the menu/dashboard
+                else:
+                    st.error("Profile not found. Please contact support.")
+
+            except Exception as e:
+                # This catches wrong passwords or non-existent emails
                 st.error("Invalid email or password.")
+
 
     st.subheader("Community connect\n- The leading digital hub that equips and connects grassroots Entreprenuers, NGOs and CBO from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
 # Sample data (Replace with your actual data)
