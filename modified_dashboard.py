@@ -20,7 +20,8 @@ rows = st_supabase.table("records").select("*").execute()
 
 st.write(rows.data)
 
-
+# Initialize connection using secrets from .streamlit/secrets.toml
+conn = st.connection("supabase", type=SupabaseConnection)
 st.title("Supabase Connection Test")
 
 if st.button("Insert Test Data"):
