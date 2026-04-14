@@ -5,6 +5,12 @@ from datetime import datetime
 current_time=datetime.now 
 import hashlib
 import os
+from supabase import create_client
+
+url = st.secrets["SUPABASE_URL"]
+key = st.secrets["SUPABASE_KEY"]
+supabase = create_client(url, key)
+
 
 #costom css
 st.markdown(
