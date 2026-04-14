@@ -121,48 +121,39 @@ else:
     menu = st.sidebar.radio("Menu", ["Dashboard", "Logout"])
 
 # REGISTRATION FORM
-if menu == "Register":
-    st.subheader("Register for ASE Dashboard.")
-
-    with st.form("registration_form", clear_on_submit=True):
-        full_name = st.text_input("Full Name")
-        email = st.text_input("Email Address")
-        phone = st.text_input("Phone Number")
-        organization = st.text_input("Mtaa (Optional)")
-        role = st.selectbox("Role", ["Donor", "Volunteer", "Partner", "Community Member"])
-        password = st.text_input("Password", type="password")
-        confirm_password = st.text_input("Confirm Password", type="password")
-
-        submitted = st.form_submit_button("Register")
-
         if submitted:
             if not full_name or not email or not phone or not password:
                 st.warning("Please fill in all required fields.")
             elif password != confirm_password:
                 st.error("Passwords do not match.")
             else:
-                encrypted_password = encrypt_password(password)
-
-                user_data = {
-                    "Full Name": full_name,
-                    "Email": email,
-                    "Phone": phone,
-                    "Organization": organization,
-                    "Role": role,
-                    "Encrypted Password": encrypted_password,
-                    "Registration Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-
                 try:
-                    df_existing = pd.read_csv("registrations.csv")
-                    df_new = pd.DataFrame([user_data])
-                    df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-                    df_combined.to_csv("registrations.csv", index=False)
-                except FileNotFoundError:
-                    df_new = pd.DataFrame([user_data])
-                    df_new.to_csv("registrations.csv", index=False)
+                    # 1. Create the Auth Account (Handles encryption for you)
+                    auth_res = conn.client.auth.sign_up({
+                        "email": email, 
+                        "password": password
+                    })
+                    
+                    # Get the unique ID created by Supabase
+                    user_id = auth_res.user.id
 
-                st.success(f"Registration successful! You can now log in.")
+                    # 2. Save additional profile data to the 'profiles' table
+                    profile_data = {
+                        "id": user_id,
+                        "full_name": full_name,
+                        "phone": phone,
+                        "organization": organization,
+                        "role": role
+                    }
+                    
+                    conn.table("profiles").insert(profile_data).execute()
+
+                    st.success("Registration successful! You can now log in.")
+                    
+                except Exception as e:
+                    # Handle errors like 'Email already registered'
+                    st.error(f"Registration error: {e}")
+
 
 # LOGIN FORM
 if menu == "Login" and not st.session_state.logged_in:
