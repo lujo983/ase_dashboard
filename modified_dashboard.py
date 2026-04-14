@@ -61,7 +61,6 @@ unsafe_allow_html=True
 
 if st.button("Test Save Data"):
     data = {
-        "id": 87,
         "name": "Test User",
         "zone": "Mbulu",
         "product_name": "Soap",
@@ -69,7 +68,6 @@ if st.button("Test Save Data"):
         "unit_price": 2000,
         "total_earnings": 10000
     }
-
     supabase.table("records").insert(data).execute()
     st.success("Data saved successfully!")
 
