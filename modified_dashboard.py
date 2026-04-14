@@ -59,7 +59,7 @@ st.markdown(
 unsafe_allow_html=True
 )
 
-response = supabase.table("records").select("*").execute()
+response = supabase.table("recordss").select("*").execute()
 
 data = response.data
 
