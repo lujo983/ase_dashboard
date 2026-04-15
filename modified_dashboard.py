@@ -8,7 +8,7 @@ import os
 from supabase import create_client 
 
 url = st.secrets["SUPABASE_URL"]  
-key = st.secrets["SUPABASE_KEY"]
+key = st.secrets["SUPABASE_KEY"] 
 supabase = create_client(url, key)
 from st_supabase_connection import SupabaseConnection
 # Initialize connection
@@ -129,7 +129,7 @@ if menu == "Register":
         email = st.text_input("Email Address")
         phone = st.text_input("Phone Number")
         organization = st.text_input("Mtaa (Optional)")
-        role = st.selectbox("Role", ["Admin","Donor", "Volunteer", "Partner", "Community Member"])
+        role = st.selectbox("Role", ["Donor", "Volunteer", "Partner", "Community Member"])
         password = st.text_input("Password", type="password")
         confirm_password = st.text_input("Confirm Password", type="password")
 
@@ -362,7 +362,6 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Community Stories",
             "Daily Production Entry Form",
             "All Production Records"
-            "Admin"
         ])
         # Add community member content
         # Community member sees daily production form
