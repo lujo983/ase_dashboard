@@ -420,15 +420,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         st.error(f"Imeshindikana kuhifadhi: {e}")
                 else:
                     st.error("Tafadhali ingia (Login) kwanza ili kuwasilisha taarifa.")
-            
-            
-                     elif menu == "All Production Records":
-                        st.subheader("All Your Production Entries")
-                        try:
-                            prod_df = pd.read_csv("production_records.csv")
-                            st.dataframe(prod_df)
-                        except FileNotFoundError:
-                            st.warning("No production records found.")
+                      
                     #End of Daily production entry form
 
 # LOGOUT
