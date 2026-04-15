@@ -422,7 +422,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                     st.error("Tafadhali ingia (Login) kwanza ili kuwasilisha taarifa.")
                       
                     #End of Daily production entry form
-          elif menu == "All Production Records":
+         elif menu == "All Production Records":
              st.subheader("📊 All Your Production Entries")
              
              if "user_id" in st.session_state:
