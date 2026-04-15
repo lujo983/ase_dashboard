@@ -375,17 +375,15 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.subheader("Learning Materials")
             st.success("Recent Learning Materials available:")
             st.markdown("- Soap bar making\n- Liquid Soap production\n- Organic lotion production\n- Organic Skin care Cream\n- Cleaning Beeswax\n- Biomass Briquettes Production")
- 
-            
-                elif menu == "Community Stories":
-                    st.subheader("Community Stories")
-                    st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
-                    st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
-                elif menu == "All Production Records":
-                     st.subheader("📊 All Your Production Entries/Taarifa za uzalishaji wako")
+        elif menu == "Community Stories":
+            st.subheader("Community Stories")
+            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
+            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+         elif menu == "All Production Records":
+             st.subheader("📊 All Your Production Entries/Taarifa za uzalishaji wako")
                      
-                     if "user_id" in st.session_state:
-                         try:
+              if "user_id" in st.session_state:
+                  try:
                              # 1. Fetch data from Supabase for this specific user
                              # RLS ensures they only get their own data, but we filter by user_id to be explicit
                              response = conn.table("production_records") \
@@ -421,6 +419,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                              st.error(f"Error fetching data: {e}")
                      else:
                          st.warning("Please login to view your records.")
+ 
                  
         elif menu == "Daily Production Entry Form":
             # Start Daily production entry form
