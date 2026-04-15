@@ -385,40 +385,42 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
 
         elif menu == "Daily Production Entry Form":
-            #Start Daily production entry form
-            st.subheader("Daily Production Entry Form")
+# Start Daily production entry form
+st.subheader("Daily Production Entry Form")
 
-            zones = ["Dongobesh", "Hydom", "Mbulu"]
-            zone = st.selectbox("Chagua Kanda yako", zones)
-            
+zones = ["Dongobesh", "Hydom", "Mbulu"]
+zone = st.selectbox("Chagua Kanda yako", zones)
 
-            product_name = st.selectbox("Jina la Bidhaa", ["Liquid Soap", "Soap Bars", "Biomass Briquettes", "Skin Care Cream", "Lotion"])
-            unit_price = st.number_input("Bei yake", min_value=0.0, step=0.01)
-            quantity = st.number_input("Kiasi ulichozalisha", min_value=0, step=1)
-            comments = st.text_area("Maoni, Tafadhali weka maoni yako hapa (Optional)")
+product_name = st.selectbox("Jina la Bidhaa", ["Liquid Soap", "Soap Bars", "Biomass Briquettes", "Skin Care Cream", "Lotion"])
+unit_price = st.number_input("Bei yake", min_value=0.0, step=0.01)
+quantity = st.number_input("Kiasi ulichozalisha", min_value=0, step=1)
+comments = st.text_area("Maoni, Tafadhali weka maoni yako hapa (Optional)")
 
-            total_earnings = unit_price * quantity
+total_earnings = unit_price * quantity
 
-            if st.button("Wasilisha Taarifa"):
-                today= " 02-04-2026"
-                data = {
+if st.button("Wasilisha Taarifa"):
+    # Ensure user is logged in to get their ID
+    if "user_id" in st.session_state:
+        production_data = {
+            "user_id": st.session_state.user_id,
+            "user_name": st.session_state.user_name,
+            "zone": zone,
+            "product_name": product_name,
+            "unit_price": unit_price,
+            "quantity": quantity,
+            "total_earnings": total_earnings,
+            "comments": comments
+        }
 
-                    "Date": today,
-                    "Zone": zone,
-                    "Name": st.session_state.user_name,
-                    "Product": product_name,
-                    "Unit Price": unit_price,
-                    "Quantity": quantity,
-                    "Total Earnings": total_earnings,
-                    "Comments": comments
-                }
-                df = pd.DataFrame([data])
-                filename = f"production_records.csv"
-                if os.path.exists(filename):
-                    df.to_csv(filename, mode='a', index=False, header=False)
-                else:
-                    df.to_csv(filename, index=False)
-                st.success("Hongera umefanikiwa kuingiza taarifa zako!")
+        try:
+            # Insert into Supabase
+            conn.table("production_records").insert(production_data).execute()
+            st.success("Hongera! Umefanikiwa kuingiza taarifa zako kwenye kanzidata.")
+        except Exception as e:
+            st.error(f"Imeshindikana kuhifadhi: {e}")
+    else:
+        st.error("Tafadhali ingia (Login) kwanza ili kuwasilisha taarifa.")
+
 
         elif menu == "All Production Records":
             st.subheader("All Your Production Entries")
