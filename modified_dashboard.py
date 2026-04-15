@@ -362,64 +362,10 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Community Stories",
             "Daily Production Entry Form",
             "All Production Records"
+            "Admin"
         ])
         # Add community member content
         # Community member sees daily production form
-             
-        elif role == "Admin":
-             st.title("👑 Admin Management Dashboard")
-             
-             tabs = st.tabs(["User Management", "Production Overview", "System Logs"])
-         
-             # --- TAB 1: USER MANAGEMENT ---
-             with tabs[0]:
-                 st.subheader("All Registered Users")
-                 try:
-                     # Fetch all profiles
-                     users_res = conn.table("profiles").select("*").execute()
-                     if users_res.data:
-                         users_df = pd.DataFrame(users_res.data)
-                         st.dataframe(users_df, use_container_width=True)
-                         
-                         # Simple User Lookup/Editor
-                         st.divider()
-                         selected_user = st.selectbox("Select a user to manage", users_df["full_name"].tolist())
-                         if st.button("Delete User (Permanent)"):
-                             st.warning(f"Are you sure you want to delete {selected_user}?")
-                             # Note: Deleting from auth.users requires Service Role, 
-                             # but you can delete the profile here.
-                     else:
-                         st.info("No users found.")
-                 except Exception as e:
-                     st.error(f"User Fetch Error: {e}")
-         
-             # --- TAB 2: PRODUCTION OVERVIEW ---
-             with tabs[1]:
-                 st.subheader("Global Production Records")
-                 try:
-                     # Fetch ALL production records from everyone
-                     all_prod = conn.table("production_records").select("*").order("created_at", desc=True).execute()
-                     
-                     if all_prod.data:
-                         all_df = pd.DataFrame(all_prod.data)
-                         
-                         # Pro Admin Metrics
-                         c1, c2, c3 = st.columns(3)
-                         c1.metric("Total Revenue", f"Tsh {all_df['total_earnings'].sum():,.2f}")
-                         c2.metric("Total Units", f"{all_df['quantity'].sum():,}")
-                         c3.metric("Total Entries", len(all_df))
-                         
-                         # Visual Chart
-                         st.bar_chart(data=all_df, x="product_name", y="total_earnings")
-                         
-                         st.dataframe(all_df, use_container_width=True)
-                     else:
-                         st.info("No production data available.")
-                 except Exception as e:
-                     st.error(f"Production Fetch Error: {e}")
-
-
-
         if menu == "Home":
             st.header("Community Member Dashboard")
             st.info("Empowering our communities! Together we can make greater impacts")
@@ -475,6 +421,58 @@ if st.session_state.logged_in and menu == "Dashboard":
                      st.error(f"Error fetching data: {e}")
              else:
                  st.warning("Please login to view your records.")
+         elif menu == "Admin":
+             st.title("👑 Admin Management Dashboard")
+             
+             tabs = st.tabs(["User Management", "Production Overview", "System Logs"])
+         
+             # --- TAB 1: USER MANAGEMENT ---
+             with tabs[0]:
+                 st.subheader("All Registered Users")
+                 try:
+                     # Fetch all profiles
+                     users_res = conn.table("profiles").select("*").execute()
+                     if users_res.data:
+                         users_df = pd.DataFrame(users_res.data)
+                         st.dataframe(users_df, use_container_width=True)
+                         
+                         # Simple User Lookup/Editor
+                         st.divider()
+                         selected_user = st.selectbox("Select a user to manage", users_df["full_name"].tolist())
+                         if st.button("Delete User (Permanent)"):
+                             st.warning(f"Are you sure you want to delete {selected_user}?")
+                             # Note: Deleting from auth.users requires Service Role, 
+                             # but you can delete the profile here.
+                     else:
+                         st.info("No users found.")
+                 except Exception as e:
+                     st.error(f"User Fetch Error: {e}")
+         
+             # --- TAB 2: PRODUCTION OVERVIEW ---
+             with tabs[1]:
+                 st.subheader("Global Production Records")
+                 try:
+                     # Fetch ALL production records from everyone
+                     all_prod = conn.table("production_records").select("*").order("created_at", desc=True).execute()
+                     
+                     if all_prod.data:
+                         all_df = pd.DataFrame(all_prod.data)
+                         
+                         # Pro Admin Metrics
+                         c1, c2, c3 = st.columns(3)
+                         c1.metric("Total Revenue", f"Tsh {all_df['total_earnings'].sum():,.2f}")
+                         c2.metric("Total Units", f"{all_df['quantity'].sum():,}")
+                         c3.metric("Total Entries", len(all_df))
+                         
+                         # Visual Chart
+                         st.bar_chart(data=all_df, x="product_name", y="total_earnings")
+                         
+                         st.dataframe(all_df, use_container_width=True)
+                     else:
+                         st.info("No production data available.")
+                 except Exception as e:
+                     st.error(f"Production Fetch Error: {e}")
+
 
         elif menu == "Daily Production Entry Form":
             # Start Daily production entry form
