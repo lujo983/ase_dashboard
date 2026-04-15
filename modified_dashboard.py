@@ -12,7 +12,7 @@ key = st.secrets["SUPABASE_KEY"]
 supabase = create_client(url, key)
 from st_supabase_connection import SupabaseConnection
 # Initialize connection
-conn = st.connection("supabase", type=SupabaseConnection)
+conn = st.connection("supabase", type=SupabaseConnection) 
 
 #costom css
 st.markdown(
@@ -408,7 +408,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          # 4. Show Summary Metrics at the top
                          col1, col2, col3 = st.columns(3)
                          col1.metric("Total Entries/Uzalishaji", len(prod_df))
-                         col2.metric("Total Quantity/Kiasi ulichozalisha", f"{prod_df['Qty'].sum():,}")
+                         col2.metric("Total Quantity/Jumla uliyozalisha", f"{prod_df['Qty'].sum():,}")
                          col3.metric("Total Earnings/Jumla ya Mapato", f"Tsh {prod_df['Total'].sum():,.2f}")
          
                          # 5. Display the data table with styling
