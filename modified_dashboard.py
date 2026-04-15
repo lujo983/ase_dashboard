@@ -257,7 +257,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.info("Thank you for your contributions!")
             st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
          
-        elif menu1 == "donor":
+        elif menu1 == "Admin":
              st.title("👑 Admin Management Dashboard")
              
              tabs = st.tabs(["User Management", "Production Overview", "System Logs"])
