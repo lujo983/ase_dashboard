@@ -415,7 +415,7 @@ if st.button("Wasilisha Taarifa"):
         try:
             # Insert into Supabase
             conn.table("production_records").insert(production_data).execute()
-            st.success("Hongera! Umefanikiwa kuingiza taarifa zako kwenye kanzidata.")
+            st.success("Hongera! Umefanikiwa kuingiza taarifa zako kwenye kanzidata2.")
         except Exception as e:
             st.error(f"Imeshindikana kuhifadhi: {e}")
     else:
