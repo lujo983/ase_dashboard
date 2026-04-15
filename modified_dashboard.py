@@ -51,7 +51,7 @@ st.markdown(
 
         /* Entire page background gradient */
     .stApp {
-        background: linear-gradient(to right, white, white);
+        background: linear-gradient(to right, #FFCC00, #06ab71);
         color: black;
     }
 
