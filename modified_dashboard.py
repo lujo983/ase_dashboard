@@ -375,105 +375,111 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.subheader("Learning Materials")
             st.success("Recent Learning Materials available:")
             st.markdown("- Soap bar making\n- Liquid Soap production\n- Organic lotion production\n- Organic Skin care Cream\n- Cleaning Beeswax\n- Biomass Briquettes Production")
-        elif menu == "Admin":
+        elif menu == "Admin Panel":
             st.title("👑 Admin Management Dashboard")
+            
+            # Create the tabs
+            tab1, tab2, tab3 = st.tabs(["User Management", "Production Overview", "System Logs"])
+        
+            # --- TAB 1: USER MANAGEMENT ---
+            with tab1:
+                st.subheader("All Registered Users")
+                try:
+                    # Fetch all profiles
+                    users_res = conn.table("profiles").select("*").execute()
+                    if users_res.data:
+                        users_df = pd.DataFrame(users_res.data)
+                        st.dataframe(users_df, use_container_width=True)
+                        
+                        # Simple User Lookup/Editor
+                        st.divider()
+                        user_list = users_df["full_name"].tolist()
+                        selected_user = st.selectbox("Select a user to manage", user_list)
+                        
+                        if st.button("Delete User (Permanent)"):
+                            st.warning(f"Are you sure you want to delete {selected_user}?")
+                            # Note: You can add deletion logic here later
+                    else:
+                        st.info("No users found.")
+                except Exception as e:
+                    st.error(f"User Fetch Error: {e}")
+        
+            # --- TAB 2: PRODUCTION OVERVIEW ---
+            with tab2:
+                st.subheader("Global Production Records")
+                try:
+                    # Fetch ALL production records from everyone
+                    all_prod = conn.table("production_records").select("*").order("created_at", desc=True).execute()
+                    
+                    if all_prod.data:
+                        all_df = pd.DataFrame(all_prod.data)
+                        
+                        # Pro Admin Metrics
+                        c1, c2, c3 = st.columns(3)
+                        total_rev = all_df['total_earnings'].sum()
+                        total_qty = all_df['quantity'].sum()
+                        
+                        c1.metric("Total Revenue", f"Tsh {total_rev:,.2f}")
+                        c2.metric("Total Units", f"{total_qty:,}")
+                        c3.metric("Total Entries", len(all_df))
+                        
+                        # Visual Chart
+                        st.bar_chart(data=all_df, x="product_name", y="total_earnings")
+                        
+                        st.dataframe(all_df, use_container_width=True)
+                    else:
+                        st.info("No production data available.")
+                except Exception as e:
+                    st.error(f"Production Fetch Error: {e}")
+        
+            # --- TAB 3: SYSTEM LOGS ---
+            with tab3:
+                st.info("System logs and audit trails will appear here.")
+            
+                elif menu == "Community Stories":
+                    st.subheader("Community Stories")
+                    st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
+                    st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+                elif menu == "All Production Records":
+                     st.subheader("📊 All Your Production Entries/Taarifa za uzalishaji wako")
                      
-            tabs = st.tabs(["User Management", "Production Overview", "System Logs"])
+                     if "user_id" in st.session_state:
+                         try:
+                             # 1. Fetch data from Supabase for this specific user
+                             # RLS ensures they only get their own data, but we filter by user_id to be explicit
+                             response = conn.table("production_records") \
+                                 .select("created_at, zone, product_name, unit_price, quantity, total_earnings, comments") \
+                                 .eq("user_id", st.session_state.user_id) \
+                                 .order("created_at", desc=True) \
+                                 .execute()
                  
-                      # --- TAB 1: USER MANAGEMENT ---
-                      with tabs[0]:
-                          st.subheader("All Registered Users")
-                          try:
-                              # Fetch all profiles
-                              users_res = conn.table("profiles").select("*").execute()
-                              if users_res.data:
-                                  users_df = pd.DataFrame(users_res.data)
-                                  st.dataframe(users_df, use_container_width=True)
-                                  
-                                  # Simple User Lookup/Editor
-                                  st.divider()
-                                  selected_user = st.selectbox("Select a user to manage", users_df["full_name"].tolist())
-                                  if st.button("Delete User (Permanent)"):
-                                      st.warning(f"Are you sure you want to delete {selected_user}?")
-                                      # Note: Deleting from auth.users requires Service Role, 
-                                      # but you can delete the profile here.
-                              else:
-                                  st.info("No users found.")
-                          except Exception as e:
-                              st.error(f"User Fetch Error: {e}")
-                  
-                      # --- TAB 2: PRODUCTION OVERVIEW ---
-                      with tabs[1]:
-                          st.subheader("Global Production Records")
-                          try:
-                              # Fetch ALL production records from everyone
-                              all_prod = conn.table("production_records").select("*").order("created_at", desc=True).execute()
-                              
-                              if all_prod.data:
-                                  all_df = pd.DataFrame(all_prod.data)
-                                  
-                                  # Pro Admin Metrics
-                                  c1, c2, c3 = st.columns(3)
-                                  c1.metric("Total Revenue", f"Tsh {all_df['total_earnings'].sum():,.2f}")
-                                  c2.metric("Total Units", f"{all_df['quantity'].sum():,}")
-                                  c3.metric("Total Entries", len(all_df))
-                                  
-                                  # Visual Chart
-                                  st.bar_chart(data=all_df, x="product_name", y="total_earnings")
-                                  
-                                  st.dataframe(all_df, use_container_width=True)
-                              else:
-                                  st.info("No production data available.")
-                          except Exception as e:
-                              st.error(f"Production Fetch Error: {e}")
-
-
-
-       
-        elif menu == "Community Stories":
-            st.subheader("Community Stories")
-            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
-            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
-        elif menu == "All Production Records":
-             st.subheader("📊 All Your Production Entries/Taarifa za uzalishaji wako")
-             
-             if "user_id" in st.session_state:
-                 try:
-                     # 1. Fetch data from Supabase for this specific user
-                     # RLS ensures they only get their own data, but we filter by user_id to be explicit
-                     response = conn.table("production_records") \
-                         .select("created_at, zone, product_name, unit_price, quantity, total_earnings, comments") \
-                         .eq("user_id", st.session_state.user_id) \
-                         .order("created_at", desc=True) \
-                         .execute()
-         
-                     if response.data:
-                         # 2. Convert to DataFrame
-                         prod_df = pd.DataFrame(response.data)
-         
-                         # 3. Clean up formatting for a "Pro" look 
-                         prod_df.columns = ["Date", "Zone", "Product", "Price", "Qty", "Total", "Comments"]
-                         prod_df["Date"] = pd.to_datetime(prod_df["Date"]).dt.strftime('%Y-%m-%d %H:%M')
-         
-                         # 4. Show Summary Metrics at the top
-                         col1, col2, col3 = st.columns(3)
-                         col1.metric("Total Entries/Uzalishaji", len(prod_df))
-                         col2.metric("Total Quantity/Jumla uliyozalisha", f"{prod_df['Qty'].sum():,}")
-                         col3.metric("Total Earnings/Jumla ya Mapato", f"Tsh {prod_df['Total'].sum():,.2f}")
-         
-                         # 5. Display the data table with styling
-                         st.dataframe(prod_df, use_container_width=True, hide_index=True)
-                         
-                         # 6. Option to Download as CSV (for their own records)
-                         csv = prod_df.to_csv(index=False).encode('utf-8')
-                         st.download_button("📥 Download Records as CSV", data=csv, file_name="my_production.csv", mime="text/csv")
+                             if response.data:
+                                 # 2. Convert to DataFrame
+                                 prod_df = pd.DataFrame(response.data)
+                 
+                                 # 3. Clean up formatting for a "Pro" look 
+                                 prod_df.columns = ["Date", "Zone", "Product", "Price", "Qty", "Total", "Comments"]
+                                 prod_df["Date"] = pd.to_datetime(prod_df["Date"]).dt.strftime('%Y-%m-%d %H:%M')
+                 
+                                 # 4. Show Summary Metrics at the top
+                                 col1, col2, col3 = st.columns(3)
+                                 col1.metric("Total Entries/Uzalishaji", len(prod_df))
+                                 col2.metric("Total Quantity/Jumla uliyozalisha", f"{prod_df['Qty'].sum():,}")
+                                 col3.metric("Total Earnings/Jumla ya Mapato", f"Tsh {prod_df['Total'].sum():,.2f}")
+                 
+                                 # 5. Display the data table with styling
+                                 st.dataframe(prod_df, use_container_width=True, hide_index=True)
+                                 
+                                 # 6. Option to Download as CSV (for their own records)
+                                 csv = prod_df.to_csv(index=False).encode('utf-8')
+                                 st.download_button("📥 Download Records as CSV", data=csv, file_name="my_production.csv", mime="text/csv")
+                             else:
+                                 st.info("Bado hujaingiza taarifa zozote za uzalishaji.")
+                                 
+                         except Exception as e:
+                             st.error(f"Error fetching data: {e}")
                      else:
-                         st.info("Bado hujaingiza taarifa zozote za uzalishaji.")
-                         
-                 except Exception as e:
-                     st.error(f"Error fetching data: {e}")
-             else:
-                 st.warning("Please login to view your records.")
+                         st.warning("Please login to view your records.")
                  
         elif menu == "Daily Production Entry Form":
             # Start Daily production entry form
