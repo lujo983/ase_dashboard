@@ -422,6 +422,47 @@ if st.session_state.logged_in and menu == "Dashboard":
                     st.error("Tafadhali ingia (Login) kwanza ili kuwasilisha taarifa.")
                       
                     #End of Daily production entry form
+          elif menu == "All Production Records":
+             st.subheader("📊 All Your Production Entries")
+             
+             if "user_id" in st.session_state:
+                 try:
+                     # 1. Fetch data from Supabase for this specific user
+                     # RLS ensures they only get their own data, but we filter by user_id to be explicit
+                     response = conn.table("production_records") \
+                         .select("created_at, zone, product_name, unit_price, quantity, total_earnings, comments") \
+                         .eq("user_id", st.session_state.user_id) \
+                         .order("created_at", desc=True) \
+                         .execute()
+         
+                     if response.data:
+                         # 2. Convert to DataFrame
+                         prod_df = pd.DataFrame(response.data)
+         
+                         # 3. Clean up formatting for a "Pro" look
+                         prod_df.columns = ["Date", "Zone", "Product", "Price", "Qty", "Total", "Comments"]
+                         prod_df["Date"] = pd.to_datetime(prod_df["Date"]).dt.strftime('%Y-%m-%d %H:%M')
+         
+                         # 4. Show Summary Metrics at the top
+                         col1, col2, col3 = st.columns(3)
+                         col1.metric("Total Entries", len(prod_df))
+                         col2.metric("Total Quantity", f"{prod_df['Qty'].sum():,}")
+                         col3.metric("Total Earnings", f"Tsh {prod_df['Total'].sum():,.2f}")
+         
+                         # 5. Display the data table with styling
+                         st.dataframe(prod_df, use_container_width=True, hide_index=True)
+                         
+                         # 6. Option to Download as CSV (for their own records)
+                         csv = prod_df.to_csv(index=False).encode('utf-8')
+                         st.download_button("📥 Download Records as CSV", data=csv, file_name="my_production.csv", mime="text/csv")
+                     else:
+                         st.info("Bado hujaingiza taarifa zozote za uzalishaji.")
+                         
+                 except Exception as e:
+                     st.error(f"Error fetching data: {e}")
+             else:
+                 st.warning("Please login to view your records.")
+
 
 # LOGOUT
 if st.sidebar.button("Logout"):
