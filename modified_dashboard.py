@@ -439,7 +439,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          # 2. Convert to DataFrame
                          prod_df = pd.DataFrame(response.data)
          
-                         # 3. Clean up formatting for a "Pro" look
+                         # 3. Clean up formatting for a "Pro" look 
                          prod_df.columns = ["Date", "Zone", "Product", "Price", "Qty", "Total", "Comments"]
                          prod_df["Date"] = pd.to_datetime(prod_df["Date"]).dt.strftime('%Y-%m-%d %H:%M')
          
