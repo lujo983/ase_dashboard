@@ -20,7 +20,7 @@ st.markdown(
 
  <style>
 [data-testid="stSidebar"]{
-    background: linear-gradient(white, #4CAF50, #FFEB3B);
+    background: linear-gradient(#FFCC00, #4CAF50, #FFEB3B);
    
 }
 
