@@ -376,65 +376,65 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.success("Recent Learning Materials available:")
             st.markdown("- Soap bar making\n- Liquid Soap production\n- Organic lotion production\n- Organic Skin care Cream\n- Cleaning Beeswax\n- Biomass Briquettes Production")
         elif menu == "Admin Panel":
-            st.title("👑 Admin Management Dashboard")
-            
-            # Create the tabs
-            tab1, tab2, tab3 = st.tabs(["User Management", "Production Overview", "System Logs"])
-        
-            # --- TAB 1: USER MANAGEMENT ---
-            with tab1:
-                st.subheader("All Registered Users")
-                try:
-                    # Fetch all profiles
-                    users_res = conn.table("profiles").select("*").execute()
-                    if users_res.data:
-                        users_df = pd.DataFrame(users_res.data)
-                        st.dataframe(users_df, use_container_width=True)
-                        
-                        # Simple User Lookup/Editor
-                        st.divider()
-                        user_list = users_df["full_name"].tolist()
-                        selected_user = st.selectbox("Select a user to manage", user_list)
-                        
-                        if st.button("Delete User (Permanent)"):
-                            st.warning(f"Are you sure you want to delete {selected_user}?")
-                            # Note: You can add deletion logic here later
-                    else:
-                        st.info("No users found.")
-                except Exception as e:
-                    st.error(f"User Fetch Error: {e}")
-        
-            # --- TAB 2: PRODUCTION OVERVIEW ---
-            with tab2:
-                st.subheader("Global Production Records")
-                try:
-                    # Fetch ALL production records from everyone
-                    all_prod = conn.table("production_records").select("*").order("created_at", desc=True).execute()
+                    st.title("👑 Admin Management Dashboard")
                     
-                    if all_prod.data:
-                        all_df = pd.DataFrame(all_prod.data)
-                        
-                        # Pro Admin Metrics
-                        c1, c2, c3 = st.columns(3)
-                        total_rev = all_df['total_earnings'].sum()
-                        total_qty = all_df['quantity'].sum()
-                        
-                        c1.metric("Total Revenue", f"Tsh {total_rev:,.2f}")
-                        c2.metric("Total Units", f"{total_qty:,}")
-                        c3.metric("Total Entries", len(all_df))
-                        
-                        # Visual Chart
-                        st.bar_chart(data=all_df, x="product_name", y="total_earnings")
-                        
-                        st.dataframe(all_df, use_container_width=True)
-                    else:
-                        st.info("No production data available.")
-                except Exception as e:
-                    st.error(f"Production Fetch Error: {e}")
-        
-            # --- TAB 3: SYSTEM LOGS ---
-            with tab3:
-                st.info("System logs and audit trails will appear here.")
+                    # Create the tabs
+                    tab1, tab2, tab3 = st.tabs(["User Management", "Production Overview", "System Logs"])
+                
+                    # --- TAB 1: USER MANAGEMENT ---
+                    with tab1:
+                        st.subheader("All Registered Users")
+                        try:
+                            # Fetch all profiles
+                            users_res = conn.table("profiles").select("*").execute()
+                            if users_res.data:
+                                users_df = pd.DataFrame(users_res.data)
+                                st.dataframe(users_df, use_container_width=True)
+                                
+                                # Simple User Lookup/Editor
+                                st.divider()
+                                user_list = users_df["full_name"].tolist()
+                                selected_user = st.selectbox("Select a user to manage", user_list)
+                                
+                                if st.button("Delete User (Permanent)"):
+                                    st.warning(f"Are you sure you want to delete {selected_user}?")
+                                    # Note: You can add deletion logic here later
+                            else:
+                                st.info("No users found.")
+                        except Exception as e:
+                            st.error(f"User Fetch Error: {e}")
+                
+                    # --- TAB 2: PRODUCTION OVERVIEW ---
+                    with tab2:
+                        st.subheader("Global Production Records")
+                        try:
+                            # Fetch ALL production records from everyone
+                            all_prod = conn.table("production_records").select("*").order("created_at", desc=True).execute()
+                            
+                            if all_prod.data:
+                                all_df = pd.DataFrame(all_prod.data)
+                                
+                                # Pro Admin Metrics
+                                c1, c2, c3 = st.columns(3)
+                                total_rev = all_df['total_earnings'].sum()
+                                total_qty = all_df['quantity'].sum()
+                                
+                                c1.metric("Total Revenue", f"Tsh {total_rev:,.2f}")
+                                c2.metric("Total Units", f"{total_qty:,}")
+                                c3.metric("Total Entries", len(all_df))
+                                
+                                # Visual Chart
+                                st.bar_chart(data=all_df, x="product_name", y="total_earnings")
+                                
+                                st.dataframe(all_df, use_container_width=True)
+                            else:
+                                st.info("No production data available.")
+                        except Exception as e:
+                            st.error(f"Production Fetch Error: {e}")
+                
+                    # --- TAB 3: SYSTEM LOGS ---
+                    with tab3:
+                        st.info("System logs and audit trails will appear here.")
             
                 elif menu == "Community Stories":
                     st.subheader("Community Stories")
