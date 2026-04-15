@@ -422,7 +422,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                     st.error("Tafadhali ingia (Login) kwanza ili kuwasilisha taarifa.")
             
             
-                    elif menu == "All Production Records":
+                     elif menu == "All Production Records":
                         st.subheader("All Your Production Entries")
                         try:
                             prod_df = pd.read_csv("production_records.csv")
