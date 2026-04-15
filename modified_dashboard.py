@@ -120,13 +120,6 @@ if not st.session_state.logged_in:
 else:
     menu = st.sidebar.radio("Menu", ["Dashboard", "Logout"])
 
-# Only show "Admin Panel" if the logged-in user is an Admin
-if st.session_state.get("role") == "Admin":
-    menu_options = ["Home", "Daily Production", "All Production Records", "Admin Panel", "Logout"]
-else:
-    menu_options = ["Home", "Register", "Login", "Daily Production", "All Production Records"]
-
-
 # REGISTRATION FORM
 if menu == "Register":
     st.subheader("Register for ASE Dashboard.")
