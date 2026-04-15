@@ -5,7 +5,7 @@ from datetime import datetime
 current_time=datetime.now 
 import hashlib 
 import os
-from supabase import create_client
+from supabase import create_client 
 
 url = st.secrets["SUPABASE_URL"]  
 key = st.secrets["SUPABASE_KEY"]
@@ -385,7 +385,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
             st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
         elif menu == "All Production Records":
-             st.subheader("📊 All Your Production Entries")
+             st.subheader("📊 All Your Production Entries/Taarifa za uzalishaji wako")
              
              if "user_id" in st.session_state:
                  try:
@@ -407,9 +407,9 @@ if st.session_state.logged_in and menu == "Dashboard":
          
                          # 4. Show Summary Metrics at the top
                          col1, col2, col3 = st.columns(3)
-                         col1.metric("Total Entries", len(prod_df))
-                         col2.metric("Total Quantity", f"{prod_df['Qty'].sum():,}")
-                         col3.metric("Total Earnings", f"Tsh {prod_df['Total'].sum():,.2f}")
+                         col1.metric("Total Entries/Uzalishaji", len(prod_df))
+                         col2.metric("Total Quantity/Kiasi ulichozalisha", f"{prod_df['Qty'].sum():,}")
+                         col3.metric("Total Earnings/Jumla ya Mapato", f"Tsh {prod_df['Total'].sum():,.2f}")
          
                          # 5. Display the data table with styling
                          st.dataframe(prod_df, use_container_width=True, hide_index=True)
