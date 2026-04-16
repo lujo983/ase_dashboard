@@ -506,17 +506,21 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
          
              # 1. Fetch current items for the dropdown
-             res = conn.table("inventory_items").select("id, item_name, current_stock").eq("user_id", st.session_state.user_id).execute()
+             res = conn.table("inventory_items").select("id, item_name, current_stock, buying_price").eq("user_id", st.session_state.user_id).execute()
              
              if res.data:
                  item_options = {item['item_name']: item for item in res.data}
                  
+                 # Start the form
                  with st.form("stock_in_form", clear_on_submit=True):
                      selected_name = st.selectbox("Chagua Bidhaa", list(item_options.keys()))
                      qty = st.number_input("Kiasi unachonunua (Quantity In)", min_value=1, step=1)
                      p_price = st.number_input("Bei ya kununulia kwa kipande kimoja", value=float(item_options[selected_name]['buying_price']), step=100.0)
                      
-                     if st.form_submit_button("Hifadhi Ununuzi"):
+                     # THE SUBMIT BUTTON MUST BE INSIDE THIS "WITH" BLOCK
+                     submitted = st.form_submit_button("Hifadhi Ununuzi")
+         
+                     if submitted:
                          try:
                              item_id = item_options[selected_name]['id']
                              
@@ -534,10 +538,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                              conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", item_id).execute()
                              
                              st.success(f"Hongera! Umeongeza {qty} za {selected_name}. Stock mpya ni {new_stock}.")
+                             st.rerun() # Refresh to update the inventory table
                          except Exception as e:
                              st.error(f"Hitilafu: {e}")
              else:
                  st.info("Tafadhali sajili bidhaa kwanza kwenye 'Register Items'.")
+
 
         # End stock In
 
