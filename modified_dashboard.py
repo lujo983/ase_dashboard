@@ -406,70 +406,54 @@ if st.session_state.logged_in and menu == "Dashboard":
                         # --- START OF PDF GENERATION LOGIC ---
                         def create_pdf(df):
                              buf = BytesIO()
-                             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+                             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=20, bottomMargin=30)
                              elements = []
                              styles = getSampleStyleSheet()
                              
-                             # Define a style for the text inside the cells to allow wrapping
-                             cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=9, leading=10)
-                             header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=10, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
-
-                              # --- LOGO & TITLE SECTION ---
-                              try:
-                                  # Load your logo file from your repository
-                                  logo = Image("bridge gap tra.jpg", width=1.2*inch, height=0.6*inch)
-                                  
-                                  # Create a table for the header to align logo (left) and title (right)
-                                  header_data = [[logo, Paragraph("ASE DASHBOARD REPORT", styles['Title'])]]
-                                  header_table = Table(header_data, colWidths=[1.5*inch, 4.5*inch])
-                                  header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('ALIGN', (1,0), (1,0), 'RIGHT')]))
-                                  elements.append(header_table)
-                              except Exception:
-                                  # If logo file is missing, just show the title
-                                  elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", styles['Title']))
-    
-                              
-                             # 2. Professional Header
-                             header_style = ParagraphStyle('HeaderStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), spaceAfter=10)
-                             elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", header_style))
+                             # Text styles
+                             cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=8, leading=10)
+                             header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=9, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
+                         
+                             # --- LOGO & TITLE SECTION ---
+                             try:
+                                 # Load your logo file from your repository
+                                 logo = Image("bridge gap tra.jpg", width=1.2*inch, height=0.6*inch)
+                                 
+                                 # Create a table for the header to align logo (left) and title (right)
+                                 header_data = [[logo, Paragraph("ASE DASHBOARD REPORT", styles['Title'])]]
+                                 header_table = Table(header_data, colWidths=[1.5*inch, 4.5*inch])
+                                 header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('ALIGN', (1,0), (1,0), 'RIGHT')]))
+                                 elements.append(header_table)
+                             except Exception:
+                                 # If logo file is missing, just show the title
+                                 elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", styles['Title']))
                              
+                             # Sub-header details
                              sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
                              elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", sub_style))
-                             elements.append(Paragraph(f"Date Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
+                             elements.append(Paragraph(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
                              elements.append(Spacer(1, 20))
                          
-                             # 3. Handle Table Data & Wrapping
-                             # We wrap headers and rows in Paragraphs to prevent overlap
-                             headers = [Paragraph(col, header_cell_style) for col in df.columns.tolist()]
-                             
+                             # --- DATA TABLE SECTION ---
+                             headers = [Paragraph(f"<b>{col}</b>", header_cell_style) for col in df.columns.tolist()]
                              data = [headers]
                              for _, row in df.iterrows():
                                  data.append([Paragraph(str(val), cell_style) for val in row.values])
                              
-                             # Calculate widths (Total ~7.3 inches for A4)
-                             col_widths = [0.8*inch, 0.9*inch, 1.1*inch, 0.7*inch, 0.5*inch, 0.8*inch, 2.5*inch]
-                         
+                             col_widths = [0.8*inch, 0.9*inch, 1.1*inch, 0.6*inch, 0.5*inch, 0.8*inch, 2.6*inch]
                              t = Table(data, colWidths=col_widths, repeatRows=1)
                              
-                             # 4. Pro Table Styling
-                             style = TableStyle([
+                             t.setStyle(TableStyle([
                                  ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
                                  ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'), # Changed to TOP for better wrapped text look
-                                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
-                                 ('LINEBELOW', (0, 0), (-1, 0), 2, colors.HexColor("#1E3A8A")),
+                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
                                  ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                                 ('LEFTPADDING', (0, 0), (-1, -1), 5),
-                                 ('RIGHTPADDING', (0, 0), (-1, -1), 5),
-                                 ('TOPPADDING', (0, 0), (-1, -1), 5),
-                                 ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-                             ])
+                                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+                             ]))
                              
-                             t.setStyle(style)
                              elements.append(t)
-                             
                              doc.build(elements)
-                             return buf.getvalue() 
+                             return buf.getvalue()
 
                         # --- END OF PDF GENERATION LOGIC ---
         
