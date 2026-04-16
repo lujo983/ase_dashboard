@@ -16,7 +16,7 @@ conn = st.connection("supabase", type=SupabaseConnection)
 
 # IMPORTS FOR PDF MAKING
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -373,7 +373,8 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Daily Production Entry Form",
             "All Production Records",
             "Register Items",
-            "My registered items"
+            "My registered items",
+            "Stock In (Manunuzi)"
         ])
         # Add community member content
         # Community member sees daily production form
@@ -499,6 +500,46 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.warning("Tafadhali ingia (Login) kwanza.")
 
         # End view registerd
+
+        # Start Stockin                                                                 
+        elif menu == "Stock In (Manunuzi)":
+             st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
+         
+             # 1. Fetch current items for the dropdown
+             res = conn.table("inventory_items").select("id, item_name, current_stock").eq("user_id", st.session_state.user_id).execute()
+             
+             if res.data:
+                 item_options = {item['item_name']: item for item in res.data}
+                 
+                 with st.form("stock_in_form", clear_on_submit=True):
+                     selected_name = st.selectbox("Chagua Bidhaa", list(item_options.keys()))
+                     qty = st.number_input("Kiasi unachonunua (Quantity In)", min_value=1, step=1)
+                     p_price = st.number_input("Bei ya kununulia kwa kipande kimoja", value=float(item_options[selected_name]['buying_price']), step=100.0)
+                     
+                     if st.form_submit_button("Hifadhi Ununuzi"):
+                         try:
+                             item_id = item_options[selected_name]['id']
+                             
+                             # A. Record Transaction
+                             conn.table("inventory_transactions").insert({
+                                 "user_id": st.session_state.user_id,
+                                 "item_id": item_id,
+                                 "type": "STOCK_IN",
+                                 "quantity": qty,
+                                 "price_per_unit": p_price
+                             }).execute()
+                             
+                             # B. Update Current Stock in inventory_items
+                             new_stock = item_options[selected_name]['current_stock'] + qty
+                             conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", item_id).execute()
+                             
+                             st.success(f"Hongera! Umeongeza {qty} za {selected_name}. Stock mpya ni {new_stock}.")
+                         except Exception as e:
+                             st.error(f"Hitilafu: {e}")
+             else:
+                 st.info("Tafadhali sajili bidhaa kwanza kwenye 'Register Items'.")
+
+        # End stock In
 
         elif menu == "All Production Records":
             st.subheader("📊 All Your Production Entries")
