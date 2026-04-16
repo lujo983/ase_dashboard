@@ -375,7 +375,8 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Register Items",
             "My registered items",
             "Stock In (Manunuzi)",
-            "Stock Out (Mauzo)"
+            "Stock Out (Mauzo)",
+            "Daily Report"
         ])
         # Add community member content
         # Community member sees daily production form
@@ -560,6 +561,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End stock In
      
+     
         # Start Sales                  
         elif menu == "Stock Out (Mauzo)":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
@@ -614,6 +616,70 @@ if st.session_state.logged_in and menu == "Dashboard":
 
 
         # End Sales form
+        # Start daily reports
+        elif menu == "Daily Report":
+             st.title("📅 Daily Business Summary")
+             
+             # Get today's date in Supabase format
+             today_date = datetime.now().strftime("%Y-%m-%d")
+             st.info(f"Showing report for: **{today_date}**")
+         
+             if "user_id" in st.session_state:
+                 try:
+                     # 1. Fetch all transactions for today
+                     # We filter by user_id and the current date
+                     res = conn.table("inventory_transactions") \
+                         .select("*, inventory_items(item_name)") \
+                         .eq("user_id", st.session_state.user_id) \
+                         .gte("transaction_date", f"{today_date}T00:00:00") \
+                         .lte("transaction_date", f"{today_date}T23:59:59") \
+                         .execute()
+         
+                     if res.data:
+                         df = pd.DataFrame(res.data)
+                         
+                         # Flatten the item name from the joined table
+                         df['Item'] = df['inventory_items'].apply(lambda x: x['item_name'])
+                         
+                         # 2. Split Data for Metrics
+                         purchases = df[df['type'] == 'STOCK_IN']
+                         sales = df[df['type'] == 'STOCK_OUT']
+                         
+                         total_spent = purchases['total_value'].sum()
+                         total_earned = sales['total_value'].sum()
+                         net_cashflow = total_earned - total_spent
+         
+                         # 3. Display High-Level Metrics
+                         m1, m2, m3 = st.columns(3)
+                         m1.metric("Total Purchases (In)", f"Tsh {total_spent:,.2f}", delta_color="normal")
+                         m2.metric("Total Sales (Out)", f"Tsh {total_earned:,.2f}", delta_color="normal")
+                         
+                         # Net Cashflow (Green if positive, Red if negative)
+                         m3.metric("Net Cashflow", f"Tsh {net_cashflow:,.2f}", delta=f"{net_cashflow:,.2f}")
+         
+                         # 4. Detailed Transaction Table
+                         st.subheader("Leo Transactions Detail")
+                         report_df = df[['transaction_date', 'Item', 'type', 'quantity', 'price_per_unit', 'total_value']]
+                         report_df.columns = ['Time', 'Item Name', 'Type', 'Qty', 'Unit Price', 'Total']
+                         
+                         # Format time for readability
+                         report_df['Time'] = pd.to_datetime(report_df['Time']).dt.strftime('%H:%M')
+                         
+                         st.dataframe(report_df, use_container_width=True, hide_index=True)
+                         
+                         # 5. Daily PDF Option
+                         if st.button("Generate Today's PDF Report"):
+                             # You can reuse your create_pdf function here
+                             pdf_data = create_pdf(report_df)
+                             st.download_button("📥 Download Daily PDF", data=pdf_data, file_name=f"Daily_Report_{today_date}.pdf")
+         
+                     else:
+                         st.warning("Hakuna miamala (transactions) yoyote iliyorekodiwa leo.")
+                         
+                 except Exception as e:
+                     st.error(f"Error loading daily report: {e}")
+
+        # End daily reports
 
         elif menu == "All Production Records":
          
