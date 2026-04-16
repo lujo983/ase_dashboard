@@ -480,16 +480,16 @@ if st.session_state.logged_in and menu == "Dashboard":
                                          st.rerun()
                          
                          # DELETE SECTION
-                         with col_b:
+                         #with col_b:
                              #st.write("Danger Zone/Kuwa Makini Hapa")
-                             if #st.button(f"🗑️ Delete {selected_name}"):
+                             #if st.button(f"🗑️ Delete {selected_name}"):
                                  # Direct delete based on unique ID
-                                 try:
-                                     conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
-                                     st.success(f"{selected_name} imefutwa!")
-                                     st.rerun()
-                                 except Exception as e:
-                                     st.error(f"Futa imeshindikana: {e}")
+                                 #try:
+                                     #conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
+                                     #st.success(f"{selected_name} imefutwa!")
+                                     #st.rerun()
+                                 #except Exception as e:
+                                     #st.error(f"Futa imeshindikana: {e}")
                                      
                      else:
                          st.info("Bado hujaasajili bidhaa yoyote.")
