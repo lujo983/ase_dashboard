@@ -658,7 +658,7 @@ if st.session_state.logged_in and menu == "Dashboard":
          
                          # --- 5. INTERNAL PDF GENERATION LOGIC ---
                          st.divider()
-                         if st.button("📑 Maandalizi ya PDF Report"):
+                         if st.button("📑 Je unataka PDF Report?"):
                              try:
                                  buf = BytesIO()
                                  doc = SimpleDocTemplate(buf, pagesize=A4)
@@ -696,7 +696,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  doc.build(elements)
                                  
                                  st.download_button(
-                                     label="📥 Download Daily PDF",
+                                     label="📥 Sasa Download Daily PDF",
                                      data=buf.getvalue(),
                                      file_name=f"Daily_Report_{today_date}.pdf",
                                      mime="application/pdf"
