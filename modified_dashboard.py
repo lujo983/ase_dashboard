@@ -192,7 +192,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
                 # 1. Authenticate with Supabase
                 res = conn.client.auth.sign_in_with_password({
                     "email": email,
-                    "password": password
+                    "password": password 
                 })
                 
                 # 2. Get the User ID from the successful login
@@ -412,12 +412,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                              styles = getSampleStyleSheet()
                              
                              # 1. Add Logo (Optional - replace 'logo.png' with your file path or URL)
-                             # try:
-                             #    logo = Image("logo.png", width=1.5*inch, height=0.5*inch)
-                             #    logo.hAlign = 'RIGHT'
-                             #    elements.append(logo)
-                             # except:
-                             #    pass
+                              try:
+                                 logo = Image("bridge gap tra.jpg", width=1.5*inch, height=0.5*inch)
+                                 logo.hAlign = 'RIGHT'
+                                 elements.append(logo)
+                              except:
+                                 pass
                          
                              # 2. Professional Header
                              header_style = ParagraphStyle('HeaderStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), spaceAfter=10)
