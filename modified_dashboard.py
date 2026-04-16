@@ -413,7 +413,22 @@ if st.session_state.logged_in and menu == "Dashboard":
                              # Define a style for the text inside the cells to allow wrapping
                              cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=9, leading=10)
                              header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=10, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
-                         
+
+                              # --- LOGO & TITLE SECTION ---
+                              try:
+                                  # Load your logo file from your repository
+                                  logo = Image("bridge gap tra.jpg", width=1.2*inch, height=0.6*inch)
+                                  
+                                  # Create a table for the header to align logo (left) and title (right)
+                                  header_data = [[logo, Paragraph("ASE DASHBOARD REPORT", styles['Title'])]]
+                                  header_table = Table(header_data, colWidths=[1.5*inch, 4.5*inch])
+                                  header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('ALIGN', (1,0), (1,0), 'RIGHT')]))
+                                  elements.append(header_table)
+                              except Exception:
+                                  # If logo file is missing, just show the title
+                                  elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", styles['Title']))
+    
+                              
                              # 2. Professional Header
                              header_style = ParagraphStyle('HeaderStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), spaceAfter=10)
                              elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", header_style))
