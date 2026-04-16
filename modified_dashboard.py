@@ -442,28 +442,30 @@ if st.session_state.logged_in and menu == "Dashboard":
                                    data.append([Paragraph(str(val), cell_style) for val in row.values])
                                
                                # 4. INVOICE-STYLE TOTALS ROW
-                                 try:
-                                     # Convert columns to string, remove non-numeric characters, and force to float
-                                     # 'errors=coerce' turns any text that isn't a number into 'NaN' so it doesn't crash
-                                     clean_qty = pd.to_numeric(df['Qty'].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
-                                     clean_total = pd.to_numeric(df['Total'].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
-                                     
-                                     total_qty = clean_qty.sum()
-                                     total_money = clean_total.sum()
-                                     
-                                     footer = [
-                                         Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
-                                         Paragraph("", cell_style),
-                                         Paragraph("", cell_style),
-                                         Paragraph("", cell_style),
-                                         Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
-                                         Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
-                                         Paragraph("", cell_style)
-                                     ]
-                                     data.append(footer)
-                                 except Exception as e:
-                                     # This will now show the exact column name or issue if it fails
-                                     data.append([Paragraph(f"<b>Check Data: {str(e)}</b>", cell_style)] + [""]*6)
+                                  
+                               try:
+                                   # Convert columns to string, remove non-numeric characters, and force to float
+                                   # 'errors=coerce' turns any text that isn't a number into 'NaN' so it doesn't crash
+                                   clean_qty = pd.to_numeric(df['Qty'].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
+                                   clean_total = pd.to_numeric(df['Total'].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
+                                   
+                                   total_qty = clean_qty.sum()
+                                   total_money = clean_total.sum()
+                                   
+                                   footer = [
+                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
+                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
+                                       Paragraph("", cell_style)
+                                   ]
+                                   data.append(footer)
+                               except Exception as e:
+                                   # This will now show the exact column name or issue if it fails
+                                   data.append([Paragraph(f"<b>Check Data: {str(e)}</b>", cell_style)] + [""]*6)
+
 
                            
                                # 5. TABLE CONSTRUCTION & PRO STYLING
