@@ -442,28 +442,28 @@ if st.session_state.logged_in and menu == "Dashboard":
                                    data.append([Paragraph(str(val), cell_style) for val in row.values])
                                
                                # 4. INVOICE-STYLE TOTALS ROW
-                                try:
-                                    # We assume: Col 4 is Qty, Col 5 is Total (counting starts at 0)
-                                    # We use .iloc to pick columns by their position
-                                    qty_values = pd.to_numeric(df.iloc[:, 4].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
-                                    total_values = pd.to_numeric(df.iloc[:, 5].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
-                                    
-                                    total_qty = qty_values.sum()
-                                    total_money = total_values.sum()
-                                    
-                                    footer = [
-                                        Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
-                                        Paragraph("", cell_style),
-                                        Paragraph("", cell_style),
-                                        Paragraph("", cell_style),
-                                        Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
-                                        Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
-                                        Paragraph("", cell_style)
-                                    ]
-                                    data.append(footer)
-                                except Exception as e:
-                                    # If it still fails, it will tell us which part of the math is wrong
-                                    data.append([Paragraph(f"<b>Calculation Error: {str(e)}</b>", cell_style)] + [""]*6)
+                               try:
+                                   # We assume: Col 4 is Qty, Col 5 is Total (counting starts at 0)
+                                   # We use .iloc to pick columns by their position
+                                   qty_values = pd.to_numeric(df.iloc[:, 4].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
+                                   total_values = pd.to_numeric(df.iloc[:, 5].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
+                                   
+                                   total_qty = qty_values.sum()
+                                   total_money = total_values.sum()
+                                   
+                                   footer = [
+                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
+                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
+                                       Paragraph("", cell_style)
+                                   ]
+                                   data.append(footer)
+                               except Exception as e:
+                                   # If it still fails, it will tell us which part of the math is wrong
+                                   data.append([Paragraph(f"<b>Calculation Error: {str(e)}</b>", cell_style)] + [""]*6)
 
 
 
