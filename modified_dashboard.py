@@ -420,7 +420,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  logo = Image("bridge gap tra.jpg", width=1.2*inch, height=0.6*inch)
                                  
                                  # Create a table for the header to align logo (left) and title (right)
-                                 header_data = [[logo, Paragraph("ASE DASHBOARD REPORT", styles['Title'])]]
+                                 header_data = [[logo, Paragraph("ASE PRODUCTION REPORT", styles['Title'])]]
                                  header_table = Table(header_data, colWidths=[1.5*inch, 4.5*inch])
                                  header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('ALIGN', (1,0), (1,0), 'RIGHT')]))
                                  elements.append(header_table)
