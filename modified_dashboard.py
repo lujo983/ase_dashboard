@@ -442,10 +442,15 @@ if st.session_state.logged_in and menu == "Dashboard":
                                    data.append([Paragraph(str(val), cell_style) for val in row.values])
                                
                                # 4. INVOICE-STYLE TOTALS ROW
+                                   # --- 4. INVOICE-STYLE TOTALS ROW ---
+                               # We clean the data first to make sure they are real numbers
                                try:
-                                   # Summing columns - Make sure 'Qty' and 'Total' match your dataframe headers exactly
-                                   total_qty = df['Qty'].astype(float).sum()
-                                   total_money = df['Total'].astype(float).sum()
+                                   # Convert columns to string, remove 'Tsh' and ',', then convert to float
+                                   clean_qty = df['Qty'].astype(str).str.replace(',', '').astype(float)
+                                   clean_total = df['Total'].astype(str).str.replace('Tsh', '').str.replace(',', '').astype(float)
+                                   
+                                   total_qty = clean_qty.sum()
+                                   total_money = clean_total.sum()
                                    
                                    footer = [
                                        Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
@@ -457,8 +462,10 @@ if st.session_state.logged_in and menu == "Dashboard":
                                        Paragraph("", cell_style)
                                    ]
                                    data.append(footer)
-                               except:
-                                   pass # Skips if columns aren't numeric
+                               except Exception as e:
+                                   # If it still fails, we add a row showing the error so you know why
+                                   data.append([Paragraph(f"Sum Error: {str(e)}", cell_style)] + [""]*6)
+
                            
                                # 5. TABLE CONSTRUCTION & PRO STYLING
                                # Widths assigned for A4: Total ~7.3 inches
