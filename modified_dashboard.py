@@ -390,89 +390,115 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.subheader("Community Stories")
             st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
             st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
-         # Register item starts
+        # Register item starts
         elif menu == "Register Items":
-            st.subheader("🆕 Register New Business Item")
-            
-            with st.form("item_reg_form", clear_on_submit=True):
-                item_name = st.text_input("Jina la Bidhaa (Item Name)")
-                category = st.selectbox("Kundi (Category)", ["Chakula", "Mavazi", "Vifaa", "Sabuni", "Zingine"])
-                unit = st.selectbox("Kipimo (Unit)", ["pcs", "kg", "ltr", "box"])
-                
-                col1, col2 = st.columns(2)
-                b_price = col1.number_input("Bei ya Kununua (Buying Price)", min_value=0.0, step=100.0)
-                s_price = col2.number_input("Bei ya Kuuzia (Selling Price)", min_value=0.0, step=100.0)
-                
-                initial_stock = st.number_input("Stock ya sasa (Initial Stock)", min_value=0, step=1)
-                
-                submitted = st.form_submit_button("Sajili Bidhaa")
-                
-                if submitted:
-                    if not item_name:
-                        st.error("Tafadhali weka jina la bidhaa.")
-                    else:
-                        try:
-                            new_item = {
-                                "user_id": st.session_state.user_id,
-                                "item_name": item_name,
-                                "category": category,
-                                "unit_measure": unit,
-                                "buying_price": b_price,
-                                "selling_price": s_price,
-                                "current_stock": initial_stock
-                            }
-                            
-                            conn.table("inventory_items").insert(new_item).execute()
-                            st.success(f"Hongera! {item_name} imesajiliwa vyema.")
-                        except Exception as e:
-                            st.error(f"Hitilafu: {e}")
-        # Register item end
-        # Start View registered items
-        elif menu == "My Registered Items":
+             st.subheader("🆕 Register New Business Item")
+             
+             with st.form("item_reg_form", clear_on_submit=True):
+                 item_name = st.text_input("Jina la Bidhaa (Item Name)")
+                 category = st.selectbox("Kundi (Category)", ["Chakula", "Mavazi", "Vifaa", "Sabuni", "Zingine"])
+                 unit = st.selectbox("Kipimo (Unit)", ["pcs", "kg", "ltr", "box"])
+                 
+                 col1, col2 = st.columns(2)
+                 b_price = col1.number_input("Bei ya Kununua (Buying Price)", min_value=0.0, step=100.0)
+                 s_price = col2.number_input("Bei ya Kuuzia (Selling Price)", min_value=0.0, step=100.0)
+                 
+                 initial_stock = st.number_input("Stock ya sasa (Initial Stock)", min_value=0, step=1)
+                 
+                 submitted = st.form_submit_button("Sajili Bidhaa")
+                 
+                 if submitted:
+                     if not item_name:
+                         st.error("Tafadhali weka jina la bidhaa.")
+                     else:
+                         try:
+                             new_item = {
+                                 "user_id": st.session_state.user_id,
+                                 "item_name": item_name,
+                                 "category": category,
+                                 "unit_measure": unit,
+                                 "buying_price": b_price,
+                                 "selling_price": s_price,
+                                 "current_stock": initial_stock
+                             }
+                             
+                             conn.table("inventory_items").insert(new_item).execute()
+                             st.success(f"Hongera! {item_name} imesajiliwa vyema.")
+                         except Exception as e:
+                             st.error(f"Hitilafu: {e}")
+        # End register items
+        # startsView registerd 
+        elif menu == "My Catalog & Actions":
              st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
              
              if "user_id" in st.session_state:
                  try:
-                     # Fetch items for the logged-in user
-                     response = conn.table("inventory_items") \
-                         .select("item_name, category, buying_price, selling_price, current_stock, unit_measure") \
-                         .eq("user_id", st.session_state.user_id) \
-                         .execute()
-         
-                     if response.data:
-                         df_items = pd.DataFrame(response.data)
+                     # 1. FETCH data for the logged-in user
+                     res = conn.table("inventory_items").select("*").eq("user_id", st.session_state.user_id).execute()
+                     
+                     if res.data:
+                         df_items = pd.DataFrame(res.data)
                          
-                         # Calculate Profit Margin for professional view
-                         df_items["Margin (Tsh)"] = df_items["selling_price"] - df_items["buying_price"]
-                         
-                         # Rename columns for a clean interface
-                         display_df = df_items.rename(columns={
-                             "item_name": "Item Name",
-                             "category": "Category",
-                             "buying_price": "Buying Price",
-                             "selling_price": "Selling Price",
-                             "current_stock": "Stock Level",
-                             "unit_measure": "Unit"
-                         })
-         
-                         # Display Metrics (Top Summary)
-                         c1, c2 = st.columns(2)
-                         c1.metric("Total Unique Items", len(df_items))
-                         c2.metric("Total Stock Value (Buy)", f"Tsh { (df_items['buying_price'] * df_items['current_stock']).sum():,.2f}")
+                         # Professional Summary Metrics
+                         m1, m2 = st.columns(2)
+                         m1.metric("Total Items", len(df_items))
+                         inventory_value = (df_items['buying_price'] * df_items['current_stock']).sum()
+                         m2.metric("Inventory Value", f"Tsh {inventory_value:,.0f}")
          
                          # Display Table
-                         st.dataframe(display_df, use_container_width=True, hide_index=True)
+                         st.dataframe(
+                             df_items[["item_name", "category", "buying_price", "selling_price", "current_stock", "unit_measure"]], 
+                             use_container_width=True, 
+                             hide_index=True
+                         )
+         
+                         # --- 2. UPDATE & DELETE LOGIC ---
+                         st.divider()
+                         st.markdown("### 🛠️ Manage Selected Item")
                          
-                         # Option to edit or delete could be added here later
+                         # Dropdown to select which item to modify
+                         selected_name = st.selectbox("Chagua bidhaa kurekebisha au kufuta", df_items["item_name"].tolist())
+                         
+                         # Fetch specific data for the selected item using its index
+                         item_data = df_items[df_items["item_name"] == selected_name].iloc[0]
+         
+                         col_a, col_b = st.columns(2)
+                         
+                         # UPDATE SECTION
+                         with col_a:
+                             with st.expander(f"✏️ Update Prices for {selected_name}"):
+                                 with st.form("up_form"):
+                                     up_buy = st.number_input("New Buy Price", value=float(item_data['buying_price']), step=100.0)
+                                     up_sell = st.number_input("New Sell Price", value=float(item_data['selling_price']), step=100.0)
+                                     
+                                     if st.form_submit_button("Hifadhi Marekebisho"):
+                                         conn.table("inventory_items")\
+                                             .update({"buying_price": up_buy, "selling_price": up_sell})\
+                                             .eq("id", item_data['id'])\
+                                             .execute()
+                                         st.success("Marekebisho yamefanikiwa!")
+                                         st.rerun()
+                         
+                         # DELETE SECTION
+                         with col_b:
+                             st.write("Danger Zone")
+                             if st.button(f"🗑️ Delete {selected_name}"):
+                                 # Direct delete based on unique ID
+                                 try:
+                                     conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
+                                     st.success(f"{selected_name} imefutwa!")
+                                     st.rerun()
+                                 except Exception as e:
+                                     st.error(f"Futa imeshindikana: {e}")
+                                     
                      else:
-                         st.info("Bado hujaasajili bidhaa yoyote. Nenda kwenye 'Register Items' kuanza.")
-                         
+                         st.info("Bado hujaasajili bidhaa yoyote.")
                  except Exception as e:
-                     st.error(f"Error loading items: {e}")
+                     st.error(f"Database Error: {e}")
              else:
                  st.warning("Tafadhali ingia (Login) kwanza.")
 
-        # End view registered items
+        # End view registerd
 
         elif menu == "All Production Records":
             st.subheader("📊 All Your Production Entries")
