@@ -406,18 +406,13 @@ if st.session_state.logged_in and menu == "Dashboard":
                         # --- START OF PDF GENERATION LOGIC ---
                         def create_pdf(df):
                              buf = BytesIO()
-                             # Use A4 and set margins
                              doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
                              elements = []
                              styles = getSampleStyleSheet()
                              
-                             # 1. Add Logo (Optional - replace 'logo.png' with your file path or URL)
-                              try:
-                                 logo = Image("bridge gap tra.jpg", width=1.5*inch, height=0.5*inch)
-                                 logo.hAlign = 'RIGHT'
-                                 elements.append(logo)
-                              except:
-                                 pass
+                             # Define a style for the text inside the cells to allow wrapping
+                             cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=9, leading=10)
+                             header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=10, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
                          
                              # 2. Professional Header
                              header_style = ParagraphStyle('HeaderStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), spaceAfter=10)
@@ -429,45 +424,37 @@ if st.session_state.logged_in and menu == "Dashboard":
                              elements.append(Spacer(1, 20))
                          
                              # 3. Handle Table Data & Wrapping
-                             # Convert all data to strings to prevent formatting errors
-                             data = [df.columns.tolist()] + df.values.astype(str).tolist()
+                             # We wrap headers and rows in Paragraphs to prevent overlap
+                             headers = [Paragraph(col, header_cell_style) for col in df.columns.tolist()]
                              
-                             # Calculate available width on A4 (approx 7.5 inches)
-                             # We define widths for each column to prevent overlap
-                             col_widths = [0.8*inch, 1.0*inch, 1.2*inch, 0.7*inch, 0.6*inch, 0.8*inch, 2.2*inch]
+                             data = [headers]
+                             for _, row in df.iterrows():
+                                 data.append([Paragraph(str(val), cell_style) for val in row.values])
+                             
+                             # Calculate widths (Total ~7.3 inches for A4)
+                             col_widths = [0.8*inch, 0.9*inch, 1.1*inch, 0.7*inch, 0.5*inch, 0.8*inch, 2.5*inch]
                          
                              t = Table(data, colWidths=col_widths, repeatRows=1)
                              
                              # 4. Pro Table Styling
                              style = TableStyle([
-                                 # Header Row
                                  ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
-                                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-                                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                                 ('FONTSIZE', (0, 0), (-1, 0), 10),
-                                 
-                                 # Data Rows
-                                 ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
-                                 ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                                 ('FONTSIZE', (0, 1), (-1, -1), 9),
-                                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                                 
-                                 # Alternating Row Colors (Zebra Strips)
+                                 ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'), # Changed to TOP for better wrapped text look
                                  ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
-                                 
-                                 # Borders
                                  ('LINEBELOW', (0, 0), (-1, 0), 2, colors.HexColor("#1E3A8A")),
                                  ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                                 ('LEFTPADDING', (0, 0), (-1, -1), 5),
+                                 ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+                                 ('TOPPADDING', (0, 0), (-1, -1), 5),
+                                 ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
                              ])
                              
                              t.setStyle(style)
                              elements.append(t)
                              
-                             # 5. Build
                              doc.build(elements)
-                             return buf.getvalue()
-
+                             return buf.getvalue() 
 
                         # --- END OF PDF GENERATION LOGIC ---
         
