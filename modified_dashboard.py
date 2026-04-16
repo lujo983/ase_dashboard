@@ -505,48 +505,55 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "Stock In (Manunuzi)":
              st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
          
+             # 1. Fetch current items
              res = conn.table("inventory_items").select("id, item_name, current_stock, buying_price").eq("user_id", st.session_state.user_id).execute()
              
              if res.data:
                  item_options = {item['item_name']: item for item in res.data}
                  
-                 # Use a unique key for the form to help Streamlit reset it
+                 # --- SELECT BOX OUTSIDE THE FORM ---
+                 # This allows the price to update instantly when the item changes
+                 selected_name = st.selectbox("Chagua Bidhaa unayotaka kuongeza stock", list(item_options.keys()))
+                 
+                 # Get the data for the item the user just picked
+                 current_item = item_options[selected_name]
+                 
+                 # 2. Form for the numbers
                  with st.form("stock_in_form", clear_on_submit=True):
-                     selected_name = st.selectbox("Chagua Bidhaa", list(item_options.keys()))
+                     st.info(f"Stock ya sasa hivi: {current_item['current_stock']}")
+                     
                      qty = st.number_input("Kiasi unachonunua", min_value=1, step=1, value=1)
                      
-                     # Pre-fill price based on selection
-                     default_price = float(item_options[selected_name]['buying_price'])
-                     p_price = st.number_input("Bei ya kununulia", value=default_price, step=100.0)
+                     # The price now automatically defaults to the selected item's buying price
+                     p_price = st.number_input(
+                         "Bei ya kununulia (kwa kila moja)", 
+                         value=float(current_item['buying_price']), 
+                         step=100.0
+                     )
                      
                      submitted = st.form_submit_button("Hifadhi Ununuzi")
          
                      if submitted:
                          try:
-                             item_id = item_options[selected_name]['id']
-                             
-                             # 1. Record Transaction
+                             # Record the buy in transactions table
                              conn.table("inventory_transactions").insert({
                                  "user_id": st.session_state.user_id,
-                                 "item_id": item_id,
+                                 "item_id": current_item['id'],
                                  "type": "STOCK_IN",
                                  "quantity": qty,
                                  "price_per_unit": p_price
                              }).execute()
                              
-                             # 2. Update Current Stock
-                             new_stock = item_options[selected_name]['current_stock'] + qty
-                             conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", item_id).execute()
+                             # Calculate and update new stock
+                             new_stock = current_item['current_stock'] + qty
+                             conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", current_item['id']).execute()
                              
-                             # 3. Show success message without immediate rerun
-                             st.success(f"Imekamilika! Umeongeza {qty} za {selected_name}. Stock mpya: {new_stock}")
-                             
-                             # Use st.info or st.button to let them refresh manually, 
-                             # or just let Streamlit naturally update on next interaction.
+                             st.success(f"Umefanikiwa! Umeongeza {qty} za {selected_name}. Stock mpya: {new_stock}")
+                             # Note: We don't use rerun here so the message stays visible
                          except Exception as e:
                              st.error(f"Hitilafu: {e}")
              else:
-                 st.info("Tafadhali sajili bidhaa kwanza.")
+                 st.info("Bado huna bidhaa. Tafadhali nenda 'Register Items' kwanza.")
 
 
 
