@@ -441,30 +441,32 @@ if st.session_state.logged_in and menu == "Dashboard":
                                for _, row in df.iterrows():
                                    data.append([Paragraph(str(val), cell_style) for val in row.values])
                                
-                               # 4. INVOICE-STYLE TOTALS ROW
-                                  
+                               # 4. INVOICE-STYLE TOTALS ROW 
                                try:
-                                   # Convert columns to string, remove non-numeric characters, and force to float
-                                   # 'errors=coerce' turns any text that isn't a number into 'NaN' so it doesn't crash
-                                   clean_qty = pd.to_numeric(df['Qty'].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
-                                   clean_total = pd.to_numeric(df['Total'].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
+                                   # Detect columns automatically to avoid "Name Error"
+                                   # This finds the column that contains 'Qty' or 'Total' even if misspelled
+                                   qty_col = [c for c in df.columns if 'Qty' in c][0]
+                                   total_col = [c for c in df.columns if 'Total' in c][0]
+                           
+                                   # Clean and Sum
+                                   total_qty = pd.to_numeric(df[qty_col].astype(str).str.replace(',', ''), errors='coerce').sum()
+                                   total_money = pd.to_numeric(df[total_col].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').sum()
                                    
-                                   total_qty = clean_qty.sum()
-                                   total_money = clean_total.sum()
-                                   
+                                   # Build the footer row
                                    footer = [
-                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
-                                       Paragraph("", cell_style),
-                                       Paragraph("", cell_style),
-                                       Paragraph("", cell_style),
-                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
-                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
-                                       Paragraph("", cell_style)
+                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style), # col 0
+                                       Paragraph("", cell_style),                      # col 1
+                                       Paragraph("", cell_style),                      # col 2
+                                       Paragraph("", cell_style),                      # col 3
+                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style), # col 4 (Qty)
+                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style), # col 5 (Total)
+                                       Paragraph("", cell_style)                       # col 6
                                    ]
                                    data.append(footer)
                                except Exception as e:
-                                   # This will now show the exact column name or issue if it fails
-                                   data.append([Paragraph(f"<b>Check Data: {str(e)}</b>", cell_style)] + [""]*6)
+                                   # If it fails, this will print the REAL error on your PDF so we can see it
+                                   data.append([Paragraph(f"<b>Sum Error: {str(e)}</b>", cell_style)] + [""]*6)
+
 
 
                            
