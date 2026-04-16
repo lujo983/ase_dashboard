@@ -428,7 +428,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                              st.error(f"Hitilafu: {e}")
         # End register items
         # startsView registerd 
-        elif menu == "My Catalog & Actions":
+        elif menu == "My registered items":
              st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
              
              if "user_id" in st.session_state:
