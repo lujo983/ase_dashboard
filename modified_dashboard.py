@@ -529,7 +529,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          "Bei ya kununulia (kwa kila moja)", 
                          value=float(current_item['buying_price']), 
                          step=100.0
-                     #)
+                     )
                      
                      submitted = st.form_submit_button("Hifadhi Ununuzi")
          
