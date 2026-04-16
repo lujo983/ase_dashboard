@@ -405,83 +405,95 @@ if st.session_state.logged_in and menu == "Dashboard":
         
                         # --- START OF PDF GENERATION LOGIC ---
                         def create_pdf(df):
-                             buf = BytesIO()
-                             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=20, bottomMargin=30)
-                             elements = []
-                             styles = getSampleStyleSheet()
-                             
-                             # Text styles
-                             cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=8, leading=10)
-                             header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=9, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
-                         
-                             # --- 1. LOGO & TITLE SECTION ---
-                             try:
-                                 # Using your specific logo filename
-                                 logo = Image("bridge gap tra.jpg", width=1.2*inch, height=0.6*inch)
-                                 header_data = [[logo, Paragraph("ASE PRODUCTION REPORT", styles['Title'])]]
-                                 header_table = Table(header_data, colWidths=[1.5*inch, 4.5*inch])
-                                 header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('ALIGN', (1,0), (1,0), 'RIGHT')]))
-                                 elements.append(header_table)
-                             except Exception:
-                                 elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", styles['Title']))
-                             
-                             # Sub-header details
-                             sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
-                             elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", sub_style))
-                             elements.append(Paragraph(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
-                             elements.append(Spacer(1, 20))
-                         
-                             # --- 2. DATA TABLE SECTION ---
-                             headers = [Paragraph(f"<b>{col}</b>", header_cell_style) for col in df.columns.tolist()]
-                             data = [headers]
-                             
-                             # Add regular data rows
-                             for _, row in df.iterrows():
-                                 data.append([Paragraph(str(val), cell_style) for val in row.values])
-                             
-                             # --- 3. SUMMARY TOTALS ROW ---
-                             try:
-                                 # Calculations (ensure columns 'Qty' and 'Total' match your df columns)
-                                 total_qty = df['Qty'].astype(float).sum()
-                                 total_money = df['Total'].astype(float).sum()
-                                 
-                                 footer = [
-                                     Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
-                                     Paragraph("", cell_style),
-                                     Paragraph("", cell_style),
-                                     Paragraph("", cell_style),
-                                     Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
-                                     Paragraph(f"<b>{total_money:,.2f}</b>", cell_style),
-                                     Paragraph("", cell_style)
-                                 ]
-                                 data.append(footer)
-                             except:
-                                 pass # Skip footer if data is missing
-                         
-                             # --- 4. TABLE STYLING ---
-                             col_widths = [0.8*inch, 0.9*inch, 1.1*inch, 0.6*inch, 0.5*inch, 0.8*inch, 2.6*inch]
-                             t = Table(data, colWidths=col_widths, repeatRows=1)
-                             
-                             t.setStyle(TableStyle([
-                                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
-                                 ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                                 ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                                 ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.whitesmoke, colors.white]),
-                                 # Highlight the Total row (the last row)
-                                 ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor("#D1D5DB")),
-                                 ('LINEABOVE', (0, -1), (-1, -1), 1.5, colors.HexColor("#1E3A8A")),
-                             ]))
-                             
-                             elements.append(t)
-                             
-                             # Final Footer Text
-                             elements.append(Spacer(1, 15))
-                             elements.append(Paragraph("<i>Ripoti hii imetolewa na ASE Dashboard.</i>", sub_style))
-                         
-                             # 5. Build
-                             doc.build(elements)
-                             return buf.getvalue()
+                               buf = BytesIO()
+                               # Professional A4 setup with clean margins
+                               doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=20, bottomMargin=30)
+                               elements = []
+                               styles = getSampleStyleSheet()
+                               
+                               # 1. PROFESSIONAL STYLES
+                               title_style = ParagraphStyle('TitleStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), alignment=1)
+                               cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=8, leading=10)
+                               header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=9, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
+                               sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
+                           
+                               # 2. LOGO & TITLE SECTION
+                               try:
+                                   # Integrated your specific logo filename
+                                   logo = Image("bridge gap tra.jpg", width=1.4*inch, height=0.7*inch)
+                                   # Table to hold Logo and Title side-by-side
+                                   header_table = Table([[logo, Paragraph("ASE PRODUCTION REPORT", title_style)]], colWidths=[1.5*inch, 4*inch])
+                                   header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
+                                   elements.append(header_table)
+                               except:
+                                   elements.append(Paragraph("ASE PRODUCTION REPORT", title_style))
+                               
+                               elements.append(Spacer(1, 10))
+                               elements.append(Paragraph(f"<b>Entrepreneur:</b> {st.session_state.user_name}", sub_style))
+                               elements.append(Paragraph(f"<b>Report Date:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
+                               elements.append(Spacer(1, 20))
+                           
+                               # 3. DATA PREPARATION (Ensuring proper wrapping)
+                               headers = [Paragraph(f"<b>{col}</b>", header_cell_style) for col in df.columns.tolist()]
+                               data = [headers]
+                               
+                               # Add regular data rows
+                               for _, row in df.iterrows():
+                                   data.append([Paragraph(str(val), cell_style) for val in row.values])
+                               
+                               # 4. INVOICE-STYLE TOTALS ROW
+                               try:
+                                   # Summing columns - Make sure 'Qty' and 'Total' match your dataframe headers exactly
+                                   total_qty = df['Qty'].astype(float).sum()
+                                   total_money = df['Total'].astype(float).sum()
+                                   
+                                   footer = [
+                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph("", cell_style),
+                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
+                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
+                                       Paragraph("", cell_style)
+                                   ]
+                                   data.append(footer)
+                               except:
+                                   pass # Skips if columns aren't numeric
+                           
+                               # 5. TABLE CONSTRUCTION & PRO STYLING
+                               # Widths assigned for A4: Total ~7.3 inches
+                               col_widths = [0.8*inch, 0.9*inch, 1.1*inch, 0.6*inch, 0.5*inch, 1.0*inch, 2.4*inch]
+                               t = Table(data, colWidths=col_widths, repeatRows=1)
+                               
+                               t.setStyle(TableStyle([
+                                   # Header Styling
+                                   ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
+                                   ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                   ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                   
+                                   # Body Styling
+                                   ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                                   ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.whitesmoke, colors.white]), # Zebra strips except last row
+                                   
+                                   # Summary/Total Row Styling
+                                   ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor("#D1D5DB")), # Light grey footer
+                                   ('LINEABOVE', (0, -1), (-1, -1), 1.5, colors.HexColor("#1E3A8A")), # Bold line above total
+                                   ('ALIGN', (4, -1), (5, -1), 'CENTER'), # Center the total numbers
+                               ]))
+                               
+                               elements.append(t)
+                               
+                               # 6. SIGNATURE/FOOTER SECTION
+                               elements.append(Spacer(1, 30))
+                               elements.append(Paragraph("__________________________", sub_style))
+                               elements.append(Paragraph("Signature & Official Stamp", sub_style))
+                               elements.append(Spacer(1, 15))
+                               elements.append(Paragraph("<i>This is a computer-generated report from ASE Dashboard.</i>", sub_style))
+                           
+                               # 7. BUILD
+                               doc.build(elements)
+                               return buf.getvalue()
+
 
 
                         # --- END OF PDF GENERATION LOGIC ---
