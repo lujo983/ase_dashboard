@@ -481,7 +481,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          
                          # DELETE SECTION
                          with col_b:
-                             st.write("Danger Zone")
+                             st.write("Danger Zone/Kuwa Makini Hapa")
                              if st.button(f"🗑️ Delete {selected_name}"):
                                  # Direct delete based on unique ID
                                  try:
