@@ -670,7 +670,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
                                  
                                  # PDF Content
-                                 elements.append(Paragraph(f"ASE DAILY REPORT: {st.session_state.user_name}", title_style))
+                                 elements.append(Paragraph(f" DAILY BUSINESS REPORT: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
          
