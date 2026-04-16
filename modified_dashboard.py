@@ -525,11 +525,11 @@ if st.session_state.logged_in and menu == "Dashboard":
                      qty = st.number_input("Kiasi unachonunua", min_value=1, step=1, value=1)
                      
                      # The price now automatically defaults to the selected item's buying price
-                     p_price = st.number_input(
-                         "Bei ya kununulia (kwa kila moja)", 
-                         value=float(current_item['buying_price']), 
-                         step=100.0
-                     )
+                     #p_price = st.number_input(
+                         #"Bei ya kununulia (kwa kila moja)", 
+                         #value=float(current_item['buying_price']), 
+                         #step=100.0
+                     #)
                      
                      submitted = st.form_submit_button("Hifadhi Ununuzi")
          
