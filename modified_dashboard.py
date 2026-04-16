@@ -14,6 +14,12 @@ from st_supabase_connection import SupabaseConnection
 # Initialize connection
 conn = st.connection("supabase", type=SupabaseConnection) 
 
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from io import BytesIO
+
 #costom css
 st.markdown(
 """
@@ -391,25 +397,51 @@ if st.session_state.logged_in and menu == "Dashboard":
                         .execute()
         
                     if response.data:
-                        # 2. Convert to DataFrame
-                        prod_df = pd.DataFrame(response.data)
-        
-                        # 3. Clean up formatting for a "Pro" look 
-                        prod_df.columns = ["Date", "Zone", "Product", "Price", "Qty", "Total", "Comments"]
-                        prod_df["Date"] = pd.to_datetime(prod_df["Date"]).dt.strftime('%Y-%m-%d %H:%M')
-        
-                        # 4. Show Summary Metrics at the top
-                        col1, col2, col3 = st.columns(3)
-                        col1.metric("Total Entries", len(prod_df))
-                        col2.metric("Total Qty", f"{prod_df['Qty'].sum():,}")
-                        col3.metric("Total Earnings", f"Tsh {prod_df['Total'].sum():,.2f}")
-        
-                        # 5. Display the data table with styling
-                        st.dataframe(prod_df, use_container_width=True, hide_index=True)
-                        
-                        # 6. Option to Download as CSV
-                        csv = prod_df.to_csv(index=False).encode('utf-8')
-                        st.download_button("📥 Download CSV", data=csv, file_name="my_production.csv", mime="text/csv")
+                        # 1. Prepare PDF function
+                         def create_pdf(df):
+                             buf = BytesIO()
+                             doc = SimpleDocTemplate(buf, pagesize=letter)
+                             elements = []
+                             styles = getSampleStyleSheet()
+                         
+                             # Title
+                             elements.append(Paragraph("ASE Dashboard - Production Report", styles['Title']))
+                             elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", styles['Normal']))
+                             elements.append(Spacer(1, 12))
+                         
+                             # Table Data
+                             # Convert DataFrame to a list of lists for ReportLab
+                             data = [df.columns.tolist()] + df.values.tolist()
+                             
+                             # Create Table
+                             t = Table(data)
+                             
+                             # Professional Styling
+                             style = TableStyle([
+                                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                 ('FONTSIZE', (0, 0), (-1, 0), 10),
+                                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                 ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                 ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                 ('FONTSIZE', (0, 1), (-1, -1), 8),
+                             ])
+                             t.setStyle(style)
+                             elements.append(t)
+                             
+                             doc.build(elements)
+                             return buf.getvalue()
+                         
+                         # 2. Add the PDF Download Button to Streamlit
+                         pdf_data = create_pdf(prod_df)
+                         st.download_button(
+                             label="📑 Download Professional PDF Report",
+                             data=pdf_data,
+                             file_name=f"Production_Report_{st.session_state.user_name}.pdf",
+                             mime="application/pdf"
+                         )
                     else:
                         st.info("Bado hujaingiza taarifa zozote za uzalishaji.")
                         
