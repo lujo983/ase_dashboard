@@ -15,7 +15,7 @@ from st_supabase_connection import SupabaseConnection
 conn = st.connection("supabase", type=SupabaseConnection) 
 
 # IMPORTS FOR PDF MAKING
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4 
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
@@ -505,26 +505,27 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "Stock In (Manunuzi)":
              st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
          
-             # 1. Fetch current items for the dropdown
              res = conn.table("inventory_items").select("id, item_name, current_stock, buying_price").eq("user_id", st.session_state.user_id).execute()
              
              if res.data:
                  item_options = {item['item_name']: item for item in res.data}
                  
-                 # Start the form
+                 # Use a unique key for the form to help Streamlit reset it
                  with st.form("stock_in_form", clear_on_submit=True):
                      selected_name = st.selectbox("Chagua Bidhaa", list(item_options.keys()))
-                     qty = st.number_input("Kiasi unachonunua (Quantity In)", min_value=1, step=1)
-                     p_price = st.number_input("Bei ya kununulia kwa kipande kimoja", value=float(item_options[selected_name]['buying_price']), step=100.0)
+                     qty = st.number_input("Kiasi unachonunua", min_value=1, step=1, value=1)
                      
-                     # THE SUBMIT BUTTON MUST BE INSIDE THIS "WITH" BLOCK
+                     # Pre-fill price based on selection
+                     default_price = float(item_options[selected_name]['buying_price'])
+                     p_price = st.number_input("Bei ya kununulia", value=default_price, step=100.0)
+                     
                      submitted = st.form_submit_button("Hifadhi Ununuzi")
          
                      if submitted:
                          try:
                              item_id = item_options[selected_name]['id']
                              
-                             # A. Record Transaction
+                             # 1. Record Transaction
                              conn.table("inventory_transactions").insert({
                                  "user_id": st.session_state.user_id,
                                  "item_id": item_id,
@@ -533,21 +534,26 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  "price_per_unit": p_price
                              }).execute()
                              
-                             # B. Update Current Stock in inventory_items
+                             # 2. Update Current Stock
                              new_stock = item_options[selected_name]['current_stock'] + qty
                              conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", item_id).execute()
                              
-                             st.success(f"Hongera! Umeongeza {qty} za {selected_name}. Stock mpya ni {new_stock}.")
-                             st.rerun() # Refresh to update the inventory table
+                             # 3. Show success message without immediate rerun
+                             st.success(f"Imekamilika! Umeongeza {qty} za {selected_name}. Stock mpya: {new_stock}")
+                             
+                             # Use st.info or st.button to let them refresh manually, 
+                             # or just let Streamlit naturally update on next interaction.
                          except Exception as e:
                              st.error(f"Hitilafu: {e}")
              else:
-                 st.info("Tafadhali sajili bidhaa kwanza kwenye 'Register Items'.")
+                 st.info("Tafadhali sajili bidhaa kwanza.")
+
 
 
         # End stock In
 
         elif menu == "All Production Records":
+         
             st.subheader("📊 All Your Production Entries")
                     
             if "user_id" in st.session_state:
