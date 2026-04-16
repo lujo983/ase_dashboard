@@ -405,68 +405,68 @@ if st.session_state.logged_in and menu == "Dashboard":
         
                         # --- START OF PDF GENERATION LOGIC ---
                         def create_pdf(df):
-    buf = BytesIO()
-    # Use A4 and set margins
-    doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
-    elements = []
-    styles = getSampleStyleSheet()
-    
-    # 1. Add Logo (Optional - replace 'logo.png' with your file path or URL)
-    # try:
-    #    logo = Image("logo.png", width=1.5*inch, height=0.5*inch)
-    #    logo.hAlign = 'RIGHT'
-    #    elements.append(logo)
-    # except:
-    #    pass
-
-    # 2. Professional Header
-    header_style = ParagraphStyle('HeaderStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), spaceAfter=10)
-    elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", header_style))
-    
-    sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
-    elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", sub_style))
-    elements.append(Paragraph(f"Date Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
-    elements.append(Spacer(1, 20))
-
-    # 3. Handle Table Data & Wrapping
-    # Convert all data to strings to prevent formatting errors
-    data = [df.columns.tolist()] + df.values.astype(str).tolist()
-    
-    # Calculate available width on A4 (approx 7.5 inches)
-    # We define widths for each column to prevent overlap
-    col_widths = [0.8*inch, 1.0*inch, 1.2*inch, 0.7*inch, 0.6*inch, 0.8*inch, 2.2*inch]
-
-    t = Table(data, colWidths=col_widths, repeatRows=1)
-    
-    # 4. Pro Table Styling
-    style = TableStyle([
-        # Header Row
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
-        
-        # Data Rows
-        ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        
-        # Alternating Row Colors (Zebra Strips)
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
-        
-        # Borders
-        ('LINEBELOW', (0, 0), (-1, 0), 2, colors.HexColor("#1E3A8A")),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-    ])
-    
-    t.setStyle(style)
-    elements.append(t)
-    
-    # 5. Build
-    doc.build(elements)
-    return buf.getvalue()
+                             buf = BytesIO()
+                             # Use A4 and set margins
+                             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+                             elements = []
+                             styles = getSampleStyleSheet()
+                             
+                             # 1. Add Logo (Optional - replace 'logo.png' with your file path or URL)
+                             # try:
+                             #    logo = Image("logo.png", width=1.5*inch, height=0.5*inch)
+                             #    logo.hAlign = 'RIGHT'
+                             #    elements.append(logo)
+                             # except:
+                             #    pass
+                         
+                             # 2. Professional Header
+                             header_style = ParagraphStyle('HeaderStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), spaceAfter=10)
+                             elements.append(Paragraph("ASE DASHBOARD PRODUCTION REPORT", header_style))
+                             
+                             sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
+                             elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", sub_style))
+                             elements.append(Paragraph(f"Date Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
+                             elements.append(Spacer(1, 20))
+                         
+                             # 3. Handle Table Data & Wrapping
+                             # Convert all data to strings to prevent formatting errors
+                             data = [df.columns.tolist()] + df.values.astype(str).tolist()
+                             
+                             # Calculate available width on A4 (approx 7.5 inches)
+                             # We define widths for each column to prevent overlap
+                             col_widths = [0.8*inch, 1.0*inch, 1.2*inch, 0.7*inch, 0.6*inch, 0.8*inch, 2.2*inch]
+                         
+                             t = Table(data, colWidths=col_widths, repeatRows=1)
+                             
+                             # 4. Pro Table Styling
+                             style = TableStyle([
+                                 # Header Row
+                                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
+                                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+                                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                 ('FONTSIZE', (0, 0), (-1, 0), 10),
+                                 
+                                 # Data Rows
+                                 ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+                                 ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                                 ('FONTSIZE', (0, 1), (-1, -1), 9),
+                                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                 
+                                 # Alternating Row Colors (Zebra Strips)
+                                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+                                 
+                                 # Borders
+                                 ('LINEBELOW', (0, 0), (-1, 0), 2, colors.HexColor("#1E3A8A")),
+                                 ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                             ])
+                             
+                             t.setStyle(style)
+                             elements.append(t)
+                             
+                             # 5. Build
+                             doc.build(elements)
+                             return buf.getvalue()
 
 
                         # --- END OF PDF GENERATION LOGIC ---
@@ -477,7 +477,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         # Show the button only because prod_df DEFINITELY exists here
                         pdf_data = create_pdf(prod_df)
                         st.download_button(
-                            label="📑 Download Professional PDF Report",
+                            label="📑 Download PDF Report",
                             data=pdf_data,
                             file_name="Production_Report.pdf",
                             mime="application/pdf"
