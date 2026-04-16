@@ -541,7 +541,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  "item_id": current_item['id'],
                                  "type": "STOCK_IN",
                                  "quantity": qty,
-                                 "price_per_unit": p_price
+                                 #"price_per_unit": p_price
                              }).execute()
                              
                              # Calculate and update new stock
