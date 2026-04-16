@@ -374,7 +374,8 @@ if st.session_state.logged_in and menu == "Dashboard":
             "All Production Records",
             "Register Items",
             "My registered items",
-            "Stock In (Manunuzi)"
+            "Stock In (Manunuzi)",
+            "Stock Out (Mauzo)"
         ])
         # Add community member content
         # Community member sees daily production form
@@ -560,7 +561,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         # End stock In
      
         # Start Sales                  
-        elif menu == "Stock Out (Sales)":
+        elif menu == "Stock Out (Mauzo)":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
          
              # 1. Fetch current items
