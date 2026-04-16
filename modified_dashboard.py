@@ -670,7 +670,38 @@ if st.session_state.logged_in and menu == "Dashboard":
                          # 5. Daily PDF Option
                          if st.button("Generate Today's PDF Report"):
                              # You can reuse your create_pdf function here
-                             pdf_data = create_pdf(report_df)
+                             def create_pdf(df):
+                                 buf = BytesIO()
+                                 doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=20, bottomMargin=30)
+                                 elements = []
+                                 styles = getSampleStyleSheet()
+                                 
+                                 cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=8, leading=10)
+                                 title_style = ParagraphStyle('TitleStyle', parent=styles['Title'], fontSize=16, textColor=colors.HexColor("#1E3A8A"))
+                             
+                                 # Header
+                                 elements.append(Paragraph("ASE DAILY BUSINESS REPORT", title_style))
+                                 elements.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+                                 elements.append(Spacer(1, 20))
+                             
+                                 # Table Data
+                                 headers = [Paragraph(f"<b>{col}</b>", cell_style) for col in df.columns.tolist()]
+                                 data = [headers]
+                                 for _, row in df.iterrows():
+                                     data.append([Paragraph(str(val), cell_style) for val in row.values])
+                             
+                                 # Table Setup
+                                 t = Table(data, repeatRows=1)
+                                 t.setStyle(TableStyle([
+                                     ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
+                                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                     ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                                     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                 ]))
+                                 
+                                 elements.append(t)
+                                 doc.build(elements)
+                                 return buf.getvalue()
                              st.download_button("📥 Download Daily PDF", data=pdf_data, file_name=f"Daily_Report_{today_date}.pdf")
          
                      else:
