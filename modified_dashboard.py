@@ -385,72 +385,61 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
             st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
         elif menu == "All Production Records":
-            st.subheader("📊 All Your Production Entries / Taarifa za uzalishaji wako")
+            st.subheader("📊 All Your Production Entries")
                     
             if "user_id" in st.session_state:
                 try:
-                    # 1. Fetch data from Supabase for this specific user
                     response = conn.table("production_records") \
                         .select("created_at, zone, product_name, unit_price, quantity, total_earnings, comments") \
                         .eq("user_id", st.session_state.user_id) \
                         .order("created_at", desc=True) \
                         .execute()
         
+                    # ONLY RUN THIS IF DATA EXISTS
                     if response.data:
-                        # 1. Prepare PDF function
-                         def create_pdf(df):
-                             buf = BytesIO()
-                             doc = SimpleDocTemplate(buf, pagesize=letter)
-                             elements = []
-                             styles = getSampleStyleSheet()
-                         
-                             # Title
-                             elements.append(Paragraph("ASE Dashboard - Production Report", styles['Title']))
-                             elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", styles['Normal']))
-                             elements.append(Spacer(1, 12))
-                         
-                             # Table Data
-                             # Convert DataFrame to a list of lists for ReportLab
-                             data = [df.columns.tolist()] + df.values.tolist()
-                             
-                             # Create Table
-                             t = Table(data)
-                             
-                             # Professional Styling
-                             style = TableStyle([
-                                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                                 ('FONTSIZE', (0, 0), (-1, 0), 10),
-                                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                                 ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                                 ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                                 ('FONTSIZE', (0, 1), (-1, -1), 8),
-                             ])
-                             t.setStyle(style)
-                             elements.append(t)
-                             
-                             doc.build(elements)
-                             return buf.getvalue()
-                         
-                         # 2. Add the PDF Download Button to Streamlit
-                         pdf_data = create_pdf(prod_df)
-                         st.download_button(
-                             label="📑 Download Professional PDF Report",
-                             data=pdf_data,
-                             file_name=f"Production_Report_{st.session_state.user_name}.pdf",
-                             mime="application/pdf"
-                         )
+                        prod_df = pd.DataFrame(response.data)
+        
+                        # --- START OF PDF GENERATION LOGIC ---
+                        def create_pdf(df):
+                            buf = BytesIO()
+                            doc = SimpleDocTemplate(buf, pagesize=letter)
+                            elements = []
+                            styles = getSampleStyleSheet()
+                            elements.append(Paragraph("ASE Dashboard - Production Report", styles['Title']))
+                            elements.append(Paragraph(f"Entrepreneur: {st.session_state.user_name}", styles['Normal']))
+                            elements.append(Spacer(1, 12))
+                            
+                            data = [df.columns.tolist()] + df.values.tolist()
+                            t = Table(data)
+                            style = TableStyle([
+                                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                            ])
+                            t.setStyle(style)
+                            elements.append(t)
+                            doc.build(elements)
+                            return buf.getvalue()
+                        # --- END OF PDF GENERATION LOGIC ---
+        
+                        # Now display the table
+                        st.dataframe(prod_df, use_container_width=True, hide_index=True)
+        
+                        # Show the button only because prod_df DEFINITELY exists here
+                        pdf_data = create_pdf(prod_df)
+                        st.download_button(
+                            label="📑 Download Professional PDF Report",
+                            data=pdf_data,
+                            file_name="Production_Report.pdf",
+                            mime="application/pdf"
+                        )
                     else:
                         st.info("Bado hujaingiza taarifa zozote za uzalishaji.")
                         
                 except Exception as e:
                     st.error(f"Error fetching data: {e}")
-            else:
-                st.warning("Please login to view your records.")
 
- 
                  
         elif menu == "Daily Production Entry Form":
             # Start Daily production entry form
