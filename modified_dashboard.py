@@ -441,31 +441,30 @@ if st.session_state.logged_in and menu == "Dashboard":
                                for _, row in df.iterrows():
                                    data.append([Paragraph(str(val), cell_style) for val in row.values])
                                
-                               # 4. INVOICE-STYLE TOTALS ROW 
-                               try:
-                                   # Detect columns automatically to avoid "Name Error"
-                                   # This finds the column that contains 'Qty' or 'Total' even if misspelled
-                                   qty_col = [c for c in df.columns if 'Qty' in c][0]
-                                   total_col = [c for c in df.columns if 'Total' in c][0]
-                           
-                                   # Clean and Sum
-                                   total_qty = pd.to_numeric(df[qty_col].astype(str).str.replace(',', ''), errors='coerce').sum()
-                                   total_money = pd.to_numeric(df[total_col].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').sum()
-                                   
-                                   # Build the footer row
-                                   footer = [
-                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style), # col 0
-                                       Paragraph("", cell_style),                      # col 1
-                                       Paragraph("", cell_style),                      # col 2
-                                       Paragraph("", cell_style),                      # col 3
-                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style), # col 4 (Qty)
-                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style), # col 5 (Total)
-                                       Paragraph("", cell_style)                       # col 6
-                                   ]
-                                   data.append(footer)
-                               except Exception as e:
-                                   # If it fails, this will print the REAL error on your PDF so we can see it
-                                   data.append([Paragraph(f"<b>Sum Error: {str(e)}</b>", cell_style)] + [""]*6)
+                               # 4. INVOICE-STYLE TOTALS ROW
+                                try:
+                                    # We assume: Col 4 is Qty, Col 5 is Total (counting starts at 0)
+                                    # We use .iloc to pick columns by their position
+                                    qty_values = pd.to_numeric(df.iloc[:, 4].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
+                                    total_values = pd.to_numeric(df.iloc[:, 5].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
+                                    
+                                    total_qty = qty_values.sum()
+                                    total_money = total_values.sum()
+                                    
+                                    footer = [
+                                        Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
+                                        Paragraph("", cell_style),
+                                        Paragraph("", cell_style),
+                                        Paragraph("", cell_style),
+                                        Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
+                                        Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
+                                        Paragraph("", cell_style)
+                                    ]
+                                    data.append(footer)
+                                except Exception as e:
+                                    # If it still fails, it will tell us which part of the math is wrong
+                                    data.append([Paragraph(f"<b>Calculation Error: {str(e)}</b>", cell_style)] + [""]*6)
+
 
 
 
