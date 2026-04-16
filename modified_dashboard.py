@@ -620,95 +620,96 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "Daily Report":
              st.title("📅 Daily Business Summary")
              
-             # Get today's date in Supabase format
+             # 1. Setup Dates
              today_date = datetime.now().strftime("%Y-%m-%d")
              st.info(f"Showing report for: **{today_date}**")
          
              if "user_id" in st.session_state:
                  try:
-                     # 1. Fetch all transactions for today
-                     # We filter by user_id and the current date
+                     # 2. Fetch all transactions for today with a JOIN to get item names
                      res = conn.table("inventory_transactions") \
-                         .select("*, inventory_items(item_name)") \
+                         .select("transaction_date, type, quantity, price_per_unit, total_value, inventory_items(item_name)") \
                          .eq("user_id", st.session_state.user_id) \
                          .gte("transaction_date", f"{today_date}T00:00:00") \
                          .lte("transaction_date", f"{today_date}T23:59:59") \
                          .execute()
          
                      if res.data:
+                         # 3. Process Data
                          df = pd.DataFrame(res.data)
+                         df['Item Name'] = df['inventory_items'].apply(lambda x: x['item_name'])
                          
-                         # Flatten the item name from the joined table
-                         df['Item'] = df['inventory_items'].apply(lambda x: x['item_name'])
-                         
-                         # 2. Split Data for Metrics
-                         purchases = df[df['type'] == 'STOCK_IN']
-                         sales = df[df['type'] == 'STOCK_OUT']
-                         
-                         total_spent = purchases['total_value'].sum()
-                         total_earned = sales['total_value'].sum()
-                         net_cashflow = total_earned - total_spent
+                         # Cleanup for display
+                         report_df = df[['transaction_date', 'Item Name', 'type', 'quantity', 'price_per_unit', 'total_value']].copy()
+                         report_df['transaction_date'] = pd.to_datetime(report_df['transaction_date']).dt.strftime('%H:%M')
+                         report_df.columns = ['Time', 'Item', 'Type', 'Qty', 'Unit Price', 'Total']
          
-                         # 3. Display High-Level Metrics
+                         # 4. Calculate Summary Metrics
+                         purchases = report_df[report_df['Type'] == 'STOCK_IN']['Total'].sum()
+                         sales = report_df[report_df['Type'] == 'STOCK_OUT']['Total'].sum()
+                         net = sales - purchases
+         
                          m1, m2, m3 = st.columns(3)
-                         m1.metric("Total Purchases (In)", f"Tsh {total_spent:,.2f}", delta_color="normal")
-                         m2.metric("Total Sales (Out)", f"Tsh {total_earned:,.2f}", delta_color="normal")
-                         
-                         # Net Cashflow (Green if positive, Red if negative)
-                         m3.metric("Net Cashflow", f"Tsh {net_cashflow:,.2f}", delta=f"{net_cashflow:,.2f}")
+                         m1.metric("Purchases (In)", f"Tsh {purchases:,.0f}")
+                         m2.metric("Sales (Out)", f"Tsh {sales:,.0f}")
+                         m3.metric("Net Flow", f"Tsh {net:,.0f}", delta=f"{net:,.0f}")
          
-                         # 4. Detailed Transaction Table
-                         st.subheader("Leo Transactions Detail")
-                         report_df = df[['transaction_date', 'Item', 'type', 'quantity', 'price_per_unit', 'total_value']]
-                         report_df.columns = ['Time', 'Item Name', 'Type', 'Qty', 'Unit Price', 'Total']
-                         
-                         # Format time for readability
-                         report_df['Time'] = pd.to_datetime(report_df['Time']).dt.strftime('%H:%M')
-                         
                          st.dataframe(report_df, use_container_width=True, hide_index=True)
-                         
-                         # 5. Daily PDF Option
-                         if st.button("Generate Today's PDF Report"):
-                             # You can reuse your create_pdf function here
-                             def create_pdf(df):
+         
+                         # --- 5. INTERNAL PDF GENERATION LOGIC ---
+                         st.divider()
+                         if st.button("📑 Maandalizi ya PDF Report"):
+                             try:
                                  buf = BytesIO()
-                                 doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=20, bottomMargin=30)
+                                 doc = SimpleDocTemplate(buf, pagesize=A4)
                                  elements = []
                                  styles = getSampleStyleSheet()
                                  
-                                 cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=8, leading=10)
-                                 title_style = ParagraphStyle('TitleStyle', parent=styles['Title'], fontSize=16, textColor=colors.HexColor("#1E3A8A"))
-                             
-                                 # Header
-                                 elements.append(Paragraph("ASE DAILY BUSINESS REPORT", title_style))
-                                 elements.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
-                                 elements.append(Spacer(1, 20))
-                             
-                                 # Table Data
-                                 headers = [Paragraph(f"<b>{col}</b>", cell_style) for col in df.columns.tolist()]
-                                 data = [headers]
-                                 for _, row in df.iterrows():
-                                     data.append([Paragraph(str(val), cell_style) for val in row.values])
-                             
-                                 # Table Setup
-                                 t = Table(data, repeatRows=1)
+                                 # PDF Styles
+                                 title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
+                                 cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
+                                 
+                                 # PDF Content
+                                 elements.append(Paragraph(f"ASE DAILY REPORT: {st.session_state.user_name}", title_style))
+                                 elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
+                                 elements.append(Spacer(1, 15))
+         
+                                 # Prepare Table Data
+                                 pdf_data = [report_df.columns.tolist()]
+                                 for _, row in report_df.iterrows():
+                                     pdf_data.append([str(x) for x in row.values])
+                                 
+                                 # Add Summary Row to PDF
+                                 pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales - purchases:,.0f}"])
+         
+                                 # Build Table
+                                 t = Table(pdf_data, colWidths=[0.8*inch, 1.5*inch, 1*inch, 0.6*inch, 1*inch, 1.2*inch])
                                  t.setStyle(TableStyle([
                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                                      ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                                     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                     ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+                                     ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
                                  ]))
                                  
                                  elements.append(t)
                                  doc.build(elements)
-                                 return buf.getvalue()
-                             st.download_button("📥 Download Daily PDF", data=pdf_data, file_name=f"Daily_Report_{today_date}.pdf")
+                                 
+                                 st.download_button(
+                                     label="📥 Download Daily PDF",
+                                     data=buf.getvalue(),
+                                     file_name=f"Daily_Report_{today_date}.pdf",
+                                     mime="application/pdf"
+                                 )
+                             except Exception as pdf_err:
+                                 st.error(f"PDF Error: {pdf_err}")
          
                      else:
-                         st.warning("Hakuna miamala (transactions) yoyote iliyorekodiwa leo.")
+                         st.warning("Hakuna miamala iliyofanyika leo.")
                          
                  except Exception as e:
-                     st.error(f"Error loading daily report: {e}")
+                     st.error(f"Error: {e}")
+
 
         # End daily reports
 
