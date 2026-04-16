@@ -564,32 +564,36 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "Stock Out (Mauzo)":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
          
-             # 1. Fetch current items
              res = conn.table("inventory_items").select("id, item_name, current_stock, selling_price").eq("user_id", st.session_state.user_id).execute()
              
              if res.data:
                  item_options = {item['item_name']: item for item in res.data}
-                 
-                 # Selectbox outside to trigger price update
                  selected_name = st.selectbox("Chagua Bidhaa unayouza", list(item_options.keys()))
                  current_item = item_options[selected_name]
                  
-                 # 2. Sales Form
                  with st.form("stock_out_form", clear_on_submit=True):
                      available = current_item['current_stock']
                      st.info(f"Kiasi kilichopo (Available Stock): {available}")
                      
-                     qty = st.number_input("Kiasi unachouza (Quantity Out)", min_value=1, max_value=int(available) if available > 0 else 1, step=1)
+                     # Removed 'max_value' so the user can type any number
+                     qty = st.number_input("Kiasi unachouza (Quantity Out)", min_value=1, step=1)
                      s_price = st.number_input("Bei ya kuuzia (Selling Price)", value=float(current_item['selling_price']), step=100.0)
                      
                      submitted = st.form_submit_button("Hifadhi Mauzo")
          
                      if submitted:
-                         if available < qty:
-                             st.error(f"Huna stock ya kutosha! Una {available} pekee.")
+                         # 1. Check if stock is available
+                         if available <= 0:
+                             st.error(f"Samahani, bidhaa ya '{selected_name}' imekwisha kabisa (Out of Stock).")
+                         
+                         # 2. Check if the user is trying to sell more than they have
+                         elif qty > available:
+                             st.error(f"Huna stock ya kutosha! Unajaribu kuuza {qty} wakati zilizopo ni {available} pekee.")
+                         
+                         # 3. If everything is okay, proceed to save
                          else:
                              try:
-                                 # A. Record Sale in transactions
+                                 # Record Sale
                                  conn.table("inventory_transactions").insert({
                                      "user_id": st.session_state.user_id,
                                      "item_id": current_item['id'],
@@ -598,15 +602,16 @@ if st.session_state.logged_in and menu == "Dashboard":
                                      "price_per_unit": s_price
                                  }).execute()
                                  
-                                 # B. Subtract from Inventory
+                                 # Subtract from Inventory
                                  new_stock = available - qty
                                  conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", current_item['id']).execute()
                                  
-                                 st.success(f"Mauzo yamehifadhiwa! Umeuza {qty} za {selected_name}. Stock iliyobaki: {new_stock}")
+                                 st.success(f"Mauzo yamehifadhiwa! Stock iliyobaki: {new_stock}")
                              except Exception as e:
                                  st.error(f"Hitilafu: {e}")
              else:
                  st.info("Sajili bidhaa kwanza ili uweze kuuza.")
+
 
         # End Sales form
 
