@@ -372,7 +372,8 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Community Stories",
             "Daily Production Entry Form",
             "All Production Records",
-            "Register Items"
+            "Register Items",
+            "My registered items"
         ])
         # Add community member content
         # Community member sees daily production form
@@ -425,7 +426,53 @@ if st.session_state.logged_in and menu == "Dashboard":
                             st.success(f"Hongera! {item_name} imesajiliwa vyema.")
                         except Exception as e:
                             st.error(f"Hitilafu: {e}")
-           # Register item end
+        # Register item end
+        # Start View registered items
+        elif menu == "My Registered Items":
+             st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
+             
+             if "user_id" in st.session_state:
+                 try:
+                     # Fetch items for the logged-in user
+                     response = conn.table("inventory_items") \
+                         .select("item_name, category, buying_price, selling_price, current_stock, unit_measure") \
+                         .eq("user_id", st.session_state.user_id) \
+                         .execute()
+         
+                     if response.data:
+                         df_items = pd.DataFrame(response.data)
+                         
+                         # Calculate Profit Margin for professional view
+                         df_items["Margin (Tsh)"] = df_items["selling_price"] - df_items["buying_price"]
+                         
+                         # Rename columns for a clean interface
+                         display_df = df_items.rename(columns={
+                             "item_name": "Item Name",
+                             "category": "Category",
+                             "buying_price": "Buying Price",
+                             "selling_price": "Selling Price",
+                             "current_stock": "Stock Level",
+                             "unit_measure": "Unit"
+                         })
+         
+                         # Display Metrics (Top Summary)
+                         c1, c2 = st.columns(2)
+                         c1.metric("Total Unique Items", len(df_items))
+                         c2.metric("Total Stock Value (Buy)", f"Tsh { (df_items['buying_price'] * df_items['current_stock']).sum():,.2f}")
+         
+                         # Display Table
+                         st.dataframe(display_df, use_container_width=True, hide_index=True)
+                         
+                         # Option to edit or delete could be added here later
+                     else:
+                         st.info("Bado hujaasajili bidhaa yoyote. Nenda kwenye 'Register Items' kuanza.")
+                         
+                 except Exception as e:
+                     st.error(f"Error loading items: {e}")
+             else:
+                 st.warning("Tafadhali ingia (Login) kwanza.")
+
+        # End view registered items
 
         elif menu == "All Production Records":
             st.subheader("📊 All Your Production Entries")
