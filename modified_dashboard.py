@@ -506,7 +506,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
          
              # 1. Fetch current items
-             res = conn.table("inventory_items").select("id, item_name, current_stock").eq("user_id", st.session_state.user_id).execute()
+             res = conn.table("inventory_items").select("id, item_name, current_stock, buying_price").eq("user_id", st.session_state.user_id).execute()
              
              if res.data:
                  item_options = {item['item_name']: item for item in res.data}
@@ -525,10 +525,10 @@ if st.session_state.logged_in and menu == "Dashboard":
                      qty = st.number_input("Kiasi unachonunua", min_value=1, step=1, value=1)
                      
                      # The price now automatically defaults to the selected item's buying price
-                     #p_price = st.number_input(
-                         #"Bei ya kununulia (kwa kila moja)", 
-                         #value=float(current_item['buying_price']), 
-                         #step=100.0
+                     p_price = st.number_input(
+                         "Bei ya kununulia (kwa kila moja)", 
+                         value=float(current_item['buying_price']), 
+                         step=100.0
                      #)
                      
                      submitted = st.form_submit_button("Hifadhi Ununuzi")
@@ -541,7 +541,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  "item_id": current_item['id'],
                                  "type": "STOCK_IN",
                                  "quantity": qty,
-                                 #"price_per_unit": p_price
+                                 "price_per_unit": p_price
                              }).execute()
                              
                              # Calculate and update new stock
