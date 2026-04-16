@@ -371,7 +371,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Learning Materials",
             "Community Stories",
             "Daily Production Entry Form",
-            "All Production Records"
+            "All Production Records",
             "Register Items"
         ])
         # Add community member content
