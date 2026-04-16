@@ -372,6 +372,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Community Stories",
             "Daily Production Entry Form",
             "All Production Records"
+            "Register Items"
         ])
         # Add community member content
         # Community member sees daily production form
@@ -388,6 +389,44 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.subheader("Community Stories")
             st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
             st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+         # Register item starts
+        elif menu == "Register Items":
+            st.subheader("🆕 Register New Business Item")
+            
+            with st.form("item_reg_form", clear_on_submit=True):
+                item_name = st.text_input("Jina la Bidhaa (Item Name)")
+                category = st.selectbox("Kundi (Category)", ["Chakula", "Mavazi", "Vifaa", "Sabuni", "Zingine"])
+                unit = st.selectbox("Kipimo (Unit)", ["pcs", "kg", "ltr", "box"])
+                
+                col1, col2 = st.columns(2)
+                b_price = col1.number_input("Bei ya Kununua (Buying Price)", min_value=0.0, step=100.0)
+                s_price = col2.number_input("Bei ya Kuuzia (Selling Price)", min_value=0.0, step=100.0)
+                
+                initial_stock = st.number_input("Stock ya sasa (Initial Stock)", min_value=0, step=1)
+                
+                submitted = st.form_submit_button("Sajili Bidhaa")
+                
+                if submitted:
+                    if not item_name:
+                        st.error("Tafadhali weka jina la bidhaa.")
+                    else:
+                        try:
+                            new_item = {
+                                "user_id": st.session_state.user_id,
+                                "item_name": item_name,
+                                "category": category,
+                                "unit_measure": unit,
+                                "buying_price": b_price,
+                                "selling_price": s_price,
+                                "current_stock": initial_stock
+                            }
+                            
+                            conn.table("inventory_items").insert(new_item).execute()
+                            st.success(f"Hongera! {item_name} imesajiliwa vyema.")
+                        except Exception as e:
+                            st.error(f"Hitilafu: {e}")
+           # Register item end
+
         elif menu == "All Production Records":
             st.subheader("📊 All Your Production Entries")
                     
