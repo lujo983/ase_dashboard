@@ -180,7 +180,7 @@ if menu == "Register":
 
 # LOGIN FORM
 if menu == "Login" and not st.session_state.get("logged_in", False):
-    st.subheader("Login to ASE Dashboard\n- Home of Entrepreneurs")
+    st.subheader("Login to BM-SYSTEM Dashboard\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
     
     with st.form("login_form"):
         email = st.text_input("Email Address")
