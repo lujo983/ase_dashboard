@@ -182,10 +182,11 @@ if menu == "Register":
 if menu == "Login" and not st.session_state.get("logged_in", False):
     st.subheader("Login to BM-SYSTEM Dashboard\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
     # Create 3 columns, with the middle one wider for the image
-    col1, col2, col3 = st.columns([1, 3, 1])
-    
-    with col2:
-        st.image("bridge gap tra.jpg", caption="Centered Image", use_container_width=True)
+    image_url = "bridge gap tra.jpg"
+    st.markdown(
+        f'<img src="{image_url}" style="border-radius: 20px; width: 100%; border: 2px solid #ddd;">',
+        unsafe_allow_html=True
+    )
     
     with st.form("login_form"):
         email = st.text_input("Email Address")
