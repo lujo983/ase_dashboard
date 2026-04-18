@@ -223,7 +223,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
                 st.error("Umekosea email au password.")
 
 
-    st.subheader("Community connect\n- The leading digital hub that equips and connects grassroots Entreprenuers, NGOs and CBO from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
+    st.subheader("Community connect\n- The Digital hub that equips and connects grassroots Entreprenuers, NGOs and CBO from both Rural and Urban with tools, knowledge, and networks to build sustainable Businesses and Transform communities.")
 # Sample data (Replace with your actual data)
 
 
