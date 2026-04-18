@@ -183,7 +183,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
     st.subheader("Login to BM-SYSTEM Dashboard\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
     # Create 3 columns, with the middle one wider for the image
     # Apply custom style via URL
-     st.markdown(
+ st.markdown(
          '<img src="bridge gap tra.jpg" style="border-radius: 50%; width: 200px;">',
          unsafe_allow_html=True
      )
