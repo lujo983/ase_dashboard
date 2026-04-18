@@ -121,7 +121,7 @@ if 'logged_in' not in st.session_state:
     st.session_state.role = ""
 
 # Sidebar Navigation
-st.sidebar.image("bm.png", width=100)
+st.sidebar.image("bridge gap tra.jpg", width=100)
 st.sidebar.title("Navigation")
 
 # Conditional menu
@@ -185,7 +185,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
     col1, col2, col3 = st.columns([0.5, 0.5, 0.5])
     
     with col2:
-        st.image("bm.png", width=100)
+        st.image("bridge gap tra.jpg", width=100)
     
     with st.form("login_form"):
         email = st.text_input("Email Address")
@@ -751,7 +751,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                # 2. LOGO & TITLE SECTION
                                try:
                                    # Integrated your specific logo filename
-                                   logo = Image("bm.png", width=1.4*inch, height=0.7*inch)
+                                   logo = Image("bridge gap tra.jpg", width=1.4*inch, height=0.7*inch)
                                    # Table to hold Logo and Title side-by-side
                                    header_table = Table([[logo, Paragraph("ASE PRODUCTION REPORT", title_style)]], colWidths=[1.5*inch, 4*inch])
                                    header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
