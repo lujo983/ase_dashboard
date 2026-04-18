@@ -182,7 +182,7 @@ if menu == "Register":
 if menu == "Login" and not st.session_state.get("logged_in", False):
     st.subheader("Login to BM-SYSTEM Dashboard\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
     # Create 3 columns, with the middle one wider for the image
-    image_url = "bridge gap tra.jpg"
+    image_url = "file_00000000af4c71f5804a1f8697d83c50_1.png"
     st.markdown(
         f'<img src="{image_url}" style="border-radius: 20px; width: 100%; border: 2px solid #ddd;">',
         unsafe_allow_html=True
