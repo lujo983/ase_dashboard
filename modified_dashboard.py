@@ -182,7 +182,7 @@ if menu == "Register":
 if menu == "Login" and not st.session_state.get("logged_in", False):
     st.subheader("Login to BM-SYSTEM Dashboard\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
     # Create 3 columns with ratios (adjust ratios for different image sizes)
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([1, 1, 1])
     
     with col2:
         st.image("bridge gap tra.jpg")
