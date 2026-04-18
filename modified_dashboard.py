@@ -184,7 +184,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
     # Create 3 columns, with the middle one wider for the image
     # Apply custom style via URL
     st.markdown(
-            '<img src="bridge gap tra.jpg" style="border-radius: 50%; width: 200px;">',
+            '<img src="https://github.com/lujo983/ase_dashboard/blob/main/bridge%20gap%20tra.jpg" style="border-radius: 50%; width: 200px;">',
             unsafe_allow_html=True
         )
     
