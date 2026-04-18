@@ -121,7 +121,7 @@ if 'logged_in' not in st.session_state:
     st.session_state.role = ""
 
 # Sidebar Navigation
-st.sidebar.image("bm.png", width=200)
+st.sidebar.image("bm.png", width=50)
 st.sidebar.title("Navigation")
 
 # Conditional menu
