@@ -694,13 +694,13 @@ if st.session_state.logged_in and menu == "Dashboard":
                          net = sales - purchases
          
                          m1, m2, m3, m4 = st.columns(4)
-                         m1.metric("Purchases", f"Tsh {purchases:,.0f}")
-                         m2.metric("Sales", f"Tsh {sales:,.0f}")
-                         m3.metric("Total Price Loss", f"Tsh {total_loss:,.0f}", delta=f"-{total_loss:,.0f}", delta_color="inverse")
+                         m1.metric("Purchases (Manunuzi)", f"Tsh {purchases:,.0f}")
+                         m2.metric("Sales (Mauzo)", f"Tsh {sales:,.0f}")
+                         m3.metric("Total Price Loss (Discounts)", f"Tsh {total_loss:,.0f}", delta=f"-{total_loss:,.0f}", delta_color="inverse")
                          m4.metric("Net Flow", f"Tsh {net:,.0f}")
          
                          if total_loss > 0:
-                             st.warning(f"⚠️ Leo umepoteza jumla ya Tsh {total_loss:,.0f} kwa kuuza chini ya bei elekezi.")
+                             st.warning(f"⚠️ Leo umepoteza jumla ya Tsh {total_loss:,.0f} kwa kuuza chini ya bei elekezi (Discounts).")
          
                          st.dataframe(report_df, use_container_width=True, hide_index=True)
          
@@ -727,7 +727,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  # Summary Row in PDF
                                  pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
          
-                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 0.8*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
+                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.5*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
                                  t.setStyle(TableStyle([
                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
