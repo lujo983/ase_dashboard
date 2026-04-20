@@ -262,7 +262,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Sajili Bidhaa",
             "Sajili Duka",
             "📤 Bulk Import (Excel)",
-            "List ya Bidhaa",
+            "📋 List ya Bidhaa Ulizosajili",
             "👥 Assign Shopkeepers",
             "Matumizi"
         ])
@@ -316,7 +316,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         
         # startsView registerd 
-        elif menu_business_owner == "List ya Bidhaa":
+        elif menu_business_owner == "📋 List ya Bidhaa Ulizosajili":
              st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
              
              if "user_id" in st.session_state:
