@@ -598,26 +598,32 @@ if st.session_state.logged_in and menu == "Dashboard":
                  selected_name = st.selectbox("Chagua Bidhaa unayouza", list(item_options.keys()))
                  current_item = item_options[selected_name]
                  
+                 # We get the registered price from the database
+                 registered_price = float(current_item['selling_price'])
+         
                  with st.form("stock_out_form", clear_on_submit=True):
                      available = current_item['current_stock']
-                     st.info(f"Kiasi kilichopo (Available Stock): {available}")
+                     st.info(f"Kiasi kilichopo (Available Stock): {available}") 
                      
-                     # Removed 'max_value' so the user can type any number
                      qty = st.number_input("Kiasi unachouza (Quantity Out)", min_value=1, step=1)
-                     s_price = st.number_input("Bei ya kuuzia (Selling Price)", value=float(current_item['selling_price']), step=100.0)
+                     s_price = st.number_input("Bei ya kuuzia (Selling Price)", value=registered_price, step=100.0)
                      
                      submitted = st.form_submit_button("Hifadhi Mauzo")
          
                      if submitted:
-                         # 1. Check if stock is available
+                         # 1. NEW CHECK: Price Alert
+                         if s_price < registered_price:
+                             st.warning(f"⚠️ Tahadhari: Unauza bidhaa hii chini ya bei uliyosajili (Tsh {registered_price:,.0f}).")
+         
+                         # 2. Check if stock is available
                          if available <= 0:
                              st.error(f"Samahani, bidhaa ya '{selected_name}' imekwisha kabisa (Out of Stock).")
                          
-                         # 2. Check if the user is trying to sell more than they have
+                         # 3. Check if user is trying to sell more than they have
                          elif qty > available:
                              st.error(f"Huna stock ya kutosha! Unajaribu kuuza {qty} wakati zilizopo ni {available} pekee.")
                          
-                         # 3. If everything is okay, proceed to save
+                         # 4. Proceed to save
                          else:
                              try:
                                  # Record Sale
@@ -634,10 +640,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", current_item['id']).execute()
                                  
                                  st.success(f"Mauzo yamehifadhiwa! Stock iliyobaki: {new_stock}")
+                                 # We use st.rerun() if you want the "Available Stock" info box to update immediately
                              except Exception as e:
                                  st.error(f"Hitilafu: {e}")
              else:
                  st.info("Sajili bidhaa kwanza ili uweze kuuza.")
+
 
 
         # End Sales form
