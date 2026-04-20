@@ -271,41 +271,40 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         if menu_business_owner == "Home/Dashboard":
             st.subheader("Donor Reports")
-            # owner_page.py
-            def show_owner_dashboard(conn):
-                st.title("🏢 Business Owner Dashboard")
-                tab1, tab2 = st.tabs(["📤 Bulk Import (Excel)", "👥 Assign Shopkeepers"])
-            
-                with tab1:
-                    st.subheader("Import Items to Shops")
-                    # 1. Fetch owner's business and shops
-                    biz = conn.table("businesses").select("id").eq("owner_id", st.session_state.user_id).single().execute()
-                    shops = conn.table("shops").select("id, shop_name").eq("business_id", biz.data['id']).execute()
+            st.title("🏢 Business Owner Dashboard")
+            tab1, tab2 = st.tabs(["📤 Bulk Import (Excel)", "👥 Assign Shopkeepers"])
+        
+            with tab1:
+                st.subheader("Import Items to Shops")
+                # 1. Fetch owner's business and shops
+                biz = conn.table("businesses").select("id").eq("owner_id", st.session_state.user_id).single().execute()
+                shops = conn.table("shops").select("id, shop_name").eq("business_id", biz.data['id']).execute()
+                
+                shop_map = {s['shop_name']: s['id'] for s in shops.data}
+                target_shop = st.selectbox("Assign items to:", list(shop_map.keys()))
+                
+                file = st.file_uploader("Upload Excel Template", type=["xlsx"])
+                if file and st.button("Process Import"):
+                    df = pd.read_excel(file)
+                    df['business_id'] = biz.data['id']
+                    df['shop_id'] = shop_map[target_shop]
+                    df['user_id'] = st.session_state.user_id # Owner still owns the data
                     
-                    shop_map = {s['shop_name']: s['id'] for s in shops.data}
-                    target_shop = st.selectbox("Assign items to:", list(shop_map.keys()))
-                    
-                    file = st.file_uploader("Upload Excel Template", type=["xlsx"])
-                    if file and st.button("Process Import"):
-                        df = pd.read_excel(file)
-                        df['business_id'] = biz.data['id']
-                        df['shop_id'] = shop_map[target_shop]
-                        df['user_id'] = st.session_state.user_id # Owner still owns the data
-                        
-                        conn.table("inventory_items").insert(df.to_dict(orient="records")).execute()
-                        st.success(f"Imported {len(df)} items to {target_shop}!")
-            
-                with tab2:
-                    st.subheader("Assign Shopkeeper to Shop")
-                    with st.form("assign_sk"):
-                        sk_email = st.text_input("Shopkeeper Email")
-                        dest_shop = st.selectbox("Assign to Shop", list(shop_map.keys()))
-                        if st.form_submit_button("Confirm Assignment"):
-                            conn.table("shop_assignments").insert({
-                                "shop_id": shop_map[dest_shop],
-                                "shopkeeper_email": sk_email
-                            }).execute()
-                            st.success(f"Assigned {sk_email} to {dest_shop}")
+                    conn.table("inventory_items").insert(df.to_dict(orient="records")).execute()
+                    st.success(f"Imported {len(df)} items to {target_shop}!")
+        
+            with tab2:
+                st.subheader("Assign Shopkeeper to Shop")
+                with st.form("assign_sk"):
+                    sk_email = st.text_input("Shopkeeper Email")
+                    dest_shop = st.selectbox("Assign to Shop", list(shop_map.keys()))
+                    if st.form_submit_button("Confirm Assignment"):
+                        conn.table("shop_assignments").insert({
+                            "shop_id": shop_map[dest_shop],
+                            "shopkeeper_email": sk_email
+                        }).execute()
+                        st.success(f"Assigned {sk_email} to {dest_shop}")
+
 
 
         # Sample data (Replace with your actual data)
