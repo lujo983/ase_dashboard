@@ -387,21 +387,53 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.warning("Tafadhali ingia (Login) kwanza.")
 
         # End view registerd
+     
 
+        # Start shopkeeper assignment
+        elif menu_business_owner == "👥 Assign Shopkeepers.":
+             st.subheader("👥 Shop & Shopkeeper Management")
+         
+             # --- PART A: CREATE A SHOP ---
+             with st.expander("➕ Create a New Shop"):
+                 with st.form("create_shop_form"):
+                     new_shop_name = st.text_input("Shop Name (e.g., Shop A)")
+                     location = st.text_input("Location")
+                     if st.form_submit_button("Save Shop"):
+                         conn.table("shops").insert({
+                             "owner_id": st.session_state.user_id,
+                             "shop_name": new_shop_name,
+                             "location": location
+                         }).execute()
+                         st.success(f"Shop '{new_shop_name}' created!")
+                         st.rerun()
+         
+             # --- PART B: ASSIGN SHOPKEEPER ---
+             st.divider()
+             st.subheader("Assign Shopkeeper to Shop")
+             
+             # Fetch existing shops for this owner
+             shops_res = conn.table("shops").select("id, shop_name").eq("owner_id", st.session_state.user_id).execute()
+             
+             if shops_res.data:
+                 shop_options = {s['shop_name']: s['id'] for s in shops_res.data}
+                 
+                 with st.form("assignment_form"):
+                     selected_shop = st.selectbox("Select Shop", list(shop_options.keys()))
+                     sk_email = st.text_input("Shopkeeper's Registered Email").lower().strip()
+                     
+                     if st.form_submit_button("Assign Shopkeeper"):
+                         if sk_email:
+                             conn.table("shop_assignments").insert({
+                                 "shop_id": shop_options[selected_shop],
+                                 "shopkeeper_email": sk_email
+                             }).execute()
+                             st.success(f"Assigned {sk_email} to {selected_shop}!")
+                         else:
+                             st.error("Please enter the shopkeeper's email.")
+             else:
+                 st.info("Please create a shop first using the expander above.")
+                # End Assign shopkeeper
 
-        elif menu_business_owner == "Community Stories":
-            # You can add content for community stories here
-            st.subheader("Community Stories")
-            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
-            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
-            stories = [
-            {"name": "Jane Doe", "story": "The beekeeping project has transformed my life..."},
-            {"name": "Mary Smith", "story": "With the sunflower farming project, I can now support my family..."}
-            ]
-
-            
-            for story in stories:
-                st.write(f"**{story['name']}**: {story['story']}")
 
         elif menu_business_owner == "Impact Metrics":
             st.subheader("Impacts Metrics")
