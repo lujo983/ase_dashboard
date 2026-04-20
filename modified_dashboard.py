@@ -259,8 +259,8 @@ if st.session_state.logged_in and menu == "Dashboard":
         #Donors sidebar
         menu_business_owner = st.sidebar.radio("Shopkeeper Links", [
             "Home/Dashboard",
+            "Sajili Bidhaa",
             "Sajili Duka",
-            "Mauzo",
             "Ripoti ya Siku",
             "Matumizi",
         ])
