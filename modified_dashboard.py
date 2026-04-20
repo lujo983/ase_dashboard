@@ -233,7 +233,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
                     st.session_state.user_name = profile.data["full_name"]
                     st.session_state.role = profile.data["role"]
                     
-                    st.success(f"Welcome {st.session_state.user_name}! 📍 You are logged in as {st.session_state.role}.")
+                    st.success(f"Welcome {st.session_state.user_name}! You are logged in as {st.session_state.role}.")
                     st.rerun() # Refresh to update the menu/dashboard
                 else:
                     st.error("Profile not found. Please contact support.")
@@ -254,7 +254,123 @@ if st.session_state.logged_in and menu == "Dashboard":
 
     role = st.session_state.role
     
+    # Start Business owner Dashboard
+    if role == "Business Owner":
+        #Donors sidebar
+        menu_business_owner = st.sidebar.radio("Shopkeeper Links", [
+            "Home/Dashboard",
+            "Sajili Duka",
+            "Mauzo",
+            "Ripoti ya Siku",
+            "Matumizi",
+        ])
 
+        # Add more donor-related content
+        # You can add content or visuals for the donor reports here
+        # Example donor data
+
+        if menu_business_owner == "Donor Reports":
+            st.subheader("Donor Reports")
+            st.info("This section includes summarized reports for donors.")
+            st.markdown("- Funding used in Q1\n- Women trained: 1500\n- Beehives installed: 10\n- Briquettes made: 1,200kg")
+
+            donor_data = {
+            "Donor": ["Alice", "Bob", "Charlie"],
+            "Amount": [500,1000, 1500], 
+            "Project": ["Sunflower Farming", "Beekeeping", "Sunflower Farming"]
+            }
+
+            df = pd.DataFrame(donor_data)
+
+        # Sample data (Replace with your actual data)
+
+        elif menu_business_owner=="Home":
+            st.header("Donor Dashboard")
+            st.info("Thank you for your contributions!")
+            st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
+        elif menu_business_owner == "Project Updates":
+            st.subheader("Project Updates")
+            st.success("Recent activities in Dongobesh and Yaeda Kati:")
+            st.markdown("- Sunflower pressing workshop completed\n- Organic lotion production training done\n- Mobile app 'Bridge Gap Transparency' launched")
+
+            updates = [
+            {"date": "2025-03-01", "update": "Successfully planted sunflowers on 5 acres."},
+            {"date": "2025-03-10", "update": "Started beekeeping training for 30 women."}
+            ]
+            st.write("### Project Updates Visualization")
+            data = {
+            'Zone': ['Hydom', 'Dongobesh', 'Mbulu'],
+            'Women': [5, 20, 15],
+            'Acres': [10, 50, 30],
+            'Yield (kg)': [500, 1750, 1000]
+            }
+
+            df = pd.DataFrame(data)
+
+                
+            #Displaying a bar chart
+            st.subheader('Women Farmers Per Zone')
+            st.bar_chart(df.set_index('Zone')['Women'])
+            #Displaying a line chart for acres
+            st.subheader('Acres Under Cultivation')
+            st.line_chart(df.set_index('Zone')['Acres'])
+            st.dataframe(df)
+
+
+        elif menu_business_owner == "Community Stories":
+            # You can add content for community stories here
+            st.subheader("Community Stories")
+            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
+            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+            stories = [
+            {"name": "Jane Doe", "story": "The beekeeping project has transformed my life..."},
+            {"name": "Mary Smith", "story": "With the sunflower farming project, I can now support my family..."}
+            ]
+
+            
+            for story in stories:
+                st.write(f"**{story['name']}**: {story['story']}")
+
+        elif menu_business_owner == "Impact Metrics":
+            st.subheader("Impacts Metrics")
+            # You can add visualizations for impact metrics here 
+            # Example metrics
+            metrics = {
+            "Women Empowered": 200,
+            "Acres Farmed": 30,
+            "Briquettes Produced": 5000
+            }
+
+            # Display metrics
+            for metric, value in metrics.items():
+                st.write(f"**{metric}**: {value}")
+            
+            # Optional: Add a chart for visualizing impact
+            #fig, ax = plt.subplots()
+            #ax.bar(metrics.keys(), metrics.values())
+            #st.pyplot(fig)
+
+        elif menu_business_owner == "All Production Records":
+            st.subheader("All Community Production Entries")
+            try:
+                prod_df = pd.read_csv("production_records.csv")
+                st.dataframe(prod_df)
+            except FileNotFoundError:
+                st.warning("No production records found.")
+            data = {
+            'Village': ['Hydom', 'Dongobesh', 'Mbulu'],
+            'Farmers': [5, 20, 15],
+            'Acres': [10, 50, 30],
+            'Yield (kg)': [500, 1750, 1000]
+            }
+
+            df = pd.DataFrame(data)
+            #Displaying a pie chart for total yield
+            st.subheader('Total Yield (kg)')
+            #fig, ax = plt.subplots()
+            #ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
+            #st.pyplot(fig)
+    # End Business owner Dashboard
     # Start Shopkeeper Dashboard
     if role == "Shopkeeper":
         #Donors sidebar
