@@ -34,7 +34,7 @@ st.markdown(
    
 }
 
-register-btn button { background-color: red; }
+#register-btn button { background-color: red; }
 
 
 [data-testid="stSidebarRadio"]{
