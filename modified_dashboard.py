@@ -613,7 +613,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                      if submitted:
                          # 1. NEW CHECK: Price Alert
                          if s_price < registered_price:
-                             st.warning(f"⚠️ Tahadhari: Unauza bidhaa hii chini ya bei uliyosajili (Tsh {registered_price:,.0f}).")
+                             st.warning(f"⚠️ Tahadhari: Umeuza bidhaa hii chini ya bei iliyopangwa (Tsh {registered_price:,.0f}).")
          
                          # 2. Check if stock is available
                          if available <= 0:
