@@ -12,7 +12,7 @@ key = st.secrets["SUPABASE_KEY"]
 supabase = create_client(url, key)
 from st_supabase_connection import SupabaseConnection
 # Initialize connection
-conn = st.connection("supabase", type=SupabaseConnection) 
+conn = st.connection("supabase", type=SupabaseConnection)  
 
 # IMPORTS FOR PDF MAKING
 from reportlab.lib.pagesizes import A4 
@@ -139,7 +139,7 @@ if menu == "Register":
         email = st.text_input("Email Address")
         phone = st.text_input("Phone Number")
         organization = st.text_input("Mtaa (Optional)")
-        role = st.selectbox("Role", ["Donor", "Volunteer", "Partner", "Community Member"])
+        role = st.selectbox("Role", ["Donor", "Volunteer", "Partner","Entreprenuer", "Business Owner", "Shopkeeper", "Community Member"])
         password = st.text_input("Password", type="password")
         confirm_password = st.text_input("Confirm Password", type="password")
 
