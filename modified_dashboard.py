@@ -65,6 +65,24 @@ st.markdown(
         color: black;
     }
 
+    /* Target the form submit button */
+    div.stForm submit_button > button {
+        background-color: #1E3A8A; /* Your dark blue */
+        color: white;
+        border-radius: 10px;
+        height: 3em;
+        width: 100%;
+        border: none;
+        transition: 0.3s;
+    }
+    
+    /* Change color on hover */
+    div.stForm submit_button > button:hover {
+        background-color: #3B82F6; /* Lighter blue */
+        color: white;
+        border: none;
+    }
+
 
  </style>
 """,
@@ -132,7 +150,7 @@ else:
 
 # REGISTRATION FORM
 if menu == "Register":
-    st.subheader("Register for ASE Dashboard.")
+    st.subheader("Register to access your Role Dashboard.")
 
     with st.form("registration_form", clear_on_submit=True):
         full_name = st.text_input("Full Name")
