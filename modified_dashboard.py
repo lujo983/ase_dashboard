@@ -260,11 +260,10 @@ if st.session_state.logged_in and menu == "Dashboard":
         #Donors sidebar
         menu_Shopkeeper = st.sidebar.radio("Shopkeeper Links", [
             "Home/Dashboard",
-            "Donor Reports",
-            "Project Updates",
-            "Community Stories",
-            "Impact Metrics",
-            "All Production Records"
+            "Manunuzi",
+            "Mauzo",
+            "Ripoti ya Siku",
+            "Matumizi",
         ])
 
         # Add more donor-related content
