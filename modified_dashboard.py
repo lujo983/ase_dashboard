@@ -257,7 +257,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     # Start Business owner Dashboard
     if role == "Business Owner":
         #Donors sidebar
-        menu_business_owner = st.sidebar.radio("Shopkeeper Links", [
+        menu_business_owner = st.sidebar.radio("Business Owner Links", [
             "Home/Dashboard",
             "Sajili Bidhaa",
             "Sajili Duka",
