@@ -258,27 +258,22 @@ if st.session_state.logged_in and menu == "Dashboard":
     if role == "Business Owner":
         #Donors sidebar
         menu_business_owner = st.sidebar.radio("Business Owner Links", [
-            "Home/Dashboard",
+            "🏢 Business Owner Dashboard",
             "Sajili Bidhaa",
             "Sajili Duka",
             "Ripoti ya Siku",
             "Matumizi",
+            "👥 Assign Shopkeepers",
+            "📤 Bulk Import (Excel)"
         ])
 
         # Add more donor-related content
         # You can add content or visuals for the donor reports here
         # Example donor data
 
-        if menu_business_owner == "Home/Dashboard":
-            st.title("🏢 Business Owner Dashboard")
-            tab1, tab2 = st.tabs(["📤 Bulk Import (Excel)", "👥 Assign Shopkeepers"])
-        
-            with tab1:
-                st.subheader("Import Items to Shops")
-                
-        
-            with tab2:
-                st.subheader("Assign Shopkeeper to Shop")
+        if menu_business_owner == "🏢 Business Owner Dashboard":
+            st.subheader("🏢 Business Owner Dashboard")
+            
                 
                     
 
