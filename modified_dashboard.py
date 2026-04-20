@@ -653,43 +653,58 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "Daily Report":
              st.title("📅 Daily Business Summary")
              
-             # 1. Setup Dates
              today_date = datetime.now().strftime("%Y-%m-%d")
              st.info(f"Showing report for: **{today_date}**")
          
              if "user_id" in st.session_state:
                  try:
-                     # 2. Fetch all transactions for today with a JOIN to get item names
+                     # 1. Fetch transactions + JOIN with inventory_items to get registered selling_price
                      res = conn.table("inventory_transactions") \
-                         .select("transaction_date, type, quantity, price_per_unit, total_value, inventory_items(item_name)") \
+                         .select("transaction_date, type, quantity, price_per_unit, total_value, inventory_items(item_name, selling_price)") \
                          .eq("user_id", st.session_state.user_id) \
                          .gte("transaction_date", f"{today_date}T00:00:00") \
                          .lte("transaction_date", f"{today_date}T23:59:59") \
                          .execute()
          
                      if res.data:
-                         # 3. Process Data
                          df = pd.DataFrame(res.data)
-                         df['Item Name'] = df['inventory_items'].apply(lambda x: x['item_name'])
                          
-                         # Cleanup for display
-                         report_df = df[['transaction_date', 'Item Name', 'type', 'quantity', 'price_per_unit', 'total_value']].copy()
-                         report_df['transaction_date'] = pd.to_datetime(report_df['transaction_date']).dt.strftime('%H:%M')
-                         report_df.columns = ['Time', 'Item', 'Type', 'Qty', 'Unit Price', 'Total']
+                         # Extract joined data
+                         df['Item Name'] = df['inventory_items'].apply(lambda x: x['item_name'])
+                         df['Reg Price'] = df['inventory_items'].apply(lambda x: x['selling_price'])
+                         
+                         # 2. Calculate Loss per transaction (Only for Sales/STOCK_OUT)
+                         # Loss = (Registered Price - Actual Sold Price) * Quantity
+                         def calculate_loss(row):
+                             if row['type'] == 'STOCK_OUT' and row['price_per_unit'] < row['Reg Price']:
+                                 return (row['Reg Price'] - row['price_per_unit']) * row['quantity']
+                             return 0
          
-                         # 4. Calculate Summary Metrics
+                         df['Loss'] = df.apply(calculate_loss, axis=1)
+         
+                         # Summary Data
+                         report_df = df[['transaction_date', 'Item Name', 'type', 'quantity', 'price_per_unit', 'total_value', 'Loss']].copy()
+                         report_df['transaction_date'] = pd.to_datetime(report_df['transaction_date']).dt.strftime('%H:%M')
+                         report_df.columns = ['Time', 'Item', 'Type', 'Qty', 'Unit Price', 'Total', 'Price Loss']
+         
+                         # 3. Calculate Summary Metrics
                          purchases = report_df[report_df['Type'] == 'STOCK_IN']['Total'].sum()
                          sales = report_df[report_df['Type'] == 'STOCK_OUT']['Total'].sum()
+                         total_loss = report_df['Price Loss'].sum()
                          net = sales - purchases
          
-                         m1, m2, m3 = st.columns(3)
-                         m1.metric("Purchases (In)", f"Tsh {purchases:,.0f}")
-                         m2.metric("Sales (Out)", f"Tsh {sales:,.0f}")
-                         m3.metric("Net Flow", f"Tsh {net:,.0f}", delta=f"{net:,.0f}")
+                         m1, m2, m3, m4 = st.columns(4)
+                         m1.metric("Purchases", f"Tsh {purchases:,.0f}")
+                         m2.metric("Sales", f"Tsh {sales:,.0f}")
+                         m3.metric("Total Price Loss", f"Tsh {total_loss:,.0f}", delta=f"-{total_loss:,.0f}", delta_color="inverse")
+                         m4.metric("Net Flow", f"Tsh {net:,.0f}")
+         
+                         if total_loss > 0:
+                             st.warning(f"⚠️ Leo umepoteza jumla ya Tsh {total_loss:,.0f} kwa kuuza chini ya bei elekezi.")
          
                          st.dataframe(report_df, use_container_width=True, hide_index=True)
          
-                         # --- 5. INTERNAL PDF GENERATION LOGIC ---
+                         # --- 4. PDF GENERATION ---
                          st.divider()
                          if st.button("📑 Je unataka PDF Report?"):
                              try:
@@ -697,26 +712,22 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  doc = SimpleDocTemplate(buf, pagesize=A4)
                                  elements = []
                                  styles = getSampleStyleSheet()
-                                 
-                                 # PDF Styles
                                  title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
                                  
-                                 # PDF Content
-                                 elements.append(Paragraph(f" DAILY BUSINESS REPORT: {st.session_state.user_name}", title_style))
+                                 elements.append(Paragraph(f"DAILY BUSINESS REPORT: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
          
-                                 # Prepare Table Data
+                                 # Table Data
                                  pdf_data = [report_df.columns.tolist()]
                                  for _, row in report_df.iterrows():
                                      pdf_data.append([str(x) for x in row.values])
                                  
-                                 # Add Summary Row to PDF
-                                 pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales - purchases:,.0f}"])
+                                 # Summary Row in PDF
+                                 pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
          
-                                 # Build Table
-                                 t = Table(pdf_data, colWidths=[0.8*inch, 1.5*inch, 1*inch, 0.6*inch, 1*inch, 1.2*inch])
+                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 0.8*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
                                  t.setStyle(TableStyle([
                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -727,21 +738,14 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  
                                  elements.append(t)
                                  doc.build(elements)
-                                 
-                                 st.download_button(
-                                     label="📥 Sasa Download Daily PDF",
-                                     data=buf.getvalue(),
-                                     file_name=f"Daily_Report_{today_date}.pdf",
-                                     mime="application/pdf"
-                                 )
+                                 st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
                              except Exception as pdf_err:
                                  st.error(f"PDF Error: {pdf_err}")
-         
                      else:
                          st.warning("Hakuna miamala iliyofanyika leo.")
-                         
                  except Exception as e:
                      st.error(f"Error: {e}")
+
 
 
         # End daily reports
