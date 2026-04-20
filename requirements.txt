@@ -3,4 +3,7 @@ pandas
 supabase
 st-supabase-connection
 reportlab
+openpyxl
+
+
 
