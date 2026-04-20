@@ -279,7 +279,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         
             with tab2:
                 st.subheader("Assign Shopkeeper to Shop")
-                with st.form("assign_sk"):
+                
                     
 
 
