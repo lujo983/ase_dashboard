@@ -271,7 +271,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         # You can add content or visuals for the donor reports here
         # Example donor data
 
-        if menu_business_owner == "🏢 Business Owner Dashboard":
+        if menu_business_owner == "🏢 Business Owner Dashboard.":
             st.subheader("🏢 Business Owner Dashboard")
             
                 
@@ -280,7 +280,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # Start csv/excell upload
 
-        elif menu_business_owner=="📤 Bulk Import (Excel)":
+        elif menu_business_owner=="📤 Pakia bidhaa/Import(Excel).":
              st.subheader("📤 Pakia Bidhaa kwa Excel (Bulk Import)")
              st.write("Pakia file la Excel lenye bidhaa zako zote.")
              
@@ -316,7 +316,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         
         # startsView registerd 
-        elif menu_business_owner == "📋 List ya Bidhaa Ulizosajili":
+        elif menu_business_owner == "📋 List ya Bidhaa Ulizosajili.":
              st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
              
              if "user_id" in st.session_state:
