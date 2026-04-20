@@ -233,7 +233,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
                     st.session_state.user_name = profile.data["full_name"]
                     st.session_state.role = profile.data["role"]
                     
-                    st.success(f"Welcome {st.session_state.user_name}! You are logged in as {st.session_state.role}. 📍 Location: {st.session_state.organization}")
+                    st.success(f"Welcome {st.session_state.user_name}! You are logged in as {st.session_state.role}. 📍 Location: {st.session_state.role}.")
                     st.rerun() # Refresh to update the menu/dashboard
                 else:
                     st.error("Profile not found. Please contact support.")
