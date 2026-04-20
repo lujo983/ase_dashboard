@@ -269,7 +269,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         # You can add content or visuals for the donor reports here
         # Example donor data
 
-        if menu_business_owner == "Donor Reports":
+        if menu_business_owner == "Home/Dashboard":
             st.subheader("Donor Reports")
             # owner_page.py
             def show_owner_dashboard(conn):
