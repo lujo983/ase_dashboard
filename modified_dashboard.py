@@ -258,12 +258,12 @@ if st.session_state.logged_in and menu == "Dashboard":
     if role == "Business Owner":
         #Donors sidebar
         menu_business_owner = st.sidebar.radio("Business Owner Links", [
-            "🏢 Business Owner Dashboard",
+            "🏢 Business Owner Dashboard.",
+            "📤 Pakia bidhaa/Import(Excel).",
+            "📋 List ya Bidhaa Ulizosajili.",
+            "👥 Assign Shopkeepers.",
             "Sajili Bidhaa",
             "Sajili Duka",
-            "📤 Bulk Import (Excel)",
-            "📋 List ya Bidhaa Ulizosajili",
-            "👥 Assign Shopkeepers",
             "Matumizi"
         ])
 
