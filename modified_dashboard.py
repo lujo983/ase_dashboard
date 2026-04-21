@@ -201,7 +201,7 @@ if menu == "Register":
 # LOGIN FORM
 if menu == "Login" and not st.session_state.get("logged_in", False):
     # Create 3 columns with ratios (adjust ratios for different image sizes)
-    col1, col2, col3 = st.columns([0.5, 0.5, 0.5])
+    col1, col2, col3 = st.columns([0.5, 0.2, 0.5])
     
     with col2:
         st.image("bm_logo_edited.png", width=300)
