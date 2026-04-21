@@ -205,7 +205,7 @@ if menu == "Login" and not st.session_state.get("logged_in", False):
     
     with col2:
         st.image("bm_logo_edited.png", width=300)
-    st.subheader("Login to the SYSTEM.\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
+    st.subheader("LOGIN TO THE SYSTEM.\n- Home of Entrepreneurs\n- BIASHARA YAKO MKONONI MWAKO")
     with st.form("login_form"):
         email = st.text_input("Email Address")
         password = st.text_input("Password", type="password")
