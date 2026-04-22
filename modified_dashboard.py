@@ -390,47 +390,59 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # Start shopkeeper assignment
         elif menu_business_owner == "👥 Assign Shopkeepers.":
-             st.subheader("👥 Shop & Shopkeeper Management")
+             st.subheader("🏢 Business & Shop Management")
          
-             # --- PART A: CREATE A SHOP ---
-             with st.expander("➕ Create a New Shop"):
-                 with st.form("create_shop_form"):
-                     new_shop_name = st.text_input("Shop Name (e.g., Shop A)")
-                     location = st.text_input("Location")
-                     if st.form_submit_button("Save Shop"):
-                         conn.table("shops").insert({
+             # 1. Fetch the Business ID for this Owner
+             # If they don't have a business, they must create one first
+             biz_res = conn.table("businesses").select("id, business_name").eq("owner_id", st.session_state.user_id).execute()
+         
+             if not biz_res.data:
+                 st.warning("Hujasajili Biashara bado.")
+                 with st.form("create_biz"):
+                     biz_name = st.text_input("Jina la Biashara yako (e.g. ASE Group)")
+                     if st.form_submit_button("Sajili Biashara"):
+                         conn.table("businesses").insert({
                              "owner_id": st.session_state.user_id,
-                             "shop_name": new_shop_name,
-                             "location": location
+                             "business_name": biz_name
                          }).execute()
-                         st.success(f"Shop '{new_shop_name}' created!")
+                         st.success("Biashara imesajiliwa!")
                          st.rerun()
+             else:
+                 business_id = biz_res.data[0]['id']
+                 st.info(f"Business: **{biz_res.data[0]['business_name']}**")
          
-             # --- PART B: ASSIGN SHOPKEEPER ---
-             st.divider()
-             st.subheader("Assign Shopkeeper to Shop")
-             
-             # Fetch existing shops for this owner
-             shops_res = conn.table("shops").select("id, shop_name").eq("owner_id", st.session_state.user_id).execute()
-             
-             if shops_res.data:
-                 shop_options = {s['shop_name']: s['id'] for s in shops_res.data}
+                 # --- NOW CREATE A SHOP USING business_id ---
+                 with st.expander("➕ Ongeza Duka Jipya (Shop)"):
+                     with st.form("create_shop_form"):
+                         new_shop_name = st.text_input("Jina la Duka (e.g. Shop A)")
+                         location = st.text_input("Mahali lilipo")
+                         if st.form_submit_button("Hifadhi Duka"):
+                             conn.table("shops").insert({
+                                 "business_id": business_id, # This fixes your error!
+                                 "owner_id": st.session_state.user_id,
+                                 "shop_name": new_shop_name,
+                                 "location": location
+                             }).execute()
+                             st.success(f"Duka '{new_shop_name}' limeundwa!")
+                             st.rerun()
+         
+                 # --- ASSIGN SHOPKEEPER ---
+                 st.divider()
+                 shops_res = conn.table("shops").select("id, shop_name").eq("owner_id", st.session_state.user_id).execute()
                  
-                 with st.form("assignment_form"):
-                     selected_shop = st.selectbox("Select Shop", list(shop_options.keys()))
-                     sk_email = st.text_input("Shopkeeper's Registered Email").lower().strip()
-                     
-                     if st.form_submit_button("Assign Shopkeeper"):
-                         if sk_email:
+                 if shops_res.data:
+                     shop_options = {s['shop_name']: s['id'] for s in shops_res.data}
+                     with st.form("assign_form"):
+                         sel_shop = st.selectbox("Chagua Duka", list(shop_options.keys()))
+                         sk_email = st.text_input("Email ya Shopkeeper").lower().strip()
+                         if st.form_submit_button("Confirm Assignment"):
                              conn.table("shop_assignments").insert({
-                                 "shop_id": shop_options[selected_shop],
+                                 "shop_id": shop_options[sel_shop],
                                  "shopkeeper_email": sk_email
                              }).execute()
-                             st.success(f"Assigned {sk_email} to {selected_shop}!")
-                         else:
-                             st.error("Please enter the shopkeeper's email.")
-             else:
-                 st.info("Please create a shop first using the expander above.")
+                             st.success("Imepangwa kikamilifu!")
+
+
                 # End Assign shopkeeper
 
 
