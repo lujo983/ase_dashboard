@@ -512,7 +512,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.header("Donor Dashboard")
             st.info("Thank you for your contributions!")
             st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
-        elif menu_Shopkeeper == "Project Updates":
+        elif menu_Shopkeeper == "Matumizi":
              st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
          
              # 1. Tafuta duka alilopangiwa huyu Shopkeeper
