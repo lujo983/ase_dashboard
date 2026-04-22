@@ -261,7 +261,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "📤 Pakia bidhaa/Import(Excel).",
             "📋 List ya Bidhaa Ulizosajili.",
             "👥 Assign Shopkeepers.",
-            "Sajili Bidhaa",
+            "Angalia duka",
             "Sajili Duka",
             "Matumizi"
         ])
@@ -459,7 +459,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          # End Assign shopkeeper
 
 
-        elif menu_business_owner == "Impact Metrics":
+        elif menu_business_owner == "Angalia duka":
              st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
          
              # 1. Tafuta duka alilopangiwa huyu Shopkeeper
