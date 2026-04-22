@@ -139,6 +139,7 @@ if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.user_name = ""
     st.session_state.role = ""
+    st.session_state.email = ""
 
 # Sidebar Navigation
 st.sidebar.image("bridge gap tra.jpg", width=200)
