@@ -274,6 +274,50 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         if menu_business_owner == "🏢 Business Owner Dashboard.":
             st.subheader("🏢 Business Owner Dashboard")
+         # start ..
+       
+             st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
+                 
+                     # 1. Tafuta duka alilopangiwa huyu Shopkeeper
+                     try:
+                         assignment = conn.table("shop_assignments") \
+                             .select("shop_id, shops(shop_name, location)") \
+                             .eq("shopkeeper_email", st.session_state.email) \
+                             .single() \
+                             .execute()
+                 
+                         if assignment.data:
+                             shop_id = assignment.data['shop_id']
+                             shop_name = assignment.data['shops']['shop_name']
+                             location = assignment.data['shops']['location']
+                             
+                             st.sidebar.info(f"📍 Unafanya kazi: {shop_name} ({location})")
+                             
+                             # 2. Onyesha Bidhaa za Duka hili pekee
+                             res = conn.table("inventory_items") \
+                                 .select("item_name, category, selling_price, current_stock, unit_measure") \
+                                 .eq("shop_id", shop_id) \
+                                 .execute()
+                 
+                             if res.data:
+                                 df_stock = pd.DataFrame(res.data)
+                                 st.write("### Bidhaa Zilizopo Dukani")
+                                 
+                                 # Metrics fupi
+                                 c1, c2 = st.columns(2)
+                                 c1.metric("Aina za Bidhaa", len(df_stock))
+                                 c2.metric("Hali ya Stock", f"{df_stock['current_stock'].sum()} {df_stock['unit_measure'].iloc[0] if not df_stock.empty else ''}")
+                 
+                                 st.dataframe(df_stock, use_container_width=True, hide_index=True)
+                             else:
+                                 st.warning("Duka hili halina bidhaa bado. Mwambie mmiliki apandishe bidhaa.")
+                         else:
+                             st.error("Hujapangiwa duka bado. Tafadhali wasiliana na mmiliki wako.")
+                             
+                     except Exception as e:
+                         st.error(f"Hitilafu: {e}")
+
+        # end ...
             
                 
                     
