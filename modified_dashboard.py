@@ -1052,7 +1052,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  styles = getSampleStyleSheet()
                                  title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
-                                 
+                                 logo = Image("bm_logo_edited.png", width=1.4*inch, height=0.7*inch)
                                  elements.append(Paragraph(f"DAILY BUSINESS REPORT: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
