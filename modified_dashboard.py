@@ -460,23 +460,48 @@ if st.session_state.logged_in and menu == "Dashboard":
 
 
         elif menu_business_owner == "Impact Metrics":
-            st.subheader("Impacts Metrics")
-            # You can add visualizations for impact metrics here 
-            # Example metrics
-            metrics = {
-            "Women Empowered": 200,
-            "Acres Farmed": 30,
-            "Briquettes Produced": 5000
-            }
+             st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
+         
+             # 1. Tafuta duka alilopangiwa huyu Shopkeeper
+             try:
+                 assignment = conn.table("shop_assignments") \
+                     .select("shop_id, shops(shop_name, location)") \
+                     .eq("shopkeeper_email", st.session_state.email) \
+                     .single() \
+                     .execute()
+         
+                 if assignment.data:
+                     shop_id = assignment.data['shop_id']
+                     shop_name = assignment.data['shops']['shop_name']
+                     location = assignment.data['shops']['location']
+                     
+                     st.sidebar.info(f"📍 Unafanya kazi: {shop_name} ({location})")
+                     
+                     # 2. Onyesha Bidhaa za Duka hili pekee
+                     res = conn.table("inventory_items") \
+                         .select("item_name, category, selling_price, current_stock, unit_measure") \
+                         .eq("shop_id", shop_id) \
+                         .execute()
+         
+                     if res.data:
+                         df_stock = pd.DataFrame(res.data)
+                         st.write("### Bidhaa Zilizopo Dukani")
+                         
+                         # Metrics fupi
+                         c1, c2 = st.columns(2)
+                         c1.metric("Aina za Bidhaa", len(df_stock))
+                         c2.metric("Hali ya Stock", f"{df_stock['current_stock'].sum()} {df_stock['unit_measure'].iloc[0] if not df_stock.empty else ''}")
+         
+                         st.dataframe(df_stock, use_container_width=True, hide_index=True)
+                     else:
+                         st.warning("Duka hili halina bidhaa bado. Mwambie mmiliki apandishe bidhaa.")
+                 else:
+                     st.error("Hujapangiwa duka bado. Tafadhali wasiliana na mmiliki wako.")
+                     
+             except Exception as e:
+                 st.error(f"Hitilafu: {e}")
 
-            # Display metrics
-            for metric, value in metrics.items():
-                st.write(f"**{metric}**: {value}")
-            
-            # Optional: Add a chart for visualizing impact
-            #fig, ax = plt.subplots()
-            #ax.bar(metrics.keys(), metrics.values())
-            #st.pyplot(fig)
+        #end shop view
 
         elif menu_business_owner == "All Production Records":
             st.subheader("All Community Production Entries")
