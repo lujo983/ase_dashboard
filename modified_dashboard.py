@@ -392,55 +392,39 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu_business_owner == "👥 Assign Shopkeepers.":
              st.subheader("🏢 Business & Shop Management")
          
-             # 1. Fetch the Business ID for this Owner
-             # If they don't have a business, they must create one first
+             # LOGIC 1: Check if Business exists
              biz_res = conn.table("businesses").select("id, business_name").eq("owner_id", st.session_state.user_id).execute()
          
              if not biz_res.data:
-                 st.warning("Hujasajili Biashara bado.")
+                 st.warning("Hatua ya 1: Sajili Biashara yako.")
                  with st.form("create_biz"):
-                     biz_name = st.text_input("Jina la Biashara yako (e.g. ASE Group)")
+                     biz_name = st.text_input("Business Name")
                      if st.form_submit_button("Sajili Biashara"):
+                         # Now 'owner_id' exists, so this will succeed
                          conn.table("businesses").insert({
                              "owner_id": st.session_state.user_id,
                              "business_name": biz_name
                          }).execute()
-                         st.success("Biashara imesajiliwa!")
+                         st.success("Imesajiliwa!")
                          st.rerun()
              else:
-                 business_id = biz_res.data[0]['id']
-                 st.info(f"Business: **{biz_res.data[0]['business_name']}**")
+                 # LOGIC 2: Business exists, create shops
+                 business_id = biz_res.data['id']
+                 st.info(f"Biashara: **{biz_res.data['business_name']}**")
          
-                 # --- NOW CREATE A SHOP USING business_id ---
-                 with st.expander("➕ Ongeza Duka Jipya (Shop)"):
-                     with st.form("create_shop_form"):
-                         new_shop_name = st.text_input("Jina la Duka (e.g. Shop A)")
-                         location = st.text_input("Mahali lilipo")
+                 with st.expander("➕ Ongeza Duka (Add Shop)"):
+                     with st.form("create_shop"):
+                         shop_name = st.text_input("Shop Name")
+                         loc = st.text_input("Location")
                          if st.form_submit_button("Hifadhi Duka"):
                              conn.table("shops").insert({
-                                 "business_id": business_id, # This fixes your error!
-                                 "owner_id": st.session_state.user_id,
-                                 "shop_name": new_shop_name,
-                                 "location": location
+                                 "business_id": business_id,
+                                 "owner_id": st.session_state.user_id, # Matches the new column
+                                 "shop_name": shop_name,
+                                 "location": loc
                              }).execute()
-                             st.success(f"Duka '{new_shop_name}' limeundwa!")
+                             st.success("Duka limeundwa!")
                              st.rerun()
-         
-                 # --- ASSIGN SHOPKEEPER ---
-                 st.divider()
-                 shops_res = conn.table("shops").select("id, shop_name").eq("owner_id", st.session_state.user_id).execute()
-                 
-                 if shops_res.data:
-                     shop_options = {s['shop_name']: s['id'] for s in shops_res.data}
-                     with st.form("assign_form"):
-                         sel_shop = st.selectbox("Chagua Duka", list(shop_options.keys()))
-                         sk_email = st.text_input("Email ya Shopkeeper").lower().strip()
-                         if st.form_submit_button("Confirm Assignment"):
-                             conn.table("shop_assignments").insert({
-                                 "shop_id": shop_options[sel_shop],
-                                 "shopkeeper_email": sk_email
-                             }).execute()
-                             st.success("Imepangwa kikamilifu!")
 
 
                 # End Assign shopkeeper
