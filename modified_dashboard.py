@@ -457,52 +457,6 @@ if st.session_state.logged_in and menu == "Dashboard":
                      st.info("Ongeza duka kwanza ili upange wafanyakazi.")
          
                          # End Assign shopkeeper
-
-
-        elif menu_business_owner == "Angalia duka":
-             st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
-         
-             # 1. Tafuta duka alilopangiwa huyu Shopkeeper
-             try:
-                 assignment = conn.table("shop_assignments") \
-                     .select("shop_id, shops(shop_name, location)") \
-                     .eq("shopkeeper_email", st.session_state.email) \
-                     .single() \
-                     .execute()
-         
-                 if assignment.data:
-                     shop_id = assignment.data['shop_id']
-                     shop_name = assignment.data['shops']['shop_name']
-                     location = assignment.data['shops']['location']
-                     
-                     st.sidebar.info(f"📍 Unafanya kazi: {shop_name} ({location})")
-                     
-                     # 2. Onyesha Bidhaa za Duka hili pekee
-                     res = conn.table("inventory_items") \
-                         .select("item_name, category, selling_price, current_stock, unit_measure") \
-                         .eq("shop_id", shop_id) \
-                         .execute()
-         
-                     if res.data:
-                         df_stock = pd.DataFrame(res.data)
-                         st.write("### Bidhaa Zilizopo Dukani")
-                         
-                         # Metrics fupi
-                         c1, c2 = st.columns(2)
-                         c1.metric("Aina za Bidhaa", len(df_stock))
-                         c2.metric("Hali ya Stock", f"{df_stock['current_stock'].sum()} {df_stock['unit_measure'].iloc[0] if not df_stock.empty else ''}")
-         
-                         st.dataframe(df_stock, use_container_width=True, hide_index=True)
-                     else:
-                         st.warning("Duka hili halina bidhaa bado. Mwambie mmiliki apandishe bidhaa.")
-                 else:
-                     st.error("Hujapangiwa duka bado. Tafadhali wasiliana na mmiliki wako.")
-                     
-             except Exception as e:
-                 st.error(f"Hitilafu: {e}")
-
-        #end shop view
-
         elif menu_business_owner == "All Production Records":
             st.subheader("All Community Production Entries")
             try:
@@ -559,33 +513,48 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.info("Thank you for your contributions!")
             st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
         elif menu_Shopkeeper == "Project Updates":
-            st.subheader("Project Updates")
-            st.success("Recent activities in Dongobesh and Yaeda Kati:")
-            st.markdown("- Sunflower pressing workshop completed\n- Organic lotion production training done\n- Mobile app 'Bridge Gap Transparency' launched")
+             st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
+         
+             # 1. Tafuta duka alilopangiwa huyu Shopkeeper
+             try:
+                 assignment = conn.table("shop_assignments") \
+                     .select("shop_id, shops(shop_name, location)") \
+                     .eq("shopkeeper_email", st.session_state.email) \
+                     .single() \
+                     .execute()
+         
+                 if assignment.data:
+                     shop_id = assignment.data['shop_id']
+                     shop_name = assignment.data['shops']['shop_name']
+                     location = assignment.data['shops']['location']
+                     
+                     st.sidebar.info(f"📍 Unafanya kazi: {shop_name} ({location})")
+                     
+                     # 2. Onyesha Bidhaa za Duka hili pekee
+                     res = conn.table("inventory_items") \
+                         .select("item_name, category, selling_price, current_stock, unit_measure") \
+                         .eq("shop_id", shop_id) \
+                         .execute()
+         
+                     if res.data:
+                         df_stock = pd.DataFrame(res.data)
+                         st.write("### Bidhaa Zilizopo Dukani")
+                         
+                         # Metrics fupi
+                         c1, c2 = st.columns(2)
+                         c1.metric("Aina za Bidhaa", len(df_stock))
+                         c2.metric("Hali ya Stock", f"{df_stock['current_stock'].sum()} {df_stock['unit_measure'].iloc[0] if not df_stock.empty else ''}")
+         
+                         st.dataframe(df_stock, use_container_width=True, hide_index=True)
+                     else:
+                         st.warning("Duka hili halina bidhaa bado. Mwambie mmiliki apandishe bidhaa.")
+                 else:
+                     st.error("Hujapangiwa duka bado. Tafadhali wasiliana na mmiliki wako.")
+                     
+             except Exception as e:
+                 st.error(f"Hitilafu: {e}")
 
-            updates = [
-            {"date": "2025-03-01", "update": "Successfully planted sunflowers on 5 acres."},
-            {"date": "2025-03-10", "update": "Started beekeeping training for 30 women."}
-            ]
-            st.write("### Project Updates Visualization")
-            data = {
-            'Zone': ['Hydom', 'Dongobesh', 'Mbulu'],
-            'Women': [5, 20, 15],
-            'Acres': [10, 50, 30],
-            'Yield (kg)': [500, 1750, 1000]
-            }
-
-            df = pd.DataFrame(data)
-
-                
-            #Displaying a bar chart
-            st.subheader('Women Farmers Per Zone')
-            st.bar_chart(df.set_index('Zone')['Women'])
-            #Displaying a line chart for acres
-            st.subheader('Acres Under Cultivation')
-            st.line_chart(df.set_index('Zone')['Acres'])
-            st.dataframe(df)
-
+        #end shop view
 
         elif menu_Shopkeeper == "Community Stories":
             # You can add content for community stories here
