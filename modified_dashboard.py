@@ -519,8 +519,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  assignment = conn.table("shop_assignments") \
                      .select("shop_id, shops(shop_name, location)") \
                      .eq("shopkeeper_email", st.session_state.email) \
-                     .single() \
-                     .execute()
+                     .execute() 
          
                  if assignment.data:
                      shop_id = assignment.data['shop_id']
