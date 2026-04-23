@@ -718,7 +718,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
                                  logo = Image("bm_logo_edited.png", width=1.4*inch, height=0.7*inch)
-                                 elements.append(Paragraph(f"DAILY BUSINESS REPORT BY: {st.session_state.user_name}", title_style))
+                                 elements.append(Paragraph(f"Ripoti ya siku ya: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
          
@@ -741,11 +741,6 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  
                                  elements.append(t)
                               # 6. SIGNATURE/FOOTER SECTION
-                                 elements.append(Spacer(1, 30))
-                                 elements.append(Paragraph("__________________________", sub_style))
-                                 elements.append(Paragraph("Signature & Official Stamp", sub_style))
-                                 elements.append(Spacer(1, 15))
-                                 elements.append(Paragraph("<i>This is a computer-generated report from ASE Dashboard.</i>", sub_style))
                                  doc.build(elements)
                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
                              except Exception as pdf_err:
