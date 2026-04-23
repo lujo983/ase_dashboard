@@ -740,6 +740,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  ]))
                                  
                                  elements.append(t)
+                              # 6. SIGNATURE/FOOTER SECTION
+                                 elements.append(Spacer(1, 30))
+                                 elements.append(Paragraph("__________________________", sub_style))
+                                 elements.append(Paragraph("Signature & Official Stamp", sub_style))
+                                 elements.append(Spacer(1, 15))
+                                 elements.append(Paragraph("<i>This is a computer-generated report from ASE Dashboard.</i>", sub_style))
                                  doc.build(elements)
                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
                              except Exception as pdf_err:
