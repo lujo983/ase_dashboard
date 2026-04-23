@@ -789,8 +789,8 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End of csv/excell items uploads
 
-        elif menu_Shopkeeper == "All Production Records":
-            st.subheader("All Community Production Entries")
+        elif menu_Shopkeeper == "Home/Dashboard":
+            st.subheader("Shopkeeper Dashboard")
             try:
                 prod_df = pd.read_csv("production_records.csv")
                 st.dataframe(prod_df)
