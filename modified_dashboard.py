@@ -506,7 +506,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             df = pd.DataFrame(donor_data)
 
             # Start Sales                  
-        elif menu == "Fanya Mauzo":
+        elif menu_Shopkeeper == "Fanya Mauzo":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
          
              res = conn.table("inventory_items").select("id, item_name, current_stock, selling_price").eq("user_id", st.session_state.user_id).execute()
