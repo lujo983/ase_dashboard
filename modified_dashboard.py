@@ -652,104 +652,104 @@ if st.session_state.logged_in and menu == "Dashboard":
        
         # Start Ripoti ya siku
         elif menu_Shopkeeper == "Ripoti ya Siku":
-            st.title("📅 Daily Business Summary")
-             
-             today_date = datetime.now().strftime("%Y-%m-%d")
-             st.info(f"Showing report for: **{today_date}**")
-         
-             if "user_id" in st.session_state:
-                 try:
-                     # 1. Fetch transactions + JOIN with inventory_items to get registered selling_price
-                     res = conn.table("inventory_transactions") \
-                         .select("transaction_date, type, quantity, price_per_unit, total_value, inventory_items(item_name, selling_price)") \
-                         .eq("user_id", st.session_state.user_id) \
-                         .gte("transaction_date", f"{today_date}T00:00:00") \
-                         .lte("transaction_date", f"{today_date}T23:59:59") \
-                         .execute()
-         
-                     if res.data:
-                         df = pd.DataFrame(res.data)
-                         
-                         # Extract joined data
-                         df['Item Name'] = df['inventory_items'].apply(lambda x: x['item_name'])
-                         df['Reg Price'] = df['inventory_items'].apply(lambda x: x['selling_price'])
-                         
-                         # 2. Calculate Loss per transaction (Only for Sales/STOCK_OUT)
-                         # Loss = (Registered Price - Actual Sold Price) * Quantity
-                         def calculate_loss(row):
-                             if row['type'] == 'STOCK_OUT' and row['price_per_unit'] < row['Reg Price']:
-                                 return (row['Reg Price'] - row['price_per_unit']) * row['quantity']
-                             return 0
-         
-                         df['Loss'] = df.apply(calculate_loss, axis=1)
-         
-                         # Summary Data
-                         report_df = df[['transaction_date', 'Item Name', 'type', 'quantity', 'price_per_unit', 'total_value', 'Loss']].copy()
-                         report_df['transaction_date'] = pd.to_datetime(report_df['transaction_date']).dt.strftime('%H:%M')
-                         report_df.columns = ['Time', 'Item', 'Type', 'Qty', 'Unit Price', 'Total', 'Price Loss']
-         
-                         # 3. Calculate Summary Metrics
-                         purchases = report_df[report_df['Type'] == 'STOCK_IN']['Total'].sum()
-                         sales = report_df[report_df['Type'] == 'STOCK_OUT']['Total'].sum()
-                         total_loss = report_df['Price Loss'].sum()
-                         net = sales - purchases
-         
-                         m1, m2, m3, m4 = st.columns(4)
-                         m1.metric("Purchases (Manunuzi)", f"Tsh {purchases:,.0f}")
-                         m2.metric("Sales (Mauzo)", f"Tsh {sales:,.0f}")
-                         m3.metric("Total Price Loss (Discounts)", f"Tsh {total_loss:,.0f}", delta=f"-{total_loss:,.0f}", delta_color="inverse")
-                         m4.metric("Net Flow", f"Tsh {net:,.0f}")
-         
-                         if total_loss > 0:
-                             st.warning(f"⚠️ Leo umepoteza jumla ya Tsh {total_loss:,.0f} kwa kuuza chini ya bei elekezi (Discounts).")
-         
-                         st.dataframe(report_df, use_container_width=True, hide_index=True)
-         
-                         # --- 4. PDF GENERATION ---
-                         st.divider()
-                         if st.button("📑 Je unataka PDF Report?"):
-                             try:
-                                 buf = BytesIO()
-                                 doc = SimpleDocTemplate(buf, pagesize=A4)
-                                 elements = []
-                                 styles = getSampleStyleSheet() 
-                                 title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
-                                 cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
-                                 logo = Image("bm_logo_edited.png", width=1.4*inch, height=0.7*inch)
-                                 elements.append(Paragraph(f"DAILY BUSINESS REPORT BY: {st.session_state.user_name}", title_style))
-                                 elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
-                                 elements.append(Spacer(1, 15))
-         
-                                 # Table Data
-                                 pdf_data = [report_df.columns.tolist()]
-                                 for _, row in report_df.iterrows():
-                                     pdf_data.append([str(x) for x in row.values])
-                                 
-                                 # Summary Row in PDF
-                                 pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
-         
-                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
-                                 t.setStyle(TableStyle([
-                                     ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
-                                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                     ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                                     ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
-                                     ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-                                 ]))
-                                 
-                                 elements.append(t)
-                                 doc.build(elements)
-                                 st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
-                             except Exception as pdf_err:
-                                 st.error(f"PDF Error: {pdf_err}")
-                     else:
-                         st.warning("Hakuna miamala iliyofanyika leo.")
-                 except Exception as e:
-                     st.error(f"Error: {e}")
-
-
-
-        # End daily reports
+             st.title("📅 Daily Business Summary")
+              
+              today_date = datetime.now().strftime("%Y-%m-%d")
+              st.info(f"Showing report for: **{today_date}**")
+          
+              if "user_id" in st.session_state:
+                  try:
+                      # 1. Fetch transactions + JOIN with inventory_items to get registered selling_price
+                      res = conn.table("inventory_transactions") \
+                          .select("transaction_date, type, quantity, price_per_unit, total_value, inventory_items(item_name, selling_price)") \
+                          .eq("user_id", st.session_state.user_id) \
+                          .gte("transaction_date", f"{today_date}T00:00:00") \
+                          .lte("transaction_date", f"{today_date}T23:59:59") \
+                          .execute()
+          
+                      if res.data:
+                          df = pd.DataFrame(res.data)
+                          
+                          # Extract joined data
+                          df['Item Name'] = df['inventory_items'].apply(lambda x: x['item_name'])
+                          df['Reg Price'] = df['inventory_items'].apply(lambda x: x['selling_price'])
+                          
+                          # 2. Calculate Loss per transaction (Only for Sales/STOCK_OUT)
+                          # Loss = (Registered Price - Actual Sold Price) * Quantity
+                          def calculate_loss(row):
+                              if row['type'] == 'STOCK_OUT' and row['price_per_unit'] < row['Reg Price']:
+                                  return (row['Reg Price'] - row['price_per_unit']) * row['quantity']
+                              return 0
+          
+                          df['Loss'] = df.apply(calculate_loss, axis=1)
+          
+                          # Summary Data
+                          report_df = df[['transaction_date', 'Item Name', 'type', 'quantity', 'price_per_unit', 'total_value', 'Loss']].copy()
+                          report_df['transaction_date'] = pd.to_datetime(report_df['transaction_date']).dt.strftime('%H:%M')
+                          report_df.columns = ['Time', 'Item', 'Type', 'Qty', 'Unit Price', 'Total', 'Price Loss']
+          
+                          # 3. Calculate Summary Metrics
+                          purchases = report_df[report_df['Type'] == 'STOCK_IN']['Total'].sum()
+                          sales = report_df[report_df['Type'] == 'STOCK_OUT']['Total'].sum()
+                          total_loss = report_df['Price Loss'].sum()
+                          net = sales - purchases
+          
+                          m1, m2, m3, m4 = st.columns(4)
+                          m1.metric("Purchases (Manunuzi)", f"Tsh {purchases:,.0f}")
+                          m2.metric("Sales (Mauzo)", f"Tsh {sales:,.0f}")
+                          m3.metric("Total Price Loss (Discounts)", f"Tsh {total_loss:,.0f}", delta=f"-{total_loss:,.0f}", delta_color="inverse")
+                          m4.metric("Net Flow", f"Tsh {net:,.0f}")
+          
+                          if total_loss > 0:
+                              st.warning(f"⚠️ Leo umepoteza jumla ya Tsh {total_loss:,.0f} kwa kuuza chini ya bei elekezi (Discounts).")
+          
+                          st.dataframe(report_df, use_container_width=True, hide_index=True)
+          
+                          # --- 4. PDF GENERATION ---
+                          st.divider()
+                          if st.button("📑 Je unataka PDF Report?"):
+                              try:
+                                  buf = BytesIO()
+                                  doc = SimpleDocTemplate(buf, pagesize=A4)
+                                  elements = []
+                                  styles = getSampleStyleSheet() 
+                                  title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
+                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
+                                  logo = Image("bm_logo_edited.png", width=1.4*inch, height=0.7*inch)
+                                  elements.append(Paragraph(f"DAILY BUSINESS REPORT BY: {st.session_state.user_name}", title_style))
+                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
+                                  elements.append(Spacer(1, 15))
+          
+                                  # Table Data
+                                  pdf_data = [report_df.columns.tolist()]
+                                  for _, row in report_df.iterrows():
+                                      pdf_data.append([str(x) for x in row.values])
+                                  
+                                  # Summary Row in PDF
+                                  pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
+          
+                                  t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
+                                  t.setStyle(TableStyle([
+                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
+                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                      ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                                      ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+                                      ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                                  ]))
+                                  
+                                  elements.append(t)
+                                  doc.build(elements)
+                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
+                              except Exception as pdf_err:
+                                  st.error(f"PDF Error: {pdf_err}")
+                      else:
+                          st.warning("Hakuna miamala iliyofanyika leo.")
+                  except Exception as e:
+                      st.error(f"Error: {e}")
+ 
+ 
+ 
+         # End daily reports
 
         elif menu_Shopkeeper == "Impact Metrics":
             st.subheader("Impacts Metrics")
