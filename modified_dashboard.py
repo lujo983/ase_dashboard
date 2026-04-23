@@ -708,6 +708,52 @@ if st.session_state.logged_in and menu == "Dashboard":
                          st.dataframe(report_df, use_container_width=True, hide_index=True)
          
                          # ---  PDF GENERATION ---
+                         st.divider()
+                         if st.button("📑 Je unataka PDF Report?"):
+                             try:
+                                 buf = BytesIO()
+                                 doc = SimpleDocTemplate(buf, pagesize=A4)
+                                 elements = []
+                                 styles = getSampleStyleSheet() 
+                                 title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
+                                 cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
+                                 logo = Image("bm_logo_edited.png", width=1.4*inch, height=0.7*inch)
+                                 elements.append(Paragraph(f"DAILY BUSINESS REPORT BY: {st.session_state.user_name}", title_style))
+                                 elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
+                                 elements.append(Spacer(1, 15))
+         
+                                 # Table Data
+                                 pdf_data = [report_df.columns.tolist()]
+                                 for _, row in report_df.iterrows():
+                                     pdf_data.append([str(x) for x in row.values])
+                                 
+                                 # Summary Row in PDF
+                                 pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
+         
+                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
+                                 t.setStyle(TableStyle([
+                                     ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
+                                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                     ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                                     ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+                                     ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                                 ]))
+                                 
+                                 elements.append(t)
+                                # 6. SIGNATURE/FOOTER SECTION
+                                 elements.append(Spacer(1, 30))
+                                 elements.append(Paragraph("__________________________", sub_style))
+                                 elements.append(Paragraph("Signature & Official Stamp", sub_style))
+                                 elements.append(Spacer(1, 15))
+                                 elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>", sub_style))
+                                 doc.build(elements)
+                                 st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
+                             except Exception as pdf_err:
+                                 st.error(f"PDF Error: {pdf_err}")
+                     else:
+                         st.warning("Hakuna miamala iliyofanyika leo.")
+                 except Exception as e:
+                     st.error(f"Error: {e}")
                          
          
                          # --- End PDF GENERATION ---
