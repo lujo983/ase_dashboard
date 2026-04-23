@@ -482,7 +482,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         #Donors sidebar
         menu_Shopkeeper = st.sidebar.radio("Shopkeeper Links", [
             "Home/Dashboard",
-            "Manunuzi",
+            "Pokea mzigo",
             "Mauzo",
             "Ripoti ya Siku",
             "Matumizi",
@@ -511,7 +511,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.header("Donor Dashboard")
             st.info("Thank you for your contributions!")
             st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
-        elif menu_Shopkeeper == "Matumizi":
+        elif menu_Shopkeeper == "Pokea mzigo":
              st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
          
              # 1. Tafuta duka alilopangiwa huyu Shopkeeper
