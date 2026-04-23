@@ -513,7 +513,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
         # Start Stockin
         elif menu_Shopkeeper == "Pokea mzigo":
-             st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
+             st.subheader("📥 Ingiza Bidhaa (Stock In / Pokea Mzigo)")
          
              # 1. Fetch current items
              res = conn.table("inventory_items").select("id, item_name, current_stock, buying_price").eq("user_id", st.session_state.user_id).execute()
