@@ -722,8 +722,6 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End of csv/excell items uploads
 
-        elif menu_Shopkeeper == "Home/Dashboard":
-            st.subheader("Shopkeeper Dashboard")
             
 
     # End Shopkeeper Dashboard
