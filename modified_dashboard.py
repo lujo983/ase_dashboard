@@ -511,48 +511,63 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.header("Donor Dashboard")
             st.info("Thank you for your contributions!")
             st.write("Here you can view\n- Donor reports\n- Funding impact\n- Financial transparency.")
+        # Start Stockin
         elif menu_Shopkeeper == "Pokea mzigo":
-             st.subheader(f"Karibu, {st.session_state.user_name} (Shopkeeper)")
+             st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
          
-             # 1. Tafuta duka alilopangiwa huyu Shopkeeper
-             try:
-                 assignment = conn.table("shop_assignments") \
-                     .select("shop_id, shops(shop_name, location)") \
-                     .eq("shopkeeper_email", st.session_state.email) \
-                     .execute() 
-         
-                 if assignment.data:
-                     shop_id = assignment.data['shop_id']
-                     shop_name = assignment.data['shops']['shop_name']
-                     location = assignment.data['shops']['location']
+             # 1. Fetch current items
+             res = conn.table("inventory_items").select("id, item_name, current_stock, buying_price").eq("user_id", st.session_state.user_id).execute()
+             
+             if res.data:
+                 item_options = {item['item_name']: item for item in res.data}
+                 
+                 # --- SELECT BOX OUTSIDE THE FORM ---
+                 # This allows the price to update instantly when the item changes
+                 selected_name = st.selectbox("Chagua Bidhaa unayotaka kuongeza stock", list(item_options.keys()))
+                 
+                 # Get the data for the item the user just picked
+                 current_item = item_options[selected_name]
+                 
+                 # 2. Form for the numbers
+                 with st.form("stock_in_form", clear_on_submit=True):
+                     st.info(f"Stock ya sasa hivi: {current_item['current_stock']}")
                      
-                     st.sidebar.info(f"📍 Unafanya kazi: {shop_name} ({location})")
+                     qty = st.number_input("Kiasi unachonunua", min_value=1, step=1, value=1)
                      
-                     # 2. Onyesha Bidhaa za Duka hili pekee
-                     res = conn.table("inventory_items") \
-                         .select("item_name, category, selling_price, current_stock, unit_measure") \
-                         .eq("shop_id", shop_id) \
-                         .execute()
-         
-                     if res.data:
-                         df_stock = pd.DataFrame(res.data)
-                         st.write("### Bidhaa Zilizopo Dukani")
-                         
-                         # Metrics fupi
-                         c1, c2 = st.columns(2)
-                         c1.metric("Aina za Bidhaa", len(df_stock))
-                         c2.metric("Hali ya Stock", f"{df_stock['current_stock'].sum()} {df_stock['unit_measure'].iloc[0] if not df_stock.empty else ''}")
-         
-                         st.dataframe(df_stock, use_container_width=True, hide_index=True)
-                     else:
-                         st.warning("Duka hili halina bidhaa bado. Mwambie mmiliki apandishe bidhaa.")
-                 else:
-                     st.error("Hujapangiwa duka bado. Tafadhali wasiliana na mmiliki wako.")
+                     # The price now automatically defaults to the selected item's buying price
+                     p_price = st.number_input(
+                         "Bei ya kununulia (kwa kila moja)", 
+                         value=float(current_item['buying_price']), 
+                         step=100.0
+                     )
                      
-             except Exception as e:
-                 st.error(f"Hitilafu: {e}")
+                     submitted = st.form_submit_button("Hifadhi Ununuzi")
+         
+                     if submitted:
+                         try:
+                             # Record the buy in transactions table
+                             conn.table("inventory_transactions").insert({
+                                 "user_id": st.session_state.user_id,
+                                 "item_id": current_item['id'],
+                                 "type": "STOCK_IN",
+                                 "quantity": qty,
+                                 "price_per_unit": p_price
+                             }).execute()
+                             
+                             # Calculate and update new stock
+                             new_stock = current_item['current_stock'] + qty
+                             conn.table("inventory_items").update({"current_stock": new_stock}).eq("id", current_item['id']).execute()
+                             
+                             st.success(f"Umefanikiwa! Umeongeza {qty} za {selected_name}. Stock mpya: {new_stock}")
+                             # Note: We don't use rerun here so the message stays visible
+                         except Exception as e:
+                             st.error(f"Hitilafu: {e}")
+             else:
+                 st.info("Bado huna bidhaa. Tafadhali nenda 'Register Items' kwanza.")
 
-        #end shop view
+
+
+        # End stock In
 
         elif menu_Shopkeeper == "Community Stories":
             # You can add content for community stories here
