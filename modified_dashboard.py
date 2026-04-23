@@ -505,9 +505,6 @@ if st.session_state.logged_in and menu == "Dashboard":
 
             df = pd.DataFrame(donor_data)
 
-        # Sample data (Replace with your actual data)
-
-        elif menu_Shopkeeper=="Home":
             # Start Sales                  
         elif menu == "Fanya Mauzo":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
