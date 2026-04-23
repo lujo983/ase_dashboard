@@ -653,7 +653,7 @@ if st.session_state.logged_in and menu == "Dashboard":
      
         # Start daily reports
         elif menu_Shopkeeper == "Ripoti ya Siku":
-             st.title("📅 Daily Business Summary")
+             st.title("📅 Ripoti ya Mauzo yako ya Leo.")
              
              today_date = datetime.now().strftime("%Y-%m-%d")
              st.info(f"Showing report for: **{today_date}**")
