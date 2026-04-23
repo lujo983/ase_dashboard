@@ -1233,6 +1233,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          st.dataframe(report_df, use_container_width=True, hide_index=True)
          
                          # --- 4. PDF GENERATION ---
+                         
                          st.divider()
                          if st.button("📑 Je unataka PDF Report?"):
                              try:
@@ -1242,8 +1243,11 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  styles = getSampleStyleSheet() 
                                  title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
-                                 logo = Image("bm_logo_edited.png", width=1.4*inch, height=0.7*inch)
-                                 elements.append(Paragraph(f"DAILY BUSINESS REPORT BY: {st.session_state.user_name}", title_style))
+                                 logo = Image("bm_logo_edited.png", width=2*inch, height=1*inch)
+                                 logo.hAlign = 'CENTER'
+                                 elements.append(logo)
+                                 elements.append(Paragraph(f"...", title_style))
+                                 elements.append(Paragraph(f"Ripoti ya siku na: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
          
@@ -1266,11 +1270,13 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  
                                  elements.append(t)
                                 # 6. SIGNATURE/FOOTER SECTION
+                                 sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
                                  elements.append(Spacer(1, 30))
                                  elements.append(Paragraph("__________________________", sub_style))
                                  elements.append(Paragraph("Signature & Official Stamp", sub_style))
                                  elements.append(Spacer(1, 15))
-                                 elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>", sub_style))
+                                 elements.append(Paragraph("<i>This is a computer-generated report by BM-SYSTEM.</i>", sub_style))
+                                 elements.append(Paragraph("<i>Weka Kumbukumbu. Jenga Biashara. Kua Sasa .</i>", sub_style))
                                  doc.build(elements)
                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
                              except Exception as pdf_err:
@@ -1279,6 +1285,10 @@ if st.session_state.logged_in and menu == "Dashboard":
                          st.warning("Hakuna miamala iliyofanyika leo.")
                  except Exception as e:
                      st.error(f"Error: {e}")
+                         
+         
+                         # --- End PDF GENERATION ---
+                  # End Pdf generator
 
 
 
