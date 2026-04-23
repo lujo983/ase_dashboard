@@ -1257,7 +1257,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                      pdf_data.append([str(x) for x in row.values])
                                  
                                  # Summary Row in PDF
-                                 pdf_data.append(["TOTAL", "", "", "", "", f"Mauzo Tsh. {sales:,.0f} <br/>. Manunuzi Tsh. {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
+                                 pdf_data.append(["TOTAL", "", "", "", "", f"Mauzo Tsh. {sales:,.0f} n\. Manunuzi Tsh. {sales:,.0f}", f"Loss: {total_loss:,.0f}"])
          
                                  t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
                                  t.setStyle(TableStyle([
