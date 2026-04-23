@@ -1404,7 +1404,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                elements.append(Paragraph("__________________________", sub_style))
                                elements.append(Paragraph("Signature & Official Stamp", sub_style))
                                elements.append(Spacer(1, 15))
-                               elements.append(Paragraph("<i>This is a computer-generated report from ASE Dashboard.</i>", sub_style))
+                               elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>", sub_style))
                            
                                # 7. BUILD
                                doc.build(elements)
