@@ -485,25 +485,49 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Pokea mzigo",
             "Fanya Mauzo",
             "Ripoti ya Siku",
-            "Matumizi",
+            "Sajili Bidhaa",
         ])
 
         # Add more donor-related content
         # You can add content or visuals for the donor reports here
         # Example donor data
-
-        if menu_Shopkeeper == "Donor Reports":
-            st.subheader("Donor Reports")
-            st.info("This section includes summarized reports for donors.")
-            st.markdown("- Funding used in Q1\n- Women trained: 1500\n- Beehives installed: 10\n- Briquettes made: 1,200kg")
-
-            donor_data = {
-            "Donor": ["Alice", "Bob", "Charlie"],
-            "Amount": [500,1000, 1500], 
-            "Project": ["Sunflower Farming", "Beekeeping", "Sunflower Farming"]
-            }
-
-            df = pd.DataFrame(donor_data)
+            # Register item starts
+        if menu_Shopkeeper == "Sajili Bidhaa":
+             st.subheader("🆕 Register New Business Item")
+             
+             with st.form("item_reg_form", clear_on_submit=True):
+                 item_name = st.text_input("Jina la Bidhaa (Item Name)")
+                 category = st.selectbox("Kundi (Category)", ["Chakula", "Mavazi", "Vifaa", "Sabuni", "Zingine"])
+                 unit = st.selectbox("Kipimo (Unit)", ["pcs", "kg", "ltr", "box"])
+                 
+                 col1, col2 = st.columns(2)
+                 b_price = col1.number_input("Bei ya Kununua (Buying Price)", min_value=0.0, step=100.0)
+                 s_price = col2.number_input("Bei ya Kuuzia (Selling Price)", min_value=0.0, step=100.0)
+                 
+                 initial_stock = st.number_input("Stock ya sasa (Initial Stock)", min_value=0, step=1)
+                 
+                 submitted = st.form_submit_button("Sajili Bidhaa")
+                 
+                 if submitted:
+                     if not item_name:
+                         st.error("Tafadhali weka jina la bidhaa.")
+                     else:
+                         try:
+                             new_item = {
+                                 "user_id": st.session_state.user_id,
+                                 "item_name": item_name,
+                                 "category": category,
+                                 "unit_measure": unit,
+                                 "buying_price": b_price,
+                                 "selling_price": s_price,
+                                 "current_stock": initial_stock
+                             }
+                             
+                             conn.table("inventory_items").insert(new_item).execute()
+                             st.success(f"Hongera! {item_name} imesajiliwa vyema.")
+                         except Exception as e:
+                             st.error(f"Hitilafu: {e}")
+        # End register items
 
             # Start Sales                  
         elif menu_Shopkeeper == "Fanya Mauzo":
