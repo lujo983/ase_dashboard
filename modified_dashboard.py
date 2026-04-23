@@ -742,8 +742,8 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  elements.append(t)
                                 # 6. SIGNATURE/FOOTER SECTION
                                  elements.append(Spacer(1, 30))
-                                 elements.append(Paragraph("__________________________", sub_style))
-                                 elements.append(Paragraph("Signature & Official Stamp", sub_style))
+                                 elements.append(Paragraph("__________________________"))
+                                 elements.append(Paragraph("Signature & Official Stamp"))
                                  elements.append(Spacer(1, 15))
                                  elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>", sub_style))
                                  doc.build(elements)
