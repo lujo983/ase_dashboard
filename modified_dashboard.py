@@ -741,6 +741,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  
                                  elements.append(t)
                                 # 6. SIGNATURE/FOOTER SECTION
+                                 sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
                                  elements.append(Spacer(1, 30))
                                  elements.append(Paragraph("__________________________", sub_style))
                                  elements.append(Paragraph("Signature & Official Stamp", sub_style))
