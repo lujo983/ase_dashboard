@@ -745,7 +745,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  elements.append(Paragraph("__________________________"))
                                  elements.append(Paragraph("Signature & Official Stamp"))
                                  elements.append(Spacer(1, 15))
-                                 elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>", sub_style))
+                                 elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>"))
                                  doc.build(elements)
                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
                              except Exception as pdf_err:
