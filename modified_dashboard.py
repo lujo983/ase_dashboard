@@ -791,29 +791,15 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         elif menu_Shopkeeper == "Home/Dashboard":
             st.subheader("Shopkeeper Dashboard")
-            try:
-                prod_df = pd.read_csv("production_records.csv")
-                st.dataframe(prod_df)
-            except FileNotFoundError:
-                st.warning("No production records found.")
-            data = {
-            'Village': ['Hydom', 'Dongobesh', 'Mbulu'],
-            'Farmers': [5, 20, 15],
-            'Acres': [10, 50, 30],
-            'Yield (kg)': [500, 1750, 1000]
-            }
-
-            df = pd.DataFrame(data)
-            #Displaying a pie chart for total yield
-            st.subheader('Total Yield (kg)')
-            #fig, ax = plt.subplots()
-            #ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
-            #st.pyplot(fig)
+            
 
     # End Shopkeeper Dashboard
 
+
+
  
-    # Donor Dashboard
+ 
+    # Start Donor Dashboard
     if role == "Donor":
         #Donors sidebar
         menu1 = st.sidebar.radio("Donors Links", [
