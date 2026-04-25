@@ -793,7 +793,7 @@ if st.session_state.logged_in and menu == "Dashboard":
  
  
     # Start Donor Dashboard
-    if role == "Donor":
+   if role == "Donor":
         #Donors sidebar
         menu1 = st.sidebar.radio("Donors Links", [
             "Home",
