@@ -498,7 +498,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              
              with st.form("item_reg_form", clear_on_submit=True):
                  item_name = st.text_input("Jina la Bidhaa (Item Name)")
-                 category = st.selectbox("Kundi (Category)", ["Chakula", "Mavazi", "Vifaa", "Sabuni", "Zingine"])
+                 category = st.selectbox("Kundi (Category)", ["Spearparts", "Lubricants", "Vifaa vya dukani", "Mafuta", "Zingine"])
                  unit = st.selectbox("Kipimo (Unit)", ["pcs", "kg", "ltr", "box"])
                  
                  col1, col2 = st.columns(2)
@@ -959,7 +959,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              
              with st.form("item_reg_form", clear_on_submit=True):
                  item_name = st.text_input("Jina la Bidhaa (Item Name)")
-                 category = st.selectbox("Kundi (Category)", ["Chakula", "Mavazi", "Vifaa", "Sabuni", "Zingine"])
+                 category = st.selectbox("Kundi (Category)", ["Material ya sabuni", "Sabuni ya mche", "Vifaa", "Sabuni ya maji", "Zingine"])
                  unit = st.selectbox("Kipimo (Unit)", ["pcs", "kg", "ltr", "box"])
                  
                  col1, col2 = st.columns(2)
