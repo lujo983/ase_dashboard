@@ -764,8 +764,8 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  elements.append(Paragraph("<i>Weka Kumbukumbu. Jenga Biashara. Kua Sasa .</i>", sub_style))
                                  doc.build(elements)
                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
-                          except Exception as pdf_err:
-                              st.error(f"PDF Error: {pdf_err}")
+                           except Exception as pdf_err:
+                               st.error(f"PDF Error: {pdf_err}")
                          
          
                          # --- End PDF GENERATION ---
