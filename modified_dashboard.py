@@ -724,6 +724,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  elements.append(Paragraph(f"Ripoti ya siku na: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
+                                                       # Table Data - Wrap headers in Paragraphs
+                                 pdf_data = [[Paragraph(str(col), cell_style) for col in report_df.columns.tolist()]]
+                                 
+                                 # Wrap row data in Paragraphs to force wrapping within colWidths
+                                 for _, row in report_df.iterrows():
+                                     pdf_data.append([Paragraph(str(x), cell_style) for x in row.values])
          
                                  # Table Data
                                  pdf_data = [report_df.columns.tolist()]
