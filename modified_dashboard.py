@@ -793,7 +793,7 @@ if st.session_state.logged_in and menu == "Dashboard":
  
 
 
-    # Volunteer Dashboard
+   # Volunteer Dashboard
     elif role == "Volunteer":
         st.header("Volunteer Dashboard")
         st.info("Thanks for your dedication!")
