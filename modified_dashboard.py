@@ -739,7 +739,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                      Paragraph(f"Loss: {total_loss:,.0f}", cell_style)
                                  ])
                          
-                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
+                                 t = Table(pdf_data, colWidths=[1.6*inch, 0.6*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
                                  t.setStyle(TableStyle([
                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -1273,7 +1273,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                      Paragraph(f"Loss: {total_loss:,.0f}", cell_style)
                                  ])
                          
-                                 t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
+                                 t = Table(pdf_data, colWidths=[1.6*inch, 0.6*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
                                  t.setStyle(TableStyle([
                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
