@@ -739,7 +739,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                                      ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                                      ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
-                                     ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                                     ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'), 
                                  ]))
                                  
                                  elements.append(t)
