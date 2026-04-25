@@ -766,6 +766,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  st.download_button("📥 Sasa Download Daily PDF", data=buf.getvalue(), file_name=f"Daily_Report_{today_date}.pdf", mime="application/pdf")
                              except Exception as pdf_err:
                                  st.error(f"PDF Error: {pdf_err}")
+                           except Exception as e:
+                               # This block is required to catch errors
+                               st.error(f"An error occurred: {e}")
                          
          
                          # --- End PDF GENERATION ---
