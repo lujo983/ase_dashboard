@@ -1241,6 +1241,7 @@ if st.session_state.logged_in and menu == "Dashboard":
          
                          # --- 4. PDF GENERATION ---
                          
+                         
                          st.divider()
                          if st.button("📑 Je unataka PDF Report?"):
                              try:
@@ -1249,7 +1250,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  elements = []
                                  styles = getSampleStyleSheet() 
                                  title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
-                                 cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8)
+                                 cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8, leading=10)
                                  logo = Image("bm_logo_edited.png", width=2*inch, height=1*inch)
                                  logo.hAlign = 'CENTER'
                                  elements.append(logo)
@@ -1257,15 +1258,21 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  elements.append(Paragraph(f"Ripoti ya siku na: {st.session_state.user_name}", title_style))
                                  elements.append(Paragraph(f"Date: {today_date}", styles['Normal']))
                                  elements.append(Spacer(1, 15))
-         
-                                 # Table Data
-                                 pdf_data = [report_df.columns.tolist()]
-                                 for _, row in report_df.iterrows():
-                                     pdf_data.append([str(x) for x in row.values])
+                         
+                                 # FIX 2: Wrap headers in Paragraph()
+                                 pdf_data = [[Paragraph(str(col), cell_style) for col in report_df.columns.tolist()]]
                                  
-                                 # Summary Row in PDF
-                                 pdf_data.append(["TOTAL", "", "", "", "", f"Tsh {sales:,.0f} ", f"Loss: {total_loss:,.0f}"])
-         
+                                 # FIX 3: Wrap row data in Paragraph()
+                                 for _, row in report_df.iterrows():
+                                     pdf_data.append([Paragraph(str(x), cell_style) for x in row.values])
+                                 
+                                 # FIX 4: Wrap Summary Row items in Paragraph()
+                                 pdf_data.append([
+                                     Paragraph("TOTAL", cell_style), "", "", "", "", 
+                                     Paragraph(f"Tsh {sales:,.0f}", cell_style), 
+                                     Paragraph(f"Loss: {total_loss:,.0f}", cell_style)
+                                 ])
+                         
                                  t = Table(pdf_data, colWidths=[0.6*inch, 1.2*inch, 1.3*inch, 0.5*inch, 0.9*inch, 1.1*inch, 1.1*inch])
                                  t.setStyle(TableStyle([
                                      ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
@@ -1273,6 +1280,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                      ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                                      ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
                                      ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                                     ('VALIGN', (0, 0), (-1, -1), 'TOP'), # FIX 5: Keep text at top of tall cells
                                  ]))
                                  
                                  elements.append(t)
