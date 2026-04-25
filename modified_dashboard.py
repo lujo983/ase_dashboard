@@ -709,8 +709,6 @@ if st.session_state.logged_in and menu == "Dashboard":
          
                          # ---  PDF GENERATION ---
                          st.divider()
-                         # ---  PDF GENERATION ---
-                         st.divider()
                          if st.button("📑 Je unataka PDF Report?"):
                              try:
                                  buf = BytesIO()
