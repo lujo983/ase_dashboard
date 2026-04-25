@@ -715,7 +715,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                  doc = SimpleDocTemplate(buf, pagesize=A4)
                                  elements = []
                                  styles = getSampleStyleSheet() 
-                                 title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.white)
+                                 title_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"))
                                  cell_style = ParagraphStyle('C', parent=styles['Normal'], fontSize=8, leading=10)
                                  logo = Image("bm_logo_edited.png", width=2*inch, height=1*inch)
                                  logo.hAlign = 'CENTER'
