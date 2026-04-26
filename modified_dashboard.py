@@ -259,7 +259,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     if role == "Business Owner":
         #Donors sidebar
         menu_business_owner = st.sidebar.radio("Business Owner Links", [
-            "🏢 Business Owner Dashboard.",
+            "🏠 Business Owner Dashboard.",
             "📤 Pakia bidhaa/Import(Excel).",
             "📋 List ya Bidhaa Ulizosajili.",
             "👥 Assign Shopkeepers.",
@@ -272,8 +272,8 @@ if st.session_state.logged_in and menu == "Dashboard":
         # You can add content or visuals for the donor reports here
         # Example donor data
 
-        if menu_business_owner == "🏢 Business Owner Dashboard.":
-            st.subheader("🏢 Business Owner Dashboard")
+        if menu_business_owner == "🏠 Business Owner Dashboard.":
+            st.subheader("🏠 Business Owner Dashboard")
       
         # Start csv/excell upload
 
@@ -481,7 +481,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     if role == "Shopkeeper":
         #Donors sidebar
         menu_Shopkeeper = st.sidebar.radio("Shopkeeper Links", [
-            "Home/Dashboard",
+            "🏠 Home/Dashboard",
             "📥 Pokea mzigo",
             "📤 Fanya Mauzo",
             "🆕 Sajili Bidhaa Mpya",
