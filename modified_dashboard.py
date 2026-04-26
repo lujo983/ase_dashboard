@@ -604,7 +604,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  try: 
                      # 2. Read the Excel file
                      df = pd.read_excel(uploaded_file)
-                     df = df.fillna(0)
+                     
                      
                      st.write("Hakiki data zako hapa chini:")
                      st.dataframe(df.head()) # Show first 5 rows to the user
