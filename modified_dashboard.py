@@ -482,18 +482,18 @@ if st.session_state.logged_in and menu == "Dashboard":
         #Donors sidebar
         menu_Shopkeeper = st.sidebar.radio("Shopkeeper Links", [
             "Home/Dashboard",
-            "Pokea mzigo",
-            "Fanya Mauzo",
-            "Ripoti ya Siku",
-            "Sajili Bidhaa",
-            "Pakia Bidhaa kwa mkupuo",
+            "📥 Pokea mzigo",
+            "📤 Fanya Mauzo",
+            "🆕 Sajili Bidhaa Mpya",
+            "📊 Ripoti ya Siku",
+            "📤 Pakia bidhaa/Import(Excel).",
         ])
 
         # Add more donor-related content
         # You can add content or visuals for the donor reports here
         # Example donor data
             # Register item starts
-        if menu_Shopkeeper == "Sajili Bidhaa":
+        if menu_Shopkeeper == "🆕 Sajili Bidhaa Mpya":
              st.subheader("🆕 Register New Business Item")
              
              with st.form("item_reg_form", clear_on_submit=True):
@@ -529,9 +529,10 @@ if st.session_state.logged_in and menu == "Dashboard":
                          except Exception as e:
                              st.error(f"Hitilafu: {e}")
         # End register items
+       
 
             # Start Sales                  
-        elif menu_Shopkeeper == "Fanya Mauzo":
+        elif menu_Shopkeeper == "📤 Fanya Mauzo":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
          
              res = conn.table("inventory_items").select("id, item_name, current_stock, selling_price").eq("user_id", st.session_state.user_id).execute()
@@ -590,10 +591,47 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.info("Sajili bidhaa kwanza ili uweze kuuza.")
 
         # End Sales form
+                     
+        # start pakia mzigo kwa mkupuo
+        elif menu_shopkeeper=="📤 Pakia bidhaa/Import(Excel).":
+             st.subheader("📤 Pakia Bidhaa kwa Excel (Bulk Import)")
+             st.write("Pakia file la Excel lenye bidhaa zako zote.")
+             
+             # 1. File Uploader
+             uploaded_file = st.file_uploader("Chagua file la Excel (.xlsx)", type=["xlsx"])
+             
+             if uploaded_file is not None:
+                 try:
+                     # 2. Read the Excel file
+                     df = pd.read_excel(uploaded_file)
+                     
+                     st.write("Hakiki data zako hapa chini:")
+                     st.dataframe(df.head()) # Show first 5 rows to the user
+             
+                     if st.button("Anza Kupakia Sasa (Start Upload)"):
+                         # 3. Add the Owner's ID to every row automatically
+                         # This ensures the items belong to this specific Business Owner
+                         df['user_id'] = st.session_state.user_id
+                         
+                         # 4. Convert the DataFrame to a list of dictionaries for Supabase
+                         data_to_insert = df.to_dict(orient="records")
+                         
+                         # 5. Execute the Bulk Insert
+                         conn.table("inventory_items").insert(data_to_insert).execute()
+                         
+                         st.success(f"Hongera! Bidhaa {len(data_to_insert)} zimeingizwa kwenye kanzidata yako.")
+                         st.rerun()
+             
+                 except Exception as e:
+                     st.error(f"Kuna tatizo kwenye file lako: {e}")
+
+        # End of csv/excell items uploads
+     
+        # start pakia mzigo kwa mkupuo
 
      
         # Start Stockin
-        elif menu_Shopkeeper == "Pokea mzigo":
+        elif menu_Shopkeeper == "📥 Pokea mzigo":
              st.subheader("📥 Ingiza Bidhaa (Stock In / Pokea Mzigo)")
          
              # 1. Fetch current items
@@ -653,7 +691,7 @@ if st.session_state.logged_in and menu == "Dashboard":
        
      
         # Start daily reports
-        elif menu_Shopkeeper == "Ripoti ya Siku":
+        elif menu_Shopkeeper == "📊 Ripoti ya Siku":
              st.title("📅 Daily Business Summary")
              
              today_date = datetime.now().strftime("%Y-%m-%d")
