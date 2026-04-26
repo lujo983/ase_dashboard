@@ -486,7 +486,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "📤 Fanya Mauzo",
             "🆕 Sajili Bidhaa Mpya",
             "📊 Ripoti ya Siku",
-            "📤 Pakia bidhaa/Import(Excel).",
+            "📤 Import(Excel)",
         ])
 
         # Add more donor-related content
@@ -593,7 +593,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         # End Sales form
                      
         # start pakia mzigo kwa mkupuo
-        elif menu_shopkeeper=="📤 Pakia bidhaa/Import(Excel).":
+        elif menu_shopkeeper=="📤 Import(Excel)":
              st.subheader("📤 Pakia Bidhaa kwa Excel (Bulk Import)")
              st.write("Pakia file la Excel lenye bidhaa zako zote.")
              
