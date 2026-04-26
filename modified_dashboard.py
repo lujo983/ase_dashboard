@@ -601,7 +601,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              uploaded_file = st.file_uploader("Chagua file la Excel (.xlsx)", type=["xlsx"])
              
              if uploaded_file is not None:
-                 try:
+                 try: 
                      # 2. Read the Excel file
                      df = pd.read_excel(uploaded_file)
                      
