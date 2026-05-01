@@ -593,37 +593,119 @@ if st.session_state.logged_in and menu == "Dashboard":
         # End Sales form
                                     # start dashboard/ home page
         elif menu_Shopkeeper=="🏠 Home/Dashboard":
-             st.subheader("📤 Pakia Bidhaa kwa Excel (Bulk Import)")
-             st.write("Pakia file la Excel lenye bidhaa zako zote.")
+             st.subheader("📊 Welcome to your Dashboard")
+             st.title("📊 Welcome to your Dashboard")
+             st.markdown("##### Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
+             st.divider()
+ 
+             # --- 1. Top Performance Metrics (KPI Cards) ---
+             # Assuming you loaded your Supabase data into 'df_sales' and 'df_inventory' earlier
              
-             # 1. File Uploader
-             uploaded_file = st.file_uploader("Chagua file la Excel (.xlsx)", type=["xlsx"])
+             total_revenue = df_sales['total_price'].sum() if 'total_price' in df_sales.columns else 0
+             total_items_sold = df_sales['quantity'].sum() if 'quantity' in df_sales.columns else 0
              
-             if uploaded_file is not None:
-                 try: 
-                     # 2. Read the Excel file
-                     df = pd.read_excel(uploaded_file)
-                     
-                     
-                     st.write("Hakiki data zako hapa chini:")
-                     st.dataframe(df.head()) # Show first 5 rows to the user
+             # Check for inventory running below a threshold (e.g., less than 5 items left)
+             low_stock_count = 0
+             if 'stock_level' in df_inventory.columns:
+                 low_stock_count = df_inventory[df_inventory['stock_level'] < 5].shape[0]
+ 
+             # Displaying KPIs in 3 distinct columns
+             m1, m2, m3 = st.columns(3)
              
-                     if st.button("Anza Kupakia Sasa (Start Upload)"):
-                         # 3. Add the Owner's ID to every row automatically
-                         # This ensures the items belong to this specific Business Owner
-                         df['user_id'] = st.session_state.user_id
-                         
-                         # 4. Convert the DataFrame to a list of dictionaries for Supabase
-                         data_to_insert = df.to_dict(orient="records")
-                         
-                         # 5. Execute the Bulk Insert
-                         conn.table("inventory_items").insert(data_to_insert).execute()
-                         
-                         st.success(f"Hongera! Bidhaa {len(data_to_insert)} zimeingizwa kwenye kanzidata yako.")
-                         st.rerun()
+             with m1:
+                 st.metric(
+                     label="💰 Jumla ya Mapato (Revenue)", 
+                     value=f"TZS {total_revenue:,.0f}"
+                 )
+             with m2:
+                 st.metric(
+                     label="📦 Bidhaa Zilizouzwa", 
+                     value=f"{total_items_sold:,} Pcs"
+                 )
+             with m3:
+                 # Highlight in red if there are critical stock issues
+                 st.metric(
+                     label="⚠️ Bidhaa Zilizoishiwa", 
+                     value=f"{low_stock_count} Bidhaa",
+                     delta=f"{low_stock_count} Zinahitaji oda" if low_stock_count > 0 else "Stoo ipo salama",
+                     delta_color="inverse" if low_stock_count > 0 else "normal"
+                 )
              
-                 except Exception as e:
-                     st.error(f"Kuna tatizo kwenye file lako: {e}")
+             st.divider()
+ 
+             # --- 2. Interactive Charts Grid (Two Columns) ---
+             col1, col2 = st.columns(2)
+ 
+             with col1:
+                 st.subheader("📈 Mwenendo wa Mauzo (Sales Trend)")
+                 
+                 # Make sure the created_at column is converted to pandas datetime
+                 df_sales['created_at'] = pd.to_datetime(df_sales['created_at'])
+                 
+                 # Group by date to see daily revenue
+                 sales_trend = df_sales.groupby(df_sales['created_at'].dt.date)['total_price'].sum().reset_index()
+                 
+                 fig_line = px.line(
+                     sales_trend, 
+                     x='created_at', 
+                     y='total_price', 
+                     labels={'total_price': 'Mauzo (TZS)', 'created_at': 'Tarehe'},
+                     color_discrete_sequence=['#10b981'] # Professional emerald green
+                 )
+                 fig_line.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10))
+                 st.plotly_chart(fig_line, use_container_width=True)
+ 
+             with col2:
+                 st.subheader("🏆 Bidhaa Zinazoongoza kwa Mauzo")
+                 
+                 # Top 5 products by revenue
+                 top_products = df_sales.groupby('product_name')['total_price'].sum().nlargest(5).reset_index()
+                 
+                 fig_bar = px.bar(
+                     top_products, 
+                     x='total_price', 
+                     y='product_name', 
+                     orientation='h', 
+                     labels={'total_price': 'Jumla (TZS)', 'product_name': 'Jina la Bidhaa'},
+                     color_discrete_sequence=['#3b82f6'] # Professional business blue
+                 )
+                 # Sort the chart from highest to lowest
+                 fig_bar.update_layout(yaxis={'categoryorder':'total ascending'}, height=350, margin=dict(l=10, r=10, t=10, b=10))
+                 st.plotly_chart(fig_bar, use_container_width=True)
+ 
+             st.divider()
+ 
+             # --- 3. Bottom Grid: Inventory & Recent Logs ---
+             col3, col4 = st.columns([1, 1])
+ 
+             with col3:
+                 st.subheader("📊 Mchanganuo wa Stoo (Inventory Status)")
+                 
+                 # Pie chart showing how stock is distributed
+                 fig_pie = px.pie(
+                     df_inventory, 
+                     values='stock_level', 
+                     names='product_name', 
+                     hole=0.4,
+                     color_discrete_sequence=px.colors.sequential.Teal
+                 )
+                 fig_pie.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10))
+                 st.plotly_chart(fig_pie, use_container_width=True)
+ 
+             with col4:
+                 st.subheader("🧾 Miamala ya Hivi Karibuni")
+                 
+                 # Fetching most recent 5 sales transactions
+                 recent_sales = df_sales.sort_values(by='created_at', ascending=False).head(5)
+                 
+                 # Selecting specific columns to keep the table clean
+                 table_cols = ['created_at', 'product_name', 'quantity', 'total_price']
+                 
+                 st.dataframe(
+                     recent_sales[table_cols], 
+                     use_container_width=True, 
+                     hide_index=True
+                 )
 
         # End dashboard/ home page
                      
