@@ -598,15 +598,15 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.divider()
  
              # --- 1. Top Performance Metrics (KPI Cards) ---
-             # Assuming you loaded your Supabase data into 'inventory_transactions' and 'df_inventory' earlier
+             # Assuming you loaded your Supabase data into 'inventory_transactions' and 'inventory_items' earlier
              
-             total_revenue = inventory_transactions['total_price'].sum() if 'total_price' in inventory_transactions.columns else 0
+             total_revenue = inventory_transactions['total_value'].sum() if 'total_value' in inventory_transactions.columns else 0
              total_items_sold = inventory_transactions['quantity'].sum() if 'quantity' in inventory_transactions.columns else 0
              
              # Check for inventory running below a threshold (e.g., less than 5 items left)
              low_stock_count = 0
-             if 'stock_level' in df_inventory.columns:
-                 low_stock_count = df_inventory[df_inventory['stock_level'] < 5].shape[0]
+             if 'stock_level' in inventory_items.columns:
+                 low_stock_count = inventory_items[inventory_items['stock_level'] < 5].shape[0]
  
              # Displaying KPIs in 3 distinct columns
              m1, m2, m3 = st.columns(3)
@@ -642,13 +642,13 @@ if st.session_state.logged_in and menu == "Dashboard":
                  inventory_transactions['created_at'] = pd.to_datetime(inventory_transactions['created_at'])
                  
                  # Group by date to see daily revenue
-                 sales_trend = inventory_transactions.groupby(inventory_transactions['created_at'].dt.date)['total_price'].sum().reset_index()
+                 sales_trend = inventory_transactions.groupby(inventory_transactions['created_at'].dt.date)['total_value'].sum().reset_index()
                  
                  fig_line = px.line(
                      sales_trend, 
                      x='created_at', 
-                     y='total_price', 
-                     labels={'total_price': 'Mauzo (TZS)', 'created_at': 'Tarehe'},
+                     y='total_value', 
+                     labels={'total_value': 'Mauzo (TZS)', 'created_at': 'Tarehe'},
                      color_discrete_sequence=['#10b981'] # Professional emerald green
                  )
                  fig_line.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10))
@@ -658,14 +658,14 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.subheader("🏆 Bidhaa Zinazoongoza kwa Mauzo")
                  
                  # Top 5 products by revenue
-                 top_products = inventory_transactions.groupby('product_name')['total_price'].sum().nlargest(5).reset_index()
+                 top_products = inventory_transactions.groupby('product_name')['total_value'].sum().nlargest(5).reset_index()
                  
                  fig_bar = px.bar(
                      top_products, 
-                     x='total_price', 
+                     x='total_value', 
                      y='product_name', 
                      orientation='h', 
-                     labels={'total_price': 'Jumla (TZS)', 'product_name': 'Jina la Bidhaa'},
+                     labels={'total_value': 'Jumla (TZS)', 'product_name': 'Jina la Bidhaa'},
                      color_discrete_sequence=['#3b82f6'] # Professional business blue
                  )
                  # Sort the chart from highest to lowest
@@ -682,7 +682,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  
                  # Pie chart showing how stock is distributed
                  fig_pie = px.pie(
-                     df_inventory, 
+                     inventory_items, 
                      values='stock_level', 
                      names='product_name', 
                      hole=0.4,
@@ -698,7 +698,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  recent_sales = inventory_transactions.sort_values(by='created_at', ascending=False).head(5)
                  
                  # Selecting specific columns to keep the table clean
-                 table_cols = ['created_at', 'product_name', 'quantity', 'total_price']
+                 table_cols = ['created_at', 'product_name', 'quantity', 'total_value']
                  
                  st.dataframe(
                      recent_sales[table_cols], 
