@@ -605,6 +605,29 @@ if st.session_state.logged_in and menu == "Dashboard":
              )
              
              st.divider()
+             # --- STEP 1: LOAD AND CLEAN DATA ---
+             try:
+                 # Fetch all data from your real table
+                 response = supabase.table("inventory_transactions").select("*").execute()
+                 
+                 # Put data into a DataFrame
+                 df_transactions = pd.DataFrame(response.data)
+                 
+                 # 🚨 CRITICAL: Convert the created_at column to a standard datetime format
+                 if 'created_at' in df_transactions.columns:
+                     df_transactions['created_at'] = pd.to_datetime(df_transactions['created_at'])
+                     
+                     # Create helper columns for easy filtering
+                     df_transactions['tarehe'] = df_transactions['created_at'].dt.date
+                     df_transactions['wiki'] = df_transactions['created_at'].dt.to_period('W').astype(str)
+                     df_transactions['mwezi'] = df_transactions['created_at'].dt.to_period('M').astype(str)
+                 else:
+                     st.error("⚠️ Safu ya 'created_at' haijapatikana kwenye table yako!")
+                     
+             except Exception as e:
+                 st.sidebar.error(f"Hitilafu ya kupakia data: {e}")
+                 # Fallback structure so the rest of the app doesn't crash
+                 df_transactions = pd.DataFrame(columns=['created_at', 'total_price', 'product_name'])
              # --- LOGIC SEPARATION ---
              # We will use the selected filter to aggregate our financial numbers
              if filter_muda == "Daily (Kila Siku)":
