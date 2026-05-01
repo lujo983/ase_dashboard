@@ -605,54 +605,19 @@ if st.session_state.logged_in and menu == "Dashboard":
              )
              
              st.divider()
-             # --- STEP 1: LOAD AND CLEAN DATA ---
-             try:
-                 # Fetch all data from your real table
-                 response = supabase.table("inventory_transactions").select("*").execute()
-                 
-                 # Put data into a DataFrame
-                 df_transactions = pd.DataFrame(response.data)
-                 
-                 # 🚨 CRITICAL: Convert the created_at column to a standard datetime format
-                 if 'transaction_date' in df_transactions.columns:
-                     df_transactions['transaction_date'] = pd.to_datetime(df_transactions['transaction_date'])
-                     
-                     # Create helper columns for easy filtering
-                     df_transactions['tarehe'] = df_transactions['transaction_date'].dt.date
-                     df_transactions['wiki'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
-                     df_transactions['mwezi'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
-                 else:
-                     st.error("⚠️ Safu ya uliochagua haipo kwenye database yako!")
-                     
-             except Exception as e:
-                 st.sidebar.error(f"Hitilafu ya kupakia data: {e}")
-                 # Fallback structure so the rest of the app doesn't crash
-                 df_transactions = pd.DataFrame(columns=['transaction_date', 'total_value', 'item_id'])
              # --- LOGIC SEPARATION ---
              # We will use the selected filter to aggregate our financial numbers
              if filter_muda == "Daily (Kila Siku)":
                  st.subheader("📅 Ripoti ya Kila Siku")
-                 # Grouping by day
-                 kikundi_data = df_transactions.groupby('tarehe')['total_value'].sum().reset_index()
-                 kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
+                 
                  
              elif filter_muda == "Weekly (Kila Wiki)":
                  st.subheader("📆 Ripoti ya Kila Wiki")
-                 # Grouping by week
-                 kikundi_data = df_transactions.groupby('wiki')['total_value'].sum().reset_index()
-                 kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
+                 
                  
              else:
                  st.subheader("🗓️ Ripoti ya Kila Mwezi")
-                 # Grouping by month
-                 kikundi_data = df_transactions.groupby('transaction_date')['total_value'].sum().reset_index()
-                 kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
- 
-             # Temporary view to make sure data mapped correctly
-             st.dataframe(kikundi_data, use_container_width=True, hide_index=True)
- 
-             
-                
+      
 
         # End dashboard/ home page
                      
