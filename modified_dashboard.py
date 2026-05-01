@@ -618,9 +618,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                      df_transactions['transaction_date'] = pd.to_datetime(df_transactions['transaction_date'])
                      
                      # Create helper columns for easy filtering
-                     df_transactions['transaction_date'] = df_transactions['transaction_date'].dt.date
-                     df_transactions['transaction_date'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
-                     df_transactions['transaction_date'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
+                     df_transactions['tarehe'] = df_transactions['transaction_date'].dt.date
+                     df_transactions['wiki'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
+                     df_transactions['mwezi'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
                  else:
                      st.error("⚠️ Safu ya uliochagua haipo kwenye database yako!")
                      
@@ -645,7 +645,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              else:
                  st.subheader("🗓️ Ripoti ya Kila Mwezi")
                  # Grouping by month
-                 kikundi_data = df_transactions.groupby('mwezi')['total_value'].sum().reset_index()
+                 kikundi_data = df_transactions.groupby('transaction_date')['total_value'].sum().reset_index()
                  kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
  
              # Temporary view to make sure data mapped correctly
