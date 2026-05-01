@@ -596,15 +596,14 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.title("📊 Welcome to your Dashboard")
              st.markdown("Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
              st.divider()
-             # Assign local reference from memory to keep code short
-             df = st.session_state.inventory_transactions
- 
-             # --- 1. Metric Cards ---
-             total_rev = df['total_value'].sum() if 'total_value' in df.columns else 0
+             # --- DYNAMIC TIME FILTER ---
+             # This allows the user to choose how they want to see the charts and numbers
+             filter_muda = st.radio(
+                 "Chagua Mpangilio wa Muda (Select Timeframe):",
+                 ["Daily (Kila Siku)", "Weekly (Kila Wiki)", "Monthly (Kila Mwezi)"],
+                 horizontal=True
+             )
              
-             m1, m2 = st.columns(2)
-             m1.metric(label="💰 Jumla ya Mapato", value=f"TZS {total_rev:,.0f}")
-             m2.metric(label="🧾 Jumla ya Miamala", value=f"{len(df):,}")
              st.divider()
  
              
