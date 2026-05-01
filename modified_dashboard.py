@@ -600,7 +600,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              # This allows the user to choose how they want to see the charts and numbers
              filter_muda = st.radio(
                  "Chagua Mpangilio wa Muda (Select Timeframe):",
-                 ["Daily (Kila Siku)", "Weekly (Kila Wiki)", "Monthly (Kila Mwezi)", "🕐 Chagua muda wako"],
+                 ["Daily (Kila Siku)", "Weekly (Kila Wiki)", "Monthly (Kila Mwezi)", "Chagua muda wako"],
                  horizontal=True
              )
              
@@ -615,7 +615,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  
              elif filter_muda == "Weekly (Kila Wiki)":
                  st.subheader("📆 Ripoti ya Kila Wiki")
-             elif filter_muda == "🕐 Chagua muda wako":
+             elif filter_muda == "Chagua muda wako":
                  st.subheader("🕐 Ripoti ya Muda uliochagua")
                  
                  
