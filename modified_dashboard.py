@@ -598,10 +598,10 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.divider()
  
              # --- 1. Top Performance Metrics (KPI Cards) ---
-             # Assuming you loaded your Supabase data into 'df_sales' and 'df_inventory' earlier
+             # Assuming you loaded your Supabase data into 'inventory_transactions' and 'df_inventory' earlier
              
-             total_revenue = df_sales['total_price'].sum() if 'total_price' in df_sales.columns else 0
-             total_items_sold = df_sales['quantity'].sum() if 'quantity' in df_sales.columns else 0
+             total_revenue = inventory_transactions['total_price'].sum() if 'total_price' in inventory_transactions.columns else 0
+             total_items_sold = inventory_transactions['quantity'].sum() if 'quantity' in inventory_transactions.columns else 0
              
              # Check for inventory running below a threshold (e.g., less than 5 items left)
              low_stock_count = 0
@@ -639,10 +639,10 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.subheader("📈 Mwenendo wa Mauzo (Sales Trend)")
                  
                  # Make sure the created_at column is converted to pandas datetime
-                 df_sales['created_at'] = pd.to_datetime(df_sales['created_at'])
+                 inventory_transactions['created_at'] = pd.to_datetime(inventory_transactions['created_at'])
                  
                  # Group by date to see daily revenue
-                 sales_trend = df_sales.groupby(df_sales['created_at'].dt.date)['total_price'].sum().reset_index()
+                 sales_trend = inventory_transactions.groupby(inventory_transactions['created_at'].dt.date)['total_price'].sum().reset_index()
                  
                  fig_line = px.line(
                      sales_trend, 
@@ -658,7 +658,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.subheader("🏆 Bidhaa Zinazoongoza kwa Mauzo")
                  
                  # Top 5 products by revenue
-                 top_products = df_sales.groupby('product_name')['total_price'].sum().nlargest(5).reset_index()
+                 top_products = inventory_transactions.groupby('product_name')['total_price'].sum().nlargest(5).reset_index()
                  
                  fig_bar = px.bar(
                      top_products, 
@@ -695,7 +695,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  st.subheader("🧾 Miamala ya Hivi Karibuni")
                  
                  # Fetching most recent 5 sales transactions
-                 recent_sales = df_sales.sort_values(by='created_at', ascending=False).head(5)
+                 recent_sales = inventory_transactions.sort_values(by='created_at', ascending=False).head(5)
                  
                  # Selecting specific columns to keep the table clean
                  table_cols = ['created_at', 'product_name', 'quantity', 'total_price']
