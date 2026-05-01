@@ -605,6 +605,28 @@ if st.session_state.logged_in and menu == "Dashboard":
              )
              
              st.divider()
+             # --- LOGIC SEPARATION ---
+             # We will use the selected filter to aggregate our financial numbers
+             if filter_muda == "Daily (Kila Siku)":
+                 st.subheader("📅 Ripoti ya Kila Siku")
+                 # Grouping by day
+                 kikundi_data = df_transactions.groupby('tarehe')['total_price'].sum().reset_index()
+                 kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
+                 
+             elif filter_muda == "Weekly (Kila Wiki)":
+                 st.subheader("📆 Ripoti ya Kila Wiki")
+                 # Grouping by week
+                 kikundi_data = df_transactions.groupby('wiki')['total_price'].sum().reset_index()
+                 kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
+                 
+             else:
+                 st.subheader("🗓️ Ripoti ya Kila Mwezi")
+                 # Grouping by month
+                 kikundi_data = df_transactions.groupby('mwezi')['total_price'].sum().reset_index()
+                 kikundi_data.columns = ['Muda', 'Jumla_Mauzo']
+ 
+             # Temporary view to make sure data mapped correctly
+             st.dataframe(kikundi_data, use_container_width=True, hide_index=True)
  
              
                 
