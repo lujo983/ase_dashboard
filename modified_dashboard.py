@@ -599,7 +599,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              # --- 1. Metric Cards (KPIs) ---
              # Handling calculations dynamically based on your transaction columns
              total_rev = 0
-             if 'total_price' in inventory_transactions.columns:
+             if 'total_value' in inventory_transactions.columns:
                  total_rev = inventory_transactions['total_value'].sum()
                  
              total_actions = len(inventory_transactions)
