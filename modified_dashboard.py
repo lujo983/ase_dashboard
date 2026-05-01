@@ -596,23 +596,16 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.title("📊 Welcome to your Dashboard")
              st.markdown("Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
              st.divider()
-             # --- 1. Metric Cards (KPIs) ---
-             # Handling calculations dynamically based on your transaction columns
-             total_rev = 0
-             if 'total_value' in inventory_transactions.columns:
-                 total_rev = inventory_transactions['total_value'].sum()
-                 
-             total_actions = len(inventory_transactions)
+             st.divider()
+             # Assign local reference from memory to keep code short
+             df = st.session_state.inventory_transactions
  
-             m1, m2, m3 = st.columns(3)
-             with m1:
-                 st.metric(label="💰 Jumla ya Mapato (All-Time)", value=f"TZS {total_rev:,.0f}")
-             with m2:
-                 st.metric(label="🧾 Jumla ya Miamala", value=f"{total_actions:,}")
-             with m3:
-                 # Placeholder for active inventory if you have a separate physical stock table
-                 st.metric(label="📦 Status ya Stoo", value="Inayofanya Kazi")
- 
+             # --- 1. Metric Cards ---
+             total_rev = df['total_price'].sum() if 'total_price' in df.columns else 0
+             
+             m1, m2 = st.columns(2)
+             m1.metric(label="💰 Jumla ya Mapato", value=f"TZS {total_rev:,.0f}")
+             m2.metric(label="🧾 Jumla ya Miamala", value=f"{len(df):,}")
              st.divider()
  
              
