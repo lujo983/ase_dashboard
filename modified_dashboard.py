@@ -596,115 +596,27 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.title("📊 Welcome to your Dashboard")
              st.markdown("Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
              st.divider()
+         # --- 1. Metric Cards (KPIs) ---
+            # Handling calculations dynamically based on your transaction columns
+            total_rev = 0
+            if 'total_price' in inventory_transactions.columns:
+                total_rev = inventory_transactions['total_value'].sum()
+                
+            total_actions = len(inventory_transactions)
+
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                st.metric(label="💰 Jumla ya Mapato (All-Time)", value=f"TZS {total_rev:,.0f}")
+            with m2:
+                st.metric(label="🧾 Jumla ya Miamala", value=f"{total_actions:,}")
+            with m3:
+                # Placeholder for active inventory if you have a separate physical stock table
+                st.metric(label="📦 Status ya Stoo", value="Inayofanya Kazi")
+
+            st.divider()
  
-             # --- 1. Top Performance Metrics (KPI Cards) ---
-             # Assuming you loaded your Supabase data into 'inventory_transactions' and 'inventory_items' earlier
              
-             total_revenue = inventory_transactions['total_value'].sum() if 'total_value' in inventory_transactions.columns else 0
-             total_items_sold = inventory_transactions['quantity'].sum() if 'quantity' in inventory_transactions.columns else 0
-             
-             # Check for inventory running below a threshold (e.g., less than 5 items left)
-             low_stock_count = 0
-             if 'stock_level' in inventory_items.columns:
-                 low_stock_count = inventory_items[inventory_items['stock_level'] < 5].shape[0]
- 
-             # Displaying KPIs in 3 distinct columns
-             m1, m2, m3 = st.columns(3)
-             
-             with m1:
-                 st.metric(
-                     label="💰 Jumla ya Mapato (Revenue)", 
-                     value=f"TZS {total_revenue:,.0f}"
-                 )
-             with m2:
-                 st.metric(
-                     label="📦 Bidhaa Zilizouzwa", 
-                     value=f"{total_items_sold:,} Pcs"
-                 )
-             with m3:
-                 # Highlight in red if there are critical stock issues
-                 st.metric(
-                     label="⚠️ Bidhaa Zilizoishiwa", 
-                     value=f"{low_stock_count} Bidhaa",
-                     delta=f"{low_stock_count} Zinahitaji oda" if low_stock_count > 0 else "Stoo ipo salama",
-                     delta_color="inverse" if low_stock_count > 0 else "normal"
-                 )
-             
-             st.divider()
- 
-             # --- 2. Interactive Charts Grid (Two Columns) ---
-             col1, col2 = st.columns(2)
- 
-             with col1:
-                 st.subheader("📈 Mwenendo wa Mauzo (Sales Trend)")
-                 
-                 # Make sure the created_at column is converted to pandas datetime
-                 inventory_transactions['created_at'] = pd.to_datetime(inventory_transactions['created_at'])
-                 
-                 # Group by date to see daily revenue
-                 sales_trend = inventory_transactions.groupby(inventory_transactions['created_at'].dt.date)['total_value'].sum().reset_index()
-                 
-                 fig_line = px.line(
-                     sales_trend, 
-                     x='created_at', 
-                     y='total_value', 
-                     labels={'total_value': 'Mauzo (TZS)', 'created_at': 'Tarehe'},
-                     color_discrete_sequence=['#10b981'] # Professional emerald green
-                 )
-                 fig_line.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10))
-                 st.plotly_chart(fig_line, use_container_width=True)
- 
-             with col2:
-                 st.subheader("🏆 Bidhaa Zinazoongoza kwa Mauzo")
-                 
-                 # Top 5 products by revenue
-                 top_products = inventory_transactions.groupby('product_name')['total_value'].sum().nlargest(5).reset_index()
-                 
-                 fig_bar = px.bar(
-                     top_products, 
-                     x='total_value', 
-                     y='product_name', 
-                     orientation='h', 
-                     labels={'total_value': 'Jumla (TZS)', 'product_name': 'Jina la Bidhaa'},
-                     color_discrete_sequence=['#3b82f6'] # Professional business blue
-                 )
-                 # Sort the chart from highest to lowest
-                 fig_bar.update_layout(yaxis={'categoryorder':'total ascending'}, height=350, margin=dict(l=10, r=10, t=10, b=10))
-                 st.plotly_chart(fig_bar, use_container_width=True)
- 
-             st.divider()
- 
-             # --- 3. Bottom Grid: Inventory & Recent Logs ---
-             col3, col4 = st.columns([1, 1])
- 
-             with col3:
-                 st.subheader("📊 Mchanganuo wa Stoo (Inventory Status)")
-                 
-                 # Pie chart showing how stock is distributed
-                 fig_pie = px.pie(
-                     inventory_items, 
-                     values='stock_level', 
-                     names='product_name', 
-                     hole=0.4,
-                     color_discrete_sequence=px.colors.sequential.Teal
-                 )
-                 fig_pie.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10))
-                 st.plotly_chart(fig_pie, use_container_width=True)
- 
-             with col4:
-                 st.subheader("🧾 Miamala ya Hivi Karibuni")
-                 
-                 # Fetching most recent 5 sales transactions
-                 recent_sales = inventory_transactions.sort_values(by='created_at', ascending=False).head(5)
-                 
-                 # Selecting specific columns to keep the table clean
-                 table_cols = ['created_at', 'product_name', 'quantity', 'total_value']
-                 
-                 st.dataframe(
-                     recent_sales[table_cols], 
-                     use_container_width=True, 
-                     hide_index=True
-                 )
+                
 
         # End dashboard/ home page
                      
