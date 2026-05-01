@@ -622,7 +622,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                      df_transactions['wiki'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
                      df_transactions['mwezi'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
                  else:
-                     st.error("⚠️ Safu ya 'created_at' haijapatikana kwenye table yako!")
+                     st.error("⚠️ Safu ya 'transaction_date' haijapatikana kwenye table yako!")
                      
              except Exception as e:
                  st.sidebar.error(f"Hitilafu ya kupakia data: {e}")
