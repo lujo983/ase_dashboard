@@ -593,9 +593,8 @@ if st.session_state.logged_in and menu == "Dashboard":
         # End Sales form
                                     # start dashboard/ home page
         elif menu_Shopkeeper=="🏠 Home/Dashboard":
-             st.subheader("📊 Welcome to your Dashboard")
              st.title("📊 Welcome to your Dashboard")
-             st.markdown("##### Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
+             st.markdown("Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
              st.divider()
  
              # --- 1. Top Performance Metrics (KPI Cards) ---
