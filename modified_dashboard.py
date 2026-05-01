@@ -596,12 +596,11 @@ if st.session_state.logged_in and menu == "Dashboard":
              st.title("📊 Welcome to your Dashboard")
              st.markdown("Muhtasari wa mauzo yote na hali ya stoo (All-Time Overview)")
              st.divider()
-             st.divider()
              # Assign local reference from memory to keep code short
              df = st.session_state.inventory_transactions
  
              # --- 1. Metric Cards ---
-             total_rev = df['total_price'].sum() if 'total_price' in df.columns else 0
+             total_rev = df['total_value'].sum() if 'total_value' in df.columns else 0
              
              m1, m2 = st.columns(2)
              m1.metric(label="💰 Jumla ya Mapato", value=f"TZS {total_rev:,.0f}")
