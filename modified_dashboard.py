@@ -618,11 +618,11 @@ if st.session_state.logged_in and menu == "Dashboard":
                      df_transactions['transaction_date'] = pd.to_datetime(df_transactions['transaction_date'])
                      
                      # Create helper columns for easy filtering
-                     df_transactions['tarehe'] = df_transactions['transaction_date'].dt.date
-                     df_transactions['wiki'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
-                     df_transactions['mwezi'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
+                     df_transactions['transaction_date'] = df_transactions['transaction_date'].dt.date
+                     df_transactions['transaction_date'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
+                     df_transactions['transaction_date'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
                  else:
-                     st.error("⚠️ Safu ya 'transaction_date' haijapatikana kwenye table yako!")
+                     st.error("⚠️ Safu ya uliochagua haipo kwenye database yako!")
                      
              except Exception as e:
                  st.sidebar.error(f"Hitilafu ya kupakia data: {e}")
