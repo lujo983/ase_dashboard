@@ -618,9 +618,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                      df_transactions['created_at'] = pd.to_datetime(df_transactions['created_at'])
                      
                      # Create helper columns for easy filtering
-                     df_transactions['tarehe'] = df_transactions['created_at'].dt.date
-                     df_transactions['wiki'] = df_transactions['created_at'].dt.to_period('W').astype(str)
-                     df_transactions['mwezi'] = df_transactions['created_at'].dt.to_period('M').astype(str)
+                     df_transactions['tarehe'] = df_transactions['transaction_date'].dt.date
+                     df_transactions['wiki'] = df_transactions['transaction_date'].dt.to_period('W').astype(str)
+                     df_transactions['mwezi'] = df_transactions['transaction_date'].dt.to_period('M').astype(str)
                  else:
                      st.error("⚠️ Safu ya 'created_at' haijapatikana kwenye table yako!")
                      
