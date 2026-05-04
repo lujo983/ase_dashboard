@@ -610,6 +610,59 @@ if st.session_state.logged_in and menu == "Dashboard":
              if filter_muda == "Daily (Kila Siku)":
                  st.subheader("📅 Ripoti ya Kila Siku")
                  # Ripoti ya siku inaanza
+                 try:
+                    # Fetch data from [Supabase](https://supabase.com "Supabase Python Client Reference")
+                    response = supabase.table("inventory_transactions").select("*").execute()
+                    df = pd.DataFrame(response.data)
+            
+                    if not df.empty:
+                        # Ensure date column is in datetime format
+                        df['created_at'] = pd.to_datetime(df['created_at'])
+                        
+                        # --- DATE FILTER SIDEBAR ---
+                        st.sidebar.header("Filter Results")
+                        min_date = df['created_at'].min().date()
+                        max_date = df['created_at'].max().date()
+                        
+                        # [st.date_input](https://streamlit.io "Streamlit Date Input Documentation") for range selection
+                        selected_range = st.sidebar.date_input(
+                            "Select Date Range",
+                            value=(min_date, max_date),
+                            min_value=min_date,
+                            max_value=max_date
+                        )
+            
+                        # Apply filter only if both start and end dates are picked
+                        if isinstance(selected_range, tuple) and len(selected_range) == 2:
+                            start_date, end_date = selected_range
+                            df = df[(df['created_at'].dt.date >= start_date) & 
+                                    (df['created_at'].dt.date <= end_date)]
+            
+                        # --- PLOTTING ---
+                        type_counts = df['type'].value_counts().reset_index()
+                        type_counts.columns = ['Transaction Type', 'Total']
+            
+                        fig = px.bar(
+                            type_counts, 
+                            x='Transaction Type', 
+                            y='Total',
+                            color='Transaction Type',
+                            title="Filtered Transactions",
+                            color_discrete_map={'sales': '#EF553B', 'purchases': '#636EFA'}
+                        )
+                        
+                        st.plotly_chart(fig, use_container_width=True)
+                        st.dataframe(df, use_container_width=True)
+                    else:
+                        st.info("No data available to display.")
+            
+                except Exception as e:
+                    st.error(f"Error fetching data: {e}")
+            
+            if not st.session_state.logged_in:
+                login_page()
+            else:
+                dashboard_page()
                  # Ripoti ya siku ina malizika
                  
                  
