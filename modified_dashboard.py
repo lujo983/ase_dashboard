@@ -662,7 +662,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                     if not st.session_state.logged_in:
                         login_page()
                     else:
-                        dashboard_page()
+                        dashboard_page()    
                  # Ripoti ya siku ina malizika
                  
                  
