@@ -655,9 +655,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                     st.dataframe(df, use_container_width=True)
                 else:
                     st.info("No data available to display.")
-        
-            except Exception as e:
-                st.error(f"Error fetching data: {e}")      
+
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")   
                       
                  # Ripoti ya siku ina malizika
                  
