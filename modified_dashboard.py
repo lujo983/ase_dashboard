@@ -725,7 +725,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End stock In
                              # startsView registerd 
-        elif menu_shopkeeper == "📋 My registered items":
+        elif menu_Shopkeeper == "📋 My registered items":
              st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
              
              if "user_id" in st.session_state:
