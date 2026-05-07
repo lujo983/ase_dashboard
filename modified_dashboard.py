@@ -485,8 +485,10 @@ if st.session_state.logged_in and menu == "Dashboard":
             "📥 Pokea mzigo",
             "📤 Fanya Mauzo",
             "🆕 Sajili Bidhaa Mpya",
+            "📋 My registered items",
             "📊 Ripoti ya Siku",
             "📤 Import(Excel)",
+            
         ])
 
         # Add more donor-related content
@@ -722,6 +724,78 @@ if st.session_state.logged_in and menu == "Dashboard":
 
 
         # End stock In
+                             # startsView registerd 
+        elif menu_shopkeeper == "📋 My registered items":
+             st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
+             
+             if "user_id" in st.session_state:
+                 try:
+                     # 1. FETCH data for the logged-in user
+                     res = conn.table("inventory_items").select("*").eq("user_id", st.session_state.user_id).execute()
+                     
+                     if res.data:
+                         df_items = pd.DataFrame(res.data)
+                         
+                         # Professional Summary Metrics
+                         m1, m2 = st.columns(2)
+                         m1.metric("Total Items", len(df_items))
+                         inventory_value = (df_items['buying_price'] * df_items['current_stock']).sum()
+                         m2.metric("Inventory Value", f"Tsh {inventory_value:,.0f}")
+         
+                         # Display Table
+                         st.dataframe(
+                             df_items[["item_name", "category", "buying_price", "selling_price", "current_stock", "unit_measure"]], 
+                             use_container_width=True, 
+                             hide_index=True
+                         )
+         
+                         # --- 2. UPDATE & DELETE LOGIC ---
+                         st.divider()
+                         st.markdown("### 🛠️ Manage Selected Item")
+                         
+                         # Dropdown to select which item to modify
+                         selected_name = st.selectbox("Chagua bidhaa kurekebisha au kufuta", df_items["item_name"].tolist())
+                         
+                         # Fetch specific data for the selected item using its index
+                         item_data = df_items[df_items["item_name"] == selected_name].iloc[0]
+         
+                         col_a, col_b = st.columns(2)
+                         
+                         # UPDATE SECTION
+                         with col_a:
+                             with st.expander(f"✏️ Update Prices for {selected_name}"):
+                                 with st.form("up_form"):
+                                     up_buy = st.number_input("New Buy Price", value=float(item_data['buying_price']), step=100.0)
+                                     up_sell = st.number_input("New Sell Price", value=float(item_data['selling_price']), step=100.0)
+                                     
+                                     if st.form_submit_button("Hifadhi Marekebisho"):
+                                         conn.table("inventory_items")\
+                                             .update({"buying_price": up_buy, "selling_price": up_sell})\
+                                             .eq("id", item_data['id'])\
+                                             .execute()
+                                         st.success("Marekebisho yamefanikiwa!")
+                                         st.rerun()
+                         
+                         # DELETE SECTION
+                         #with col_b:
+                             #st.write("Danger Zone/Kuwa Makini Hapa")
+                             #if st.button(f"🗑️ Delete {selected_name}"):
+                                 # Direct delete based on unique ID
+                                 #try:
+                                     #conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
+                                     #st.success(f"{selected_name} imefutwa!")
+                                     #st.rerun()
+                                 #except Exception as e:
+                                     #st.error(f"Futa imeshindikana: {e}")
+                                     
+                     else:
+                         st.info("Bado hujaasajili bidhaa yoyote.")
+                 except Exception as e:
+                     st.error(f"Database Error: {e}")
+             else:
+                 st.warning("Tafadhali ingia (Login) kwanza.")
+
+        # End view registerd
 
        
      
