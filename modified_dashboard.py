@@ -766,7 +766,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                              with st.expander(f"✏️ Update Prices for {selected_name}"):
                                  with st.form("up_form"):
                                      up_buy = st.number_input("New Buy Price", value=float(item_data['buying_price']), step=100.0)
-                                     up_stock = st.number_input("New Stock", value=int(item_data['current_stock']), step=100.0)
+                                     up_stock = st.number_input("New Stock", value=int(item_data['current_stock']), step=100)
                                      up_sell = st.number_input("New Sell Price", value=float(item_data['selling_price']), step=100.0)
                                      
                                      if st.form_submit_button("Hifadhi Marekebisho"):
