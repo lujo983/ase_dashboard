@@ -781,7 +781,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                          with col_b:
                              st.write("Danger Zone/Kuwa Makini Hapa")
                              if st.button(f"🗑️ Delete {selected_name}"):
-                                  Direct delete based on unique ID
+                                  #Direct delete based on unique ID
                                  try:
                                      conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
                                      st.success(f"{selected_name} imefutwa!")
