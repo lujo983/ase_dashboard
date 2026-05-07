@@ -766,27 +766,28 @@ if st.session_state.logged_in and menu == "Dashboard":
                              with st.expander(f"✏️ Update Prices for {selected_name}"):
                                  with st.form("up_form"):
                                      up_buy = st.number_input("New Buy Price", value=float(item_data['buying_price']), step=100.0)
+                                     up_stock = st.number_input("New Stock", value=float(item_data['current_stock']), step=100.0)
                                      up_sell = st.number_input("New Sell Price", value=float(item_data['selling_price']), step=100.0)
                                      
                                      if st.form_submit_button("Hifadhi Marekebisho"):
                                          conn.table("inventory_items")\
-                                             .update({"buying_price": up_buy, "selling_price": up_sell})\
+                                             .update({"buying_price": up_buy, "selling_price": up_sell, "current_stock": up_stock})\
                                              .eq("id", item_data['id'])\
                                              .execute()
                                          st.success("Marekebisho yamefanikiwa!")
                                          st.rerun()
                          
                          # DELETE SECTION
-                         #with col_b:
-                             #st.write("Danger Zone/Kuwa Makini Hapa")
-                             #if st.button(f"🗑️ Delete {selected_name}"):
-                                 # Direct delete based on unique ID
-                                 #try:
-                                     #conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
-                                     #st.success(f"{selected_name} imefutwa!")
-                                     #st.rerun()
-                                 #except Exception as e:
-                                     #st.error(f"Futa imeshindikana: {e}")
+                         with col_b:
+                             st.write("Danger Zone/Kuwa Makini Hapa")
+                             if st.button(f"🗑️ Delete {selected_name}"):
+                                  Direct delete based on unique ID
+                                 try:
+                                     conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
+                                     st.success(f"{selected_name} imefutwa!")
+                                     st.rerun()
+                                 except Exception as e:
+                                     st.error(f"Futa imeshindikana: {e}")
                                      
                      else:
                          st.info("Bado hujaasajili bidhaa yoyote.")
