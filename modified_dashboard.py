@@ -264,8 +264,8 @@ if st.session_state.logged_in and menu == "Dashboard":
          st.switch_page("pages/3_donor.py")
     elif role== "Community Member": 
          st.switch_page("pages/4_communitymember.py")
- else: 
-     st.error("Youre not yet login, please login with correct username(email) and password")
+    else: 
+        st.error("Youre not yet login, please login with correct username(email) and password")
      
     # End switch pages
 
