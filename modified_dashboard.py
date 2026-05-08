@@ -262,7 +262,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     # End switch pages
     
     # Start Business owner Dashboard
-    if role == "Business Owner":
+    elif role == "Business Owner":
         #Donors sidebar
         menu_business_owner = st.sidebar.radio("Business Owner Links", [
             "🏠 Business Owner Dashboard.",
