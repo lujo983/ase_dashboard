@@ -1,3 +1,15 @@
+import streamlit as st
+import pandas as pd
+from reportlab.lib.pagesizes import A4 
+# ... (Import all your reportlab/PDF modules here)
+
+
+# PROTECT THE PAGE: Redirect if not logged in
+if not st.session_state.get("logged_in", False):
+    st.warning("Please login on the Home page to access this data.")
+    st.stop() 
+
+st.title("Admin Dashboard")
 if role == "Shopkeeper":
         #Donors sidebar
         menu_Shopkeeper = st.sidebar.radio("Shopkeeper Links", [
