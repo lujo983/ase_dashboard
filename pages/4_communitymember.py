@@ -826,5 +826,5 @@ if st.sidebar.button("Logout"):
     conn.client.auth.sign_out()
     st.session_state.logged_in = False
     st.session_state.clear()
-    st.rerun()
+    st.switch_page("modified_dashboard.py")
     st.success("You have been logged out successful.")
