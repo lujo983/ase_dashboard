@@ -1,5 +1,4 @@
-# Start Shopkeeper Dashboard
-    if role == "Shopkeeper":
+if role == "Shopkeeper":
         #Donors sidebar
         menu_Shopkeeper = st.sidebar.radio("Shopkeeper Links", [
             "🏠 Home/Dashboard",
@@ -435,23 +434,3 @@
                          st.warning("Hakuna miamala iliyofanyika leo.")
                  except Exception as e:
                      st.error(f"Error: {e}")
-                         
-         
-                         # --- End PDF GENERATION ---
-                         
-                         
-                               
-
-
-
-        # End daily reports
-             
-        # Start csv/excell upload
-
-        
-
-        # End of csv/excell items uploads
-
-            
-
-    # End Shopkeeper Dashboard
