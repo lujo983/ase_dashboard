@@ -696,3 +696,10 @@ if role == "Shopkeeper":
                          st.warning("Hakuna miamala iliyofanyika leo.")
                  except Exception as e:
                      st.error(f"Error: {e}")
+
+if st.sidebar.button("Logout"):
+    conn.client.auth.sign_out()
+    st.session_state.logged_in = False
+    st.session_state.clear()
+    st.rerun()
+    st.success("You have been logged out successful.")
