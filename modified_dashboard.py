@@ -259,36 +259,6 @@ if st.session_state.logged_in and menu == "Dashboard":
     if role== "Shopkeeper": 
        st.switch_page("pages/1_shopkeeper.py")
     # End switch pages
- 
-    # End switch pages
-    
-    
-    # End Business owner Dashboard
-    # i removed shopkeeper here
-
-
-
- 
- 
-    # Start Donor Dashboard
-    
-
-    # Volunteer Dashboard
-    elif role == "Volunteer":
-        st.header("Volunteer Dashboard")
-        st.info("Thanks for your dedication!")
-        st.write("Access volunteer tasks, schedules, and community events here.")
-        # Add volunteer-related content
-
-    # Partner Dashboard
-    elif role == "Partner":
-        st.header("Partner Dashboard")
-        st.info("Collaborating for greater impact!")
-        st.write("View partnership opportunities, joint projects, and reports here.")
-        # Add partner-related content
-
-    
-
 
 def donor_dashboard():
     st.header("Donor Dashboard")
