@@ -149,7 +149,7 @@ st.sidebar.title("Navigation")
 if not st.session_state.logged_in:
     menu = st.sidebar.radio("Menu", ["Login", "Register"])
 else:
-    menu = st.sidebar.radio("Menu", ["Dashboard", "Logout"])
+    menu = st.sidebar.radio("Menu", ["Dashboard"])
 
 # REGISTRATION FORM
 if menu == "Register":
