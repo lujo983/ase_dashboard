@@ -5,7 +5,7 @@
             "🏠 Home/Dashboard",
             "📥 Pokea mzigo",
             "📤 Fanya Mauzo",
-            "🆕 Sajili Bidhaa Mpya",
+            "🆕 Sajili Bidhaa Mpya", 
             "📋 My registered items",
             "📊 Ripoti ya Siku",
             "📤 Import(Excel)",
