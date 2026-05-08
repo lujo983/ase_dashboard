@@ -258,6 +258,15 @@ if st.session_state.logged_in and menu == "Dashboard":
     # Switch to the pages
     if role== "Shopkeeper": 
        st.switch_page("pages/1_shopkeeper.py")
+    elif role== "Business Owner": 
+         st.switch_page("pages/2_businessowner.py")
+    elif role== "Donor": 
+         st.switch_page("pages/3_donor.py")
+    elif role== "Community Member": 
+         st.switch_page("pages/4_communitymember.py")
+ else: 
+     st.error("Youre not yet login, please login with correct username(email) and password")
+     
     # End switch pages
 
 def donor_dashboard():
