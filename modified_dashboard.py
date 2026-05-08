@@ -256,8 +256,8 @@ if st.session_state.logged_in and menu == "Dashboard":
     role = st.session_state.role
 
     # Switch to the pages
-    if role== "shopkeeper": 
-       st.switch_page("pages/1_shopkeeeper.py")
+    if rolee== "shopkeeper": 
+       st.switch_page("pages/1_shopkeeper.py")
     # End switch pages
  
     # End switch pages
