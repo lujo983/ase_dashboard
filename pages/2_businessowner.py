@@ -476,3 +476,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                 #fig, ax = plt.subplots()
             #ax.pie(df['Yield (kg)'], labels=df['Village'], autopct='%1.1f%%')
             #st.pyplot(fig)
+if st.sidebar.button("Logout"):
+    conn.client.auth.sign_out()
+    st.session_state.logged_in = False
+    st.session_state.clear()
+    st.rerun()
+    st.success("You have been logged out successful.")
