@@ -254,6 +254,12 @@ if st.session_state.logged_in and menu == "Dashboard":
     st.write(f"You are logged in as **{st.session_state.role}**.")
 
     role = st.session_state.role
+
+    # Switch to the pages
+    if role== "shopkeeper": st.switch_page("pages/1_shopkeeper.py")
+    # End switch pages
+ 
+    # End switch pages
     
     # Start Business owner Dashboard
     if role == "Business Owner":
