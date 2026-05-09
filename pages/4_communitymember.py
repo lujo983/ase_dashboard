@@ -815,8 +815,6 @@ if st.session_state.logged_in and menu == "Dashboard":
                     else:
                         st.subheader("🗓️ Ripoti ya Kila Mwezi")
         # End of Matumizi/MAREJESHO NA MADENI
-     
-        elif menu == "🏭 TAARIFA ZA UZALISHAJI":
              
                              
             # Mwisho taarifa za uzalishaji 
