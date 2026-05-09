@@ -832,7 +832,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                     # We will use the selected filter to aggregate our financial numbers
                     if filter_muda == "🏭 FOMU YA UZALISHAJI":
                         st.subheader("🏭 FOMU YA UZALISHAJI")
-                        # Ripoti ya siku inaanza
+                        # Ripoti ya siku inaanza 
           
                         # Ripoti ya siku ina malizika
                         
