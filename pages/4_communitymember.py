@@ -647,35 +647,35 @@ if st.session_state.logged_in and menu == "Dashboard":
                  
                                             # MATUMIZI/MAREJESHO/MADENI
         elif menu=="💰 MATUMIZI/MADENI":
-                    st.title("📊 Welcome to your 💰💳💸 MATUMIZI/MAREJESHO/MADENI")
+                    st.title("💰💳💸 Ukurasa wa; MATUMIZI/MAREJESHO/MADENI")
                     st.markdown("Muhtasari wa mauzo yote na hali ya Biashara yako")
                     st.divider()
                     # --- DYNAMIC TIME FILTER ---
                     # This allows the user to choose how they want to see the charts and numbers
                     filter_muda = st.radio(
                         "Chagua Mpangilio wa Muda (Select Timeframe):",
-                        ["Daily (Kila Siku)", "Weekly (Kila Wiki)", "Monthly (Kila Mwezi)", "Chagua muda wako"],
+                        ["💳 Matumizi", "💸 Marejesho", "💰 Madeni", "Chagua muda wako"],
                         horizontal=True
                     )
                     
                     st.divider()
                     # --- LOGIC SEPARATION ---
                     # We will use the selected filter to aggregate our financial numbers
-                    if filter_muda == "Daily (Kila Siku)":
-                        st.subheader("📅 Ripoti ya Kila Siku")
+                    if filter_muda == "💳 Matumizi":
+                        st.subheader("💳 Matumizi")
                         # Ripoti ya siku inaanza
           
                         # Ripoti ya siku ina malizika
                         
                         
-                    elif filter_muda == "Weekly (Kila Wiki)":
-                        st.subheader("📆 Ripoti ya Kila Wiki")
+                    elif filter_muda == "💸 Marejesho":
+                        st.subheader("💸 Marejesho")
                     elif filter_muda == "Chagua muda wako":
                         st.subheader("🕐 Ripoti ya Muda uliochagua")
                         
                         
                     else:
-                        st.subheader("🗓️ Ripoti ya Kila Mwezi")
+                        st.subheader("💰 Madeni")
         # End of Matumizi/MAREJESHO NA MADENI
         elif menu=="🏭 TAARIFA ZA UZALISHAJI": 
                     st.title("🏭 TAARIFA ZA UZALISHAJI")
