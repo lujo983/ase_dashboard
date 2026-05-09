@@ -654,7 +654,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                     # This allows the user to choose how they want to see the charts and numbers
                     filter_muda = st.radio(
                         "Chagua Mpangilio wa Muda (Select Timeframe):",
-                        ["💳 Matumizi", "💸 Marejesho", "💰 Madeni", "💡 Ushauri"],
+                        ["💳 Matumizi", "💳 J/Matumizi", "💸 Marejesho", "💰 Madeni", "💡 Ushauri"],
                         horizontal=True
                     )
                     
@@ -695,7 +695,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "💸 Marejesho":
                         st.subheader("💸 Marejesho")
-                    elif filter_muda == "💡 Ushauri":
+                    elif filter_muda == "💳 J/Matumizi":
                         st.header("📊 Ripoti ya Matumizi")
                         # Example: Admins see all, Staff see only theirs
                         user_role = st.session_state.get("role")
