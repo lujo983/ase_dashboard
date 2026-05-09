@@ -259,18 +259,18 @@ if st.session_state.logged_in and menu == "Dashboard":
     if role == "Community Member":
         #This is side bar
         menu = st.sidebar.radio("Karibu Chagua viunganishi", [
-            "Home",
-            "Learning Materials",
-            "Community Stories",
+            "🏠 Home",
+            "📚 Learning Materials",
+            "👥 Community Stories",
             "💰💳💸 MATUMIZI/MAREJESHO/MADENI",
-            "Daily Production Entry Form",
-            "🚚USAMBAZAJI BIDHAA"
-            "All Production Records",
-            "Register Items",
-            "My registered items",
-            "Stock In (Manunuzi)",
-            "Stock Out (Mauzo)",
-            "Daily Report"
+            "🏭 DAILY PRODUCTION FORM",
+            "🚚 USAMBAZAJI BIDHAA"
+            "📜 ALL PRODUCTION RECORDS",
+            "📝 REGISTER ITEMS",
+            "👁️ MY REGISTERED ITEMS",
+            "📥 Stock In (Manunuzi)",
+            "📤 Stock Out (Mauzo)",
+            "📊 Daily Report"
         ])
         # Add community member content
         # Community member sees daily production form
