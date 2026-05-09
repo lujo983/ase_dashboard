@@ -707,7 +707,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                             response = conn.table("expenditure").select("*").execute()
                         else:
                             # Fetch only current user's records
-                            response = conn.table("expenditure").select("*").eq("user_id", user_id).execute()
+                            response = conn.table("expenditure").select("transaction_date, category, amount, description").eq("user_id", user_id).execute()
                         
                         if response.data:
                             st.dataframe(response.data)
