@@ -711,6 +711,20 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                         if response.data:
                             st.dataframe(response.data)
+                            # 3. Calculate Total
+                            total_matumizi = df["amount"].sum()
+                            
+                            # 4. Display the Total at the top using a metric for visibility
+                            st.metric(label="Jumla ya Matumizi (Total)", value=f"TSh {total_matumizi:,.2f}")
+                            
+                            # 5. Display the Table with nice headers
+                            st.write("### Orodha ya Matumizi")
+                            display_df = df.rename(columns={
+                                "category": "Aina",
+                                "amount": "Kiasi",
+                                "description": "Maelezo"
+                            })
+                            st.dataframe(display_df, use_container_width=True)
                         else:
                             st.info("Hakuna matumizi yaliyorekodiwa bado.")
 
