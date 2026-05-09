@@ -694,9 +694,43 @@ if st.session_state.logged_in and menu == "Dashboard":
                     # We will use the selected filter to aggregate our financial numbers
                     if filter_muda == "🏭 FOMU YA UZALISHAJI":
                         st.subheader("🏭 FOMU YA UZALISHAJI")
-                        # Ripoti ya siku inaanza 
+                        # Ripoti ya UZALISHAJI inaanza 
+                        zones = ["Dongobesh", "Hydom", "Mbulu"]
+                        zone = st.selectbox("Chagua Kanda yako", zones)
+                        
+                        product_name = st.selectbox("Jina la Bidhaa", ["Liquid Soap", "Soap Bars", "Biomass Briquettes", "Skin Care Cream", "Lotion"])
+                        unit_price = st.number_input("Bei yake", min_value=0.0, step=0.01)
+                        quantity = st.number_input("Kiasi ulichozalisha", min_value=0, step=1)
+                        comments = st.text_area("Maoni, Tafadhali weka maoni yako hapa (Optional)")
+                        
+                        total_earnings = unit_price * quantity
+                        
+                        if st.button("Wasilisha Taarifa"):
+                            # Ensure user is logged in to get their ID
+                            if "user_id" in st.session_state:
+                                production_data = {
+                                    "user_id": st.session_state.user_id,
+                                    "user_name": st.session_state.user_name,
+                                    "zone": zone,
+                                    "product_name": product_name,
+                                    "unit_price": unit_price,
+                                    "quantity": quantity,
+                                    "total_earnings": total_earnings,
+                                    "comments": comments
+                                }
+                        
+                                try:
+                                    # Insert into Supabase
+                                    conn.table("production_records").insert(production_data).execute()
+                                    st.success("Hongera! Umefanikiwa kuingiza taarifa zako kwenye kanzidata2.")
+                                except Exception as e:
+                                    st.error(f"Imeshindikana kuhifadhi: {e}")
+                            else:
+                                st.error("Tafadhali ingia (Login) kwanza ili kuwasilisha taarifa.")
+                      
+                    #End of Daily production entry form
           
-                        # Ripoti ya siku ina malizika
+                        # Ripoti ya UZALISHAJI ina malizika
                         
                         
                     elif filter_muda == "🚚 USAMBAZAJI BIDHAA":
