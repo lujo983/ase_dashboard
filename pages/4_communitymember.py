@@ -642,143 +642,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End daily reports
 
-        elif menu == "All Production Records":
-         
-            st.subheader("📊 All Your Production Entries")
-                    
-            if "user_id" in st.session_state:
-                try:
-                    response = conn.table("production_records") \
-                        .select("created_at, zone, product_name, unit_price, quantity, total_earnings, comments") \
-                        .eq("user_id", st.session_state.user_id) \
-                        .order("created_at", desc=True) \
-                        .execute()
-        
-                    # ONLY RUN THIS IF DATA EXISTS
-                    if response.data:
-                        prod_df = pd.DataFrame(response.data)
-        
-                        # --- START OF PDF GENERATION LOGIC ---
-                        def create_pdf(df):
-                               buf = BytesIO()
-                               # Professional A4 setup with clean margins
-                               doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=20, bottomMargin=30)
-                               elements = []
-                               styles = getSampleStyleSheet()
-                               
-                               # 1. PROFESSIONAL STYLES
-                               title_style = ParagraphStyle('TitleStyle', parent=styles['Title'], fontSize=18, textColor=colors.HexColor("#1E3A8A"), alignment=1)
-                               cell_style = ParagraphStyle('CellStyle', parent=styles['Normal'], fontSize=8, leading=10)
-                               header_cell_style = ParagraphStyle('HeaderCellStyle', parent=styles['Normal'], fontSize=9, textColor=colors.whitesmoke, fontName='Helvetica-Bold', alignment=1)
-                               sub_style = ParagraphStyle('SubStyle', parent=styles['Normal'], fontSize=10, textColor=colors.grey)
-                           
-                               # 2. LOGO & TITLE SECTION
-                               try:
-                                   # Integrated your specific logo filename
-                                   logo = Image("bridge gap tra.jpg", width=1.4*inch, height=0.7*inch)
-                                   # Table to hold Logo and Title side-by-side
-                                   header_table = Table([[logo, Paragraph("ASE PRODUCTION REPORT", title_style)]], colWidths=[1.5*inch, 4*inch])
-                                   header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
-                                   elements.append(header_table)
-                               except:
-                                   elements.append(Paragraph("ASE PRODUCTION REPORT", title_style))
-                               
-                               elements.append(Spacer(1, 10))
-                               elements.append(Paragraph(f"<b>Entrepreneur:</b> {st.session_state.user_name}", sub_style))
-                               elements.append(Paragraph(f"<b>Report Date:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", sub_style))
-                               elements.append(Spacer(1, 20))
-                           
-                               # 3. DATA PREPARATION (Ensuring proper wrapping)
-                               headers = [Paragraph(f"<b>{col}</b>", header_cell_style) for col in df.columns.tolist()]
-                               data = [headers]
-                               
-                               # Add regular data rows
-                               for _, row in df.iterrows():
-                                   data.append([Paragraph(str(val), cell_style) for val in row.values])
-                               
-                               # 4. INVOICE-STYLE TOTALS ROW
-                               try:
-                                   # We assume: Col 4 is Qty, Col 5 is Total (counting starts at 0)
-                                   # We use .iloc to pick columns by their position
-                                   qty_values = pd.to_numeric(df.iloc[:, 4].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
-                                   total_values = pd.to_numeric(df.iloc[:, 5].astype(str).str.replace('Tsh', '').str.replace(',', ''), errors='coerce').fillna(0)
-                                   
-                                   total_qty = qty_values.sum()
-                                   total_money = total_values.sum()
-                                   
-                                   footer = [
-                                       Paragraph("<b>JUMLA / TOTAL</b>", cell_style),
-                                       Paragraph("", cell_style),
-                                       Paragraph("", cell_style),
-                                       Paragraph("", cell_style),
-                                       Paragraph(f"<b>{total_qty:,.0f}</b>", cell_style),
-                                       Paragraph(f"<b>Tsh {total_money:,.2f}</b>", cell_style),
-                                       Paragraph("", cell_style)
-                                   ]
-                                   data.append(footer)
-                               except Exception as e:
-                                   # If it still fails, it will tell us which part of the math is wrong
-                                   data.append([Paragraph(f"<b>Calculation Error: {str(e)}</b>", cell_style)] + [""]*6)
-
-
-
-
-                           
-                               # 5. TABLE CONSTRUCTION & PRO STYLING
-                               # Widths assigned for A4: Total ~7.3 inches
-                               col_widths = [0.8*inch, 0.9*inch, 1.1*inch, 0.6*inch, 0.5*inch, 1.0*inch, 2.4*inch]
-                               t = Table(data, colWidths=col_widths, repeatRows=1)
-                               
-                               t.setStyle(TableStyle([
-                                   # Header Styling
-                                   ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
-                                   ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                                   ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                                   
-                                   # Body Styling
-                                   ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                                   ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.whitesmoke, colors.white]), # Zebra strips except last row
-                                   
-                                   # Summary/Total Row Styling
-                                   ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor("#D1D5DB")), # Light grey footer
-                                   ('LINEABOVE', (0, -1), (-1, -1), 1.5, colors.HexColor("#1E3A8A")), # Bold line above total
-                                   ('ALIGN', (4, -1), (5, -1), 'CENTER'), # Center the total numbers
-                               ]))
-                               
-                               elements.append(t)
-                               
-                               # 6. SIGNATURE/FOOTER SECTION
-                               elements.append(Spacer(1, 30))
-                               elements.append(Paragraph("__________________________", sub_style))
-                               elements.append(Paragraph("Signature & Official Stamp", sub_style))
-                               elements.append(Spacer(1, 15))
-                               elements.append(Paragraph("<i>This is a computer-generated report from Bridge gap transparency system.</i>", sub_style))
-                           
-                               # 7. BUILD
-                               doc.build(elements)
-                               return buf.getvalue()
-
-
-
-                        # --- END OF PDF GENERATION LOGIC ---
-        
-                        # Now display the table
-                        st.dataframe(prod_df, use_container_width=True, hide_index=True)
-        
-                        # Show the button only because prod_df DEFINITELY exists here
-                        pdf_data = create_pdf(prod_df)
-                        st.download_button(
-                            label="📑 Download PDF Report",
-                            data=pdf_data,
-                            file_name="Production_Report.pdf",
-                            mime="application/pdf"
-                        )
-                    else:
-                        st.info("Bado hujaingiza taarifa zozote za uzalishaji.")
-                        
-                except Exception as e:
-                    st.error(f"Error fetching data: {e}")
-                 # END OF PDF GENERATOR
+      
 
                  
                                             # MATUMIZI/MAREJESHO/MADENI
@@ -842,7 +706,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                         
                     else:
-                        st.subheader("📊 REPORTS YA UZALISHAJI")
+                        st.subheader("📊 REPORTS ZA UZALISHAJI")
                         if "user_id" in st.session_state:
                             try:
                                 response = conn.table("production_records") \
