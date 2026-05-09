@@ -264,7 +264,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "👥 Community Stories",
             "💰💳💸 MATUMIZI/MAREJESHO/MADENI",
             "🏭 DAILY PRODUCTION FORM",
-            "🚚 USAMBAZAJI BIDHAA"
+            "🚚 USAMBAZAJI BIDHAA",
             "📜 ALL PRODUCTION RECORDS",
             "📝 REGISTER ITEMS",
             "👁️ MY REGISTERED ITEMS",
