@@ -816,35 +816,35 @@ if st.session_state.logged_in and menu == "Dashboard":
                         st.subheader("🗓️ Ripoti ya Kila Mwezi")
         # End of Matumizi/MAREJESHO NA MADENI
         elif menu=="🏭 TAARIFA ZA UZALISHAJI":
-                    st.title("📊 Welcome to your 💰💳💸 MATUMIZI/MAREJESHO/MADENI")
-                    st.markdown("Muhtasari wa mauzo yote na hali ya Biashara yako")
+                    st.title("🏭 TAARIFA ZA UZALISHAJI")
+                    st.markdown("Taarifa za uzalishaji, usambazaji na madeni unayodai")
                     st.divider()
                     # --- DYNAMIC TIME FILTER ---
                     # This allows the user to choose how they want to see the charts and numbers
                     filter_muda = st.radio(
-                        "Chagua Mpangilio wa Muda (Select Timeframe):",
-                        ["Daily (Kila Siku)", "Weekly (Kila Wiki)", "Monthly (Kila Mwezi)", "Chagua muda wako"],
+                        "Chagua Mpangilio ",
+                        ["🏭 FOMU YA UZALISHAJI", "🚚 USAMBAZAJI BIDHAA", "💸 MADENI", "📊 REPORTS YA UZALISHAJI"],
                         horizontal=True
                     )
                     
                     st.divider()
                     # --- LOGIC SEPARATION ---
                     # We will use the selected filter to aggregate our financial numbers
-                    if filter_muda == "Daily (Kila Siku)":
-                        st.subheader("📅 Ripoti ya Kila Siku")
+                    if filter_muda == "🏭 FOMU YA UZALISHAJI":
+                        st.subheader("🏭 FOMU YA UZALISHAJI")
                         # Ripoti ya siku inaanza
           
                         # Ripoti ya siku ina malizika
                         
                         
-                    elif filter_muda == "Weekly (Kila Wiki)":
-                        st.subheader("📆 Ripoti ya Kila Wiki")
-                    elif filter_muda == "Chagua muda wako":
-                        st.subheader("🕐 Ripoti ya Muda uliochagua")
+                    elif filter_muda == "🚚 USAMBAZAJI BIDHAA":
+                        st.subheader("🚚 USAMBAZAJI BIDHAA")
+                    elif filter_muda == "💸 MADENI":
+                        st.subheader("💸 MADENI")
                         
                         
                     else:
-                        st.subheader("🗓️ Ripoti ya Kila Mwezi")
+                        st.subheader("📊 REPORTS YA UZALISHAJI")
              
                              
             # Mwisho taarifa za uzalishaji 
