@@ -819,7 +819,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "🏭 TAARIFA ZA UZALISHAJI":
             # Start Daily production entry form
             # Taarifa za uzalishaji 
-            st.title("📊 Welcome to your 💰💳💸 MATUMIZI/MAREJESHO/MADENI")
+                       st.title("📊 Welcome to your 💰💳💸 MATUMIZI/MAREJESHO/MADENI")
                        st.markdown("Muhtasari wa mauzo yote na hali ya Biashara yako")
                        st.divider()
                        # --- DYNAMIC TIME FILTER ---
