@@ -686,7 +686,6 @@ if st.session_state.logged_in and menu == "Dashboard":
                                 try:
                                     conn.table("expenditure").insert(data).execute()
                                     st.success("Matumizi yamehifadhiwa kikamilifu!")
-                                    st.rerun()
                                 except Exception as e:
                                     st.error(f"Hitilafu: {e}")
 
