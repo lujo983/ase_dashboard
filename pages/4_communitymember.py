@@ -8,7 +8,7 @@ import hashlib
 import os
 from supabase import create_client 
 
-url = st.secrets["SUPABASE_URL"]  
+url = st.secrets["SUPABASE_URL"]   
 key = st.secrets["SUPABASE_KEY"] 
 supabase = create_client(url, key)
 from st_supabase_connection import SupabaseConnection
@@ -263,7 +263,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "📚 Learning Materials",
             "👥 Community Stories",
             "💰💳💸 MATUMIZI/MAREJESHO/MADENI",
-            "🏭 DAILY PRODUCTION FORM",
+            "🏭 TAARIFA ZA UZALISHAJI",
             "🚚 USAMBAZAJI BIDHAA",
             "📜 ALL PRODUCTION RECORDS",
             "📝 REGISTER ITEMS",
@@ -520,7 +520,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End Sales form
         # Start daily reports
-        elif menu == "Daily Report":
+        elif menu == "🏭 TAARIFA ZA UZALISHAJI":
              st.title("📅 Daily Business Summary")
              
              today_date = datetime.now().strftime("%Y-%m-%d")
