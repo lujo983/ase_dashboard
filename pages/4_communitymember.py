@@ -520,7 +520,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
         # End Sales form
         # Start daily reports
-        elif menu == "🏭 TAARIFA ZA UZALISHAJI":
+        elif menu == "📊 Daily Report":
              st.title("📅 Daily Business Summary")
              
              today_date = datetime.now().strftime("%Y-%m-%d")
@@ -816,9 +816,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                         st.subheader("🗓️ Ripoti ya Kila Mwezi")
         # End of Matumizi/MAREJESHO NA MADENI
      
-        elif menu == "Daily Production Entry Form":
+        elif menu == "🏭 TAARIFA ZA UZALISHAJI":
             # Start Daily production entry form
-            st.subheader("Daily Production Entry Form")
+            st.subheader("🏭 Taarifa za Uzalishaji Mali")
             
             zones = ["Dongobesh", "Hydom", "Mbulu"]
             zone = st.selectbox("Chagua Kanda yako", zones)
