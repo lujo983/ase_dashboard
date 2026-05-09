@@ -815,6 +815,36 @@ if st.session_state.logged_in and menu == "Dashboard":
                     else:
                         st.subheader("🗓️ Ripoti ya Kila Mwezi")
         # End of Matumizi/MAREJESHO NA MADENI
+        elif menu=="🏭 TAARIFA ZA UZALISHAJI":
+                    st.title("📊 Welcome to your 💰💳💸 MATUMIZI/MAREJESHO/MADENI")
+                    st.markdown("Muhtasari wa mauzo yote na hali ya Biashara yako")
+                    st.divider()
+                    # --- DYNAMIC TIME FILTER ---
+                    # This allows the user to choose how they want to see the charts and numbers
+                    filter_muda = st.radio(
+                        "Chagua Mpangilio wa Muda (Select Timeframe):",
+                        ["Daily (Kila Siku)", "Weekly (Kila Wiki)", "Monthly (Kila Mwezi)", "Chagua muda wako"],
+                        horizontal=True
+                    )
+                    
+                    st.divider()
+                    # --- LOGIC SEPARATION ---
+                    # We will use the selected filter to aggregate our financial numbers
+                    if filter_muda == "Daily (Kila Siku)":
+                        st.subheader("📅 Ripoti ya Kila Siku")
+                        # Ripoti ya siku inaanza
+          
+                        # Ripoti ya siku ina malizika
+                        
+                        
+                    elif filter_muda == "Weekly (Kila Wiki)":
+                        st.subheader("📆 Ripoti ya Kila Wiki")
+                    elif filter_muda == "Chagua muda wako":
+                        st.subheader("🕐 Ripoti ya Muda uliochagua")
+                        
+                        
+                    else:
+                        st.subheader("🗓️ Ripoti ya Kila Mwezi")
              
                              
             # Mwisho taarifa za uzalishaji 
