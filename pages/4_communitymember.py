@@ -700,6 +700,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         st.header("Ripoti ya Matumizi")
                         # Example: Admins see all, Staff see only theirs
                         user_role = st.session_state.get("role")
+                        user_id = st.session_state.get("user_id")
                         
                         if user_role == "admin":
                             # Fetch all records
