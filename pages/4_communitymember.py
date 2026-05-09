@@ -264,8 +264,6 @@ if st.session_state.logged_in and menu == "Dashboard":
             "👥 Community Stories",
             "💰💳💸 MATUMIZI/MAREJESHO/MADENI",
             "🏭 TAARIFA ZA UZALISHAJI",
-            "🚚 USAMBAZAJI BIDHAA",
-            "📜 ALL PRODUCTION RECORDS",
             "📝 REGISTER ITEMS",
             "👁️ MY REGISTERED ITEMS",
             "📥 Stock In (Manunuzi)",
