@@ -262,7 +262,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "🏠 Home",
             "📚 Learning Materials",
             "👥 Community Stories",
-            "💰💳💸 MATUMIZI/MAREJESHO/MADENI",
+            "💰 MATUMIZI/MADENI",
             "🏭 TAARIFA ZA UZALISHAJI",
             "📝 REGISTER ITEMS",
             "👁️ MY REGISTERED ITEMS",
@@ -646,7 +646,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
                  
                                             # MATUMIZI/MAREJESHO/MADENI
-        elif menu=="💰💳💸 MATUMIZI/MAREJESHO/MADENI":
+        elif menu=="💰 MATUMIZI/MADENI":
                     st.title("📊 Welcome to your 💰💳💸 MATUMIZI/MAREJESHO/MADENI")
                     st.markdown("Muhtasari wa mauzo yote na hali ya Biashara yako")
                     st.divider()
