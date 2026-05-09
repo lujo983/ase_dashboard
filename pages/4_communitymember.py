@@ -264,6 +264,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "Community Stories",
             "💰💳💸 MATUMIZI/MAREJESHO/MADENI",
             "Daily Production Entry Form",
+            "🚚USAMBAZAJI BIDHAA"
             "All Production Records",
             "Register Items",
             "My registered items",
