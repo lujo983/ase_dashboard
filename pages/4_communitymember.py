@@ -883,7 +883,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                            
                            
                        else:
-                           st.subheader("🗓️ Ripoti ya Kila Mwezi")
+                           st.subheader("🗓️ Ripoti ya Kila Mwezi")        
             # Mwisho taarifa za uzalishaji 
             
 
