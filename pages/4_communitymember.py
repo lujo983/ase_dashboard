@@ -648,13 +648,13 @@ if st.session_state.logged_in and menu == "Dashboard":
                                             # MATUMIZI/MAREJESHO/MADENI
         elif menu=="💰 MATUMIZI/MADENI":
                     st.title("💰💳💸 MATUMIZI/MAREJESHO/MADENI")
-                    st.markdown("Muhtasari wa MATUMIZI/MAREJESHO/MADENI ya Biashara yako")
+                    st.markdown("MATUMIZI/MAREJESHO/MADENI NA MWENENDO WA BIASHARA YAKO")
                     st.divider()
                     # --- DYNAMIC TIME FILTER ---
                     # This allows the user to choose how they want to see the charts and numbers
                     filter_muda = st.radio(
                         "Chagua Mpangilio wa Muda (Select Timeframe):",
-                        ["💳 Matumizi", "💸 Marejesho", "💰 Madeni", "Chagua muda wako"],
+                        ["💳 Matumizi", "💸 Marejesho", "💰 Madeni", "💡 Ushauri"],
                         horizontal=True
                     )
                     
@@ -670,8 +670,8 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "💸 Marejesho":
                         st.subheader("💸 Marejesho")
-                    elif filter_muda == "Chagua muda wako":
-                        st.subheader("🕐 Ripoti ya Muda uliochagua")
+                    elif filter_muda == "💡 Ushauri":
+                        st.subheader("🤔 ⚖️💡 USHAURI WA BIASHARA YAKO")
                         
                         
                     else:
