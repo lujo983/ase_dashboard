@@ -796,7 +796,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                             elements.append(Paragraph(f"<b>Jumla ya Malipo: TZS.</b> {total_out:,.0f} /=", styles['Normal']))
                             elements.append(Paragraph(f"<b>Deni la Sasa: TZS.</b> {final_bal:,.0f} /=", styles['Normal']))
                             elements.append(Spacer(1, 20))
-                            elements.append(Paragraph(f"<b>HISTORIA YA MALIPO.</b> ", styles['Normal']))
+                            elements.append(Paragraph(f"<b>HISTORIA YA KUCHUKUA MZIGO NA MALIPO.</b> ", styles['Normal']))
                         
                             # 4. TABLE DATA
                             # Prepare table headers and rows
