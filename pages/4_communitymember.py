@@ -764,7 +764,80 @@ if st.session_state.logged_in and menu == "Dashboard":
                                 st.info("Hakuna miamala iliyopatikana.")
                         else:
                             st.error("Sajili wakala kwanza.")
+                         # pdf generation for agent
+                        import io
+                        from reportlab.lib import colors
+                        from reportlab.lib.pagesizes import A4
+                        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+                        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+                        
+                        def generate_pdf(data_frame, agent_name, start_date, end_date):
+                            buffer = io.BytesIO()
+                            doc = SimpleDocTemplate(buffer, pagesize=A4)
+                            elements = []
+                            styles = getSampleStyleSheet()
+                            
+                            # 1. ADD LOGO (Optional)
+                            # If you have 'logo.png' in your folder, uncomment below:
+                            # logo = Image("logo.png", width=100, height=50)
+                            # elements.append(logo)
+                        
+                            # 2. HEADER
+                            title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], alignment=1)
+                            elements.append(Paragraph("RIPOTI YA MAESABU (STATEMENT)", title_style))
+                            elements.append(Spacer(1, 12))
+                        
+                            # 3. AGENT INFO
+                            elements.append(Paragraph(f"<b>Wakala:</b> {agent_name}", styles['Normal']))
+                            elements.append(Paragraph(f"<b>Kipindi:</b> {start_date} mpaka {end_date}", styles['Normal']))
+                            elements.append(Paragraph(f"<b>Tarehe ya Ripoti:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+                            elements.append(Spacer(1, 20))
+                        
+                            # 4. TABLE DATA
+                            # Prepare table headers and rows
+                            table_data = [["Date", "Description", "Increase", "Decrease", "Balance"]]
+                            for _, row in data_frame.iterrows():
+                                table_data.append([
+                                    str(row['Date']),
+                                    row['Description'],
+                                    f"{row['Increase']:,.0f}",
+                                    f"{row['Decrease']:,.0f}",
+                                    f"{row['Running Balance']:,.0f}"
+                                ])
+                        
+                            # 5. TABLE STYLING
+                            t = Table(table_data, colWidths=[70, 200, 80, 80, 80])
+                            t.setStyle(TableStyle([
+                                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                ('ALIGN', (2, 1), (-1, -1), 'RIGHT'), # Align money columns to right
+                            ]))
+                            elements.append(t)
+                            
+                            # Build PDF
+                            doc.build(elements)
+                            buffer.seek(0)
+                            return buffer
+                        
+                        # --- INSIDE YOUR STREAMLIT UI ---
+                        # Add this button after displaying the dataframe
+                        
+                        if not filtered_df.empty:
+                            pdf_file = generate_pdf(filtered_df, selected_agent_name, start_date, end_date)
+                            st.download_button(
+                                label="📄 Pakua Ripoti ya PDF (Pro)",
+                                data=pdf_file,
+                                file_name=f"Statement_{selected_agent_name}_{start_date}.pdf",
+                                mime="application/pdf"
+                            )
 
+                        # end of pdf gene
 
                     elif filter_muda == "📊 Ripoti/Matumizi":
                         st.header("📊 Ripoti ya Matumizi")
