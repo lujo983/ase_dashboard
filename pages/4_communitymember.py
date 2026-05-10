@@ -794,9 +794,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                         
                     elif filter_muda == "🚚 USAMBAZAJI BIDHAA":
-                        st.subheader("🚚 USAMBAZAJI BIDHAA")
-                        st.header("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
-                        
+                        st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
                         # Ensure user is logged in
                         logged_in_staff_id = st.session_state.get("user_id")
                         
