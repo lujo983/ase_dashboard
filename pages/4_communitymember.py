@@ -283,7 +283,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.markdown("- Soap bar making\n- Liquid Soap production\n- Organic lotion production\n- Organic Skin care Cream\n- Cleaning Beeswax\n- Biomass Briquettes Production")
         elif menu == "👥 SAJILI WAKALA/DUKA":
             st.subheader("Community Stories")
-            st.header("👤 Sajili Wakala Mpya")
+            st.header("👤 Sajili Wakala Mpya/Duka")
          # --- 1. CONNECTION & SESSION SETUP ---
             conn = st.connection("supabase", type=SupabaseConnection)
             
