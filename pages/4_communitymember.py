@@ -800,7 +800,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                             # 4. TABLE DATA
                             # Prepare table headers and rows
-                            table_data = [["Date", "Description", "Increase", "Decrease", "Balance"]]
+                            table_data = [["Date", "Description", "Increase (ULICHUKUA)", "Decrease(ULIPUNGUZA)", "Balance(DENI)"]]
                             for _, row in data_frame.iterrows():
                                 table_data.append([
                                     str(row['Date']),
