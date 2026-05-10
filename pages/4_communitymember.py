@@ -302,7 +302,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                 if st.form_submit_button("Hifadhi"):
                     conn.table("agents").insert({"name": name, "phone": phone, "location": location, "created_by": u_id}).execute()
                     st.success("Wakala amesajiliwa!")
-                    st.rerun()
+                    st.balloons()
         # Register item starts
         elif menu == "Register Items":
              st.subheader("🆕 Register New Business Item")
