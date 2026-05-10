@@ -795,6 +795,51 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "🚚 USAMBAZAJI BIDHAA":
                         st.subheader("🚚 USAMBAZAJI BIDHAA")
+                        st.header("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
+                        
+                        # Ensure user is logged in
+                        logged_in_staff_id = st.session_state.get("user_id")
+                        
+                        if not logged_in_staff_id:
+                            st.error("Tafadhali ingia kwenye mfumo kwanza (Login Required)")
+                        else:
+                            with st.form("supply_form", clear_on_submit=True):
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    agent_name = st.selectbox("Mchague Wakala (Agent)", options=list(agents_list.keys()))
+                                    product = st.text_input("Bidhaa (Product Name)")
+                                    quantity = st.number_input("Idadi (Quantity)", min_value=1)
+                                    
+                                with col2:
+                                    total_price = st.number_input("Thamani Kamili (Total Cost)", min_value=0.0)
+                                    discount = st.number_input("Punguzo (Discount)", min_value=0.0)
+                                    date = st.date_input("Tarehe ya Ugavi")
+                        
+                                submitted = st.form_submit_button("Hifadhi Ugavi")
+                        
+                                if submitted:
+                                    agent_id = agents_list[agent_name]
+                                    
+                                    # Prepare data for agent_supplies table
+                                    supply_data = {
+                                        "agent_id": agent_id,
+                                        "product_name": product,
+                                        "quantity": quantity,
+                                        "total_cost": total_price,
+                                        "discount_amount": discount,
+                                        "supply_date": str(date),
+                                        "recorded_by": logged_in_staff_id  # Linking to the logged-in user
+                                    }
+                        
+                                    try:
+                                        # Insert into Supabase
+                                        conn.table("agent_supplies").insert(supply_data).execute()
+                                        st.success(f"Imerekodiwa! {agent_name} amepokea bidhaa.")
+                                        st.balloons()
+                                    except Exception as e:
+                                        st.error(f"Imeshindikana kuhifadhi: {e}")
+
                     elif filter_muda == "💸 MADENI":
                         st.subheader("💸 MADENI")
                         
