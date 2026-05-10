@@ -795,6 +795,37 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "🚚 USAMBAZAJI BIDHAA":
                         st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
+                        # 1. Fetch agents from Supabase
+                        agents_res = conn.table("agents").select("id, name").execute()
+                        
+                        # 2. Create the dictionary (Handle empty case to avoid NameError)
+                        if agents_res.data:
+                            agents_list = {item['name']: item['id'] for item in agents_res.data}
+                        else:
+                            agents_list = {} # Initialize as empty if no agents exist yet
+                        
+                        # --- NOW START THE UI ---
+                        
+                        st.header("🚚 Rekodi Ugavi kwa Wakala")
+                        
+                        if not agents_list:
+                            st.warning("⚠️ Hakuna mawakala (agents) waliopatikana. Tafadhali ongeza wakala kwanza.")
+                            # Option to add an agent quickly
+                            new_agent = st.text_input("Jina la Wakala Mpya")
+                            if st.button("Sajili Wakala"):
+                                conn.table("agents").insert({"name": new_agent, "created_by": st.session_state.get("user_id")}).execute()
+                                st.rerun() # Refresh to populate the list
+                        else:
+                            # 3. Use the list safely in the form
+                            with st.form("supply_form"):
+                                agent_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()))
+                                # ... rest of your form code ...
+                                submitted = st.form_submit_button("Hifadhi Ugavi")
+                                
+                                if submitted:
+                                    agent_id = agents_list[agent_name]
+                                    # ... insert logic ...
+
                         # Ensure user is logged in
                         logged_in_staff_id = st.session_state.get("user_id")
                         
