@@ -1000,9 +1000,6 @@ if st.session_state.logged_in and menu == "Dashboard":
                         else:
                             st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
                             st.stop() # Stops the rest of the app from running without a user
-    
-
-                        st.header("🚚 Rekodi Ugavi kwa Wakala")
                         # 1. Fetch Agents & Inventory
                         agents_res = conn.table("agents").select("id, name").execute()
                         items_res = conn.table("inventory_items").select("id, item_name, selling_price").execute()
