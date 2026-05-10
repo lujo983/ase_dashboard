@@ -1069,7 +1069,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                 col1, col2 = st.columns(2)
                                 with col1:
                                     amount = st.number_input("Kiasi Anacholipa (Amount Paid)", min_value=0.0, step=500.0)
-                                    pay_method = st.selectbox("Njia ya Malipo", ["Cash", "M-Pesa", "Tigo Pesa", "Bank Transfer"])
+                                    pay_method = st.selectbox("Njia ya Malipo", ["Cash", "M-Pesa", "AirtelMoney", "Tigo Pesa", "Bank Transfer"])
                                 with col2:
                                     pay_date = st.date_input("Tarehe ya Malipo")
                                     note = st.text_input("Maelezo (Optional)", placeholder="Mf. Malipo ya mwezi wa 5")
