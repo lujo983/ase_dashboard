@@ -695,6 +695,97 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "💸 Marejesho":
                         st.subheader("💸 Marejesho")
+                        st.title("📑 Ripoti ya Mahesabu (Unified Agent Ledger)")
+                        
+                        # 1. Fetch Agents for Selection
+                        agents_res = conn.table("agents").select("id, name").execute()
+                        if agents_res.data:
+                            agents_dict = {item['name']: item['id'] for item in agents_res.data}
+                            selected_agent_name = st.selectbox("Chagua Wakala", options=list(agents_dict.keys()))
+                            a_id = agents_dict[selected_agent_name]
+                        
+                            # 2. Fetch Data from all 3 tables
+                            # Supplies (Increases Debt)
+                            supp_res = conn.table("agent_supplies").select("supply_date, product_name, total_cost, discount_amount").eq("agent_id", a_id).execute()
+                            # Payments (Decreases Debt)
+                            pay_res = conn.table("agent_payments").select("payment_date, amount_paid, payment_method").eq("agent_id", a_id).execute()
+                            # Returns (Decreases Debt)
+                            ret_res = conn.table("agent_returns").select("return_date, product_name, return_value").eq("agent_id", a_id).execute()
+                        
+                            # 3. Combine into a single list
+                            ledger_data = []
+                        
+                            for s in supp_res.data:
+                                ledger_data.append({
+                                    "Date": s['supply_date'],
+                                    "Description": f"Ugavi: {s['product_name']}",
+                                    "Increase (Debt)": s['total_cost'] - s['discount_amount'],
+                                    "Decrease (Credit)": 0
+                                })
+                        
+                            for p in pay_res.data:
+                                ledger_data.append({
+                                    "Date": p['payment_date'],
+                                    "Description": f"Malipo: {p['payment_method']}",
+                                    "Increase (Debt)": 0,
+                                    "Decrease (Credit)": p['amount_paid']
+                                })
+                        
+                            for r in ret_res.data:
+                                ledger_data.append({
+                                    "Date": r['return_date'],
+                                    "Description": f"Kurudisha: {r['product_name']}",
+                                    "Increase (Debt)": 0,
+                                    "Decrease (Credit)": r['return_value']
+                                })
+                        
+                            # 4. Process the DataFrame
+                            if ledger_data:
+                                df = pd.DataFrame(ledger_data)
+                                
+                                # Ensure Date is in datetime format for correct sorting
+                                df['Date'] = pd.to_datetime(df['Date'])
+                                df = df.sort_values(by="Date")
+                        
+                                # Calculate the Running Balance
+                                # Balance = (Sum of Increases) - (Sum of Decreases)
+                                df["Running Balance"] = (df["Increase (Debt)"] - df["Decrease (Credit)"]).cumsum()
+                        
+                                # 5. Display Summary Metrics
+                                current_bal = df["Running Balance"].iloc[-1]
+                                c1, c2 = st.columns(2)
+                                c1.metric("Wakala", selected_agent_name)
+                                c2.metric("Salio la Deni (Current Balance)", f"TSh {current_bal:,.0f}", delta_color="inverse")
+                        
+                                st.write("---")
+                        
+                                # 6. Format and Display Table
+                                # Convert date back to string for cleaner display
+                                df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')
+                                
+                                st.dataframe(
+                                    df.style.format({
+                                        "Increase (Debt)": "{:,.0f}",
+                                        "Decrease (Credit)": "{:,.0f}",
+                                        "Running Balance": "{:,.0f}"
+                                    }), 
+                                    use_container_width=True,
+                                    hide_index=True
+                                )
+                        
+                                # 7. CSV Export
+                                csv = df.to_csv(index=False).encode('utf-8')
+                                st.download_button(
+                                    label="Download Statement (CSV)",
+                                    data=csv,
+                                    file_name=f"Statement_{selected_agent_name}.csv",
+                                    mime="text/csv",
+                                )
+                            else:
+                                st.info(f"Wakala {selected_agent_name} hana historia ya miamala bado.")
+                        else:
+                            st.error("Hakuna mawakala kwenye kanzi data (No agents found).")
+
                     elif filter_muda == "📊 Ripoti/Matumizi":
                         st.header("📊 Ripoti ya Matumizi")
                         # Example: Admins see all, Staff see only theirs
