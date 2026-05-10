@@ -792,9 +792,9 @@ if st.session_state.logged_in and menu == "Dashboard":
                             elements.append(Paragraph(f"<b>Kipindi:</b> {start_date} mpaka {end_date}", styles['Normal']))
                             elements.append(Paragraph(f"<b>Tarehe ya Ripoti:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
                             elements.append(Spacer(1, 20))
-                            elements.append(Paragraph(f"<b>Deni unalodaiwa:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
-                            elements.append(Paragraph(f"<b>Kiasi ulicholipa:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
-                            elements.append(Paragraph(f"<b>Kiasi unachodaiwa sasa:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+                            elements.append(Paragraph(f"<b>Jumla ya ugavi:</b> {total_in:,.0f}", styles['Normal']))
+                            elements.append(Paragraph(f"<b>Jumla ya Malipo:</b> {total_out:,.0f}", styles['Normal']))
+                            elements.append(Paragraph(f"<b>Deni la Sasa:</b> {final_bal:,.0f}", styles['Normal']))
                         
                             # 4. TABLE DATA
                             # Prepare table headers and rows
