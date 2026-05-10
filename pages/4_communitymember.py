@@ -695,11 +695,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "💸 Marejesho":
                         st.subheader("💸 Marejesho")
-                        st.title("📑 Ripoti ya Mahesabu (Unified Agent Ledger)")
-                        from datetime import datetime, date
-                        
                         st.title("📑 Ripoti ya Mahesabu (Filtered Ledger)")
-                        
                         # 1. Selection & Date Filter
                         agents_res = conn.table("agents").select("id, name").execute()
                         
