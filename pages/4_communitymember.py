@@ -991,7 +991,18 @@ if st.session_state.logged_in and menu == "Dashboard":
                                     # ... insert logic ...
 
                         # Ensure user is logged in
+                     # --- SESSION AND CONNECTION SETUP ---
+    
+
                         st.header("🚚 Rekodi Ugavi kwa Wakala")
+                        conn = st.connection("supabase", type=SupabaseConnection)
+                            
+                            # 1. Initialize u_id safely
+                            if "user_id" in st.session_state:
+                                u_id = st.session_state["user_id"]
+                            else:
+                                st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
+                                st.stop() # Stops the rest of the app from running without a user
                         # 1. Fetch Agents & Inventory
                         agents_res = conn.table("agents").select("id, name").execute()
                         items_res = conn.table("inventory_items").select("id, item_name, selling_price").execute()
