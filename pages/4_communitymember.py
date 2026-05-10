@@ -972,10 +972,6 @@ if st.session_state.logged_in and menu == "Dashboard":
                         else:
                             agents_list = {} # Initialize as empty if no agents exist yet
                         
-                        # --- NOW START THE UI ---
-                        
-                        st.header("🚚 Rekodi Ugavi kwa Wakala")
-                        
                         if not agents_list:
                             st.warning("⚠️ Hakuna mawakala (agents) waliopatikana. Tafadhali ongeza wakala kwanza.")
                             # Option to add an agent quickly
