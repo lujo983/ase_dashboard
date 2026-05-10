@@ -817,7 +817,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                 st.rerun() # Refresh to populate the list
                         else:
                             # 3. Use the list safely in the form
-                            with st.form("supply_form"):
+                            with st.form("add_new_agent_form"):
                                 agent_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()))
                                 # ... rest of your form code ...
                                 submitted = st.form_submit_button("Hifadhi Ugavi")
