@@ -779,12 +779,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                             
                             # 1. ADD LOGO (Optional)
                             # If you have 'logo.png' in your folder, uncomment below:
-                            # logo = Image("logo.png", width=100, height=50)
-                            # elements.append(logo)
+                            logo = Image("bm_logo_edited.png", width=100, height=50)
+                            elements.append(logo)
                         
                             # 2. HEADER
                             title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], alignment=1)
-                            elements.append(Paragraph("RIPOTI YA MAESABU (STATEMENT)", title_style))
+                            elements.append(Paragraph("RIPOTI YA MAHESABU (STATEMENT)", title_style))
                             elements.append(Spacer(1, 12))
                         
                             # 3. AGENT INFO
