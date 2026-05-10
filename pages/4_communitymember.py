@@ -284,6 +284,17 @@ if st.session_state.logged_in and menu == "Dashboard":
         elif menu == "👥 SAJILI WAKALA/DUKA":
             st.subheader("Community Stories")
             st.header("👤 Sajili Wakala Mpya")
+         # --- 1. CONNECTION & SESSION SETUP ---
+            conn = st.connection("supabase", type=SupabaseConnection)
+            
+            # Check for user_id in session state. 
+            # If it's not there, we set it to None to avoid the NameError.
+            if "user_id" not in st.session_state:
+                # Option A: If you have a login system, tell them to log in
+                st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
+                st.stop()
+            else:
+                u_id = st.session_state["user_id"]
             with st.form("reg_form", clear_on_submit=True):
                 name = st.text_input("Jina la Wakala")
                 phone = st.text_input("Simu")
