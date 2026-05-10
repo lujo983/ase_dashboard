@@ -950,6 +950,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                     # Insert into Supabase
                                     conn.table("production_records").insert(production_data).execute()
                                     st.success("Hongera! Umefanikiwa kuingiza taarifa zako kwenye kanzidata2.")
+                                    st.balloons()
                                 except Exception as e:
                                     st.error(f"Imeshindikana kuhifadhi: {e}")
                             else:
