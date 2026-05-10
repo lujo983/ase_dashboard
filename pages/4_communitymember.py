@@ -963,6 +963,14 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                     elif filter_muda == "🚚 USAMBAZAJI BIDHAA":
                         st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
+                        import streamlit as st
+                        st.header("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
+                        # Ensure user is logged in
+                        logged_in_staff_id = st.session_state.get("user_id")
+                        
+                        if not logged_in_staff_id:
+                            st.error("Tafadhali ingia kwenye mfumo kwanza (Login Required)")
+                        else:
                             with st.form("supply_form", clear_on_submit=True):
                                 col1, col2 = st.columns(2)
                                 
@@ -999,6 +1007,8 @@ if st.session_state.logged_in and menu == "Dashboard":
                                         st.balloons()
                                     except Exception as e:
                                         st.error(f"Imeshindikana kuhifadhi: {e}")
+
+                            
 
                     elif filter_muda == "💸 MADENI":
                         st.subheader("💸 MADENI NA MALIPO")
