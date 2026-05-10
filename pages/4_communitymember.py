@@ -992,51 +992,55 @@ if st.session_state.logged_in and menu == "Dashboard":
 
                         # Ensure user is logged in
                         st.header("🚚 Rekodi Ugavi kwa Wakala")
-                        # 1. Fetch Agents & Inventory Items
-                        agents = conn.table("agents").select("id, name").execute()
-                        items = conn.table("inventory_items").select("id, item_name, selling_price").execute()
+                        # 1. Fetch Agents & Inventory
+                        agents_res = conn.table("agents").select("id, name").execute()
+                        items_res = conn.table("inventory_items").select("id, item_name, selling_price").execute()
                         
-                        agents_list = {a['name']: a['id'] for a in agents.data} if agents.data else {}
-                        items_list = {i['item_name']: {'id': i['id'], 'price': i['selling_price']} for i in items.data} if items.data else {}
+                        agents_list = {a['name']: a['id'] for a in agents_res.data} if agents_res.data else {}
+                        # Create a dictionary that stores the price for each item name
+                        items_dict = {i['item_name']: i['selling_price'] for i in items_res.data} if items_res.data else {}
                     
-                        if not agents_list or not items_list:
+                        if not agents_list or not items_dict:
                             st.warning("⚠️ Hakikisha una 'Agents' na 'Inventory Items' kwenye mfumo.")
                         else:
-                            # Layout columns
                             col1, col2 = st.columns(2)
                             
                             with col1:
                                 agent_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()))
-                                # Dropdown for Items
-                                item_selection = st.selectbox("Chagua Bidhaa", options=list(items_list.keys()))
-                                qty = st.number_input("Idadi (Quantity)", min_value=1, value=1)
+                                item_name = st.selectbox("Chagua Bidhaa", options=list(items_dict.keys()))
                                 
-                            with col2:
-                                # Auto-calculate selling price based on selection
-                                unit_price = items_list[item_selection]['price']
+                                # GET THE PRICE: Automatically updates when item_name changes
+                                unit_price = items_dict[item_name]
                                 st.info(f"Bei ya kila moja: TSh {unit_price:,.0f}")
+                    
+                            with col2:
+                                qty = st.number_input("Idadi (Quantity)", min_value=1, value=1, step=1)
                                 
-                                # AUTO CALCULATION
-                                total_val = qty * unit_price
-                                st.subheader(f"Thamani Kamili: TSh {total_val:,.0f}")
+                                # AUTO CALCULATION: This runs instantly whenever qty or item changes
+                                thamani_kamili = qty * unit_price
+                                
+                                # Display it in a read-only number input or a metric
+                                st.number_input("Thamani Kamili (Total Cost)", value=float(thamani_kamili), disabled=True)
                                 
                                 discount = st.number_input("Punguzo (Discount)", min_value=0.0, value=0.0)
-                                net_total = total_val - discount
-                                st.success(f"Deni Jipya: TSh {net_total:,.0f}")
+                                net_total = thamani_kamili - discount
+                                st.success(f"Deni la Kusajili: TSh {net_total:,.0f}")
                     
-                            # Submission Button
-                            if st.button("Hifadhi na Tuma"):
+                            # 2. SUBMIT BUTTON (Outside the form for live updates)
+                            if st.button("Hifadhi Ugavi", use_container_width=True):
+                                supply_data = {
+                                    "agent_id": agents_list[agent_name],
+                                    "product_name": item_name,
+                                    "quantity": qty,
+                                    "total_cost": thamani_kamili,
+                                    "discount_amount": discount,
+                                    "recorded_by": u_id
+                                }
+                                
                                 try:
-                                    conn.table("agent_supplies").insert({
-                                        "agent_id": agents_list[agent_name],
-                                        "product_name": item_selection,
-                                        "quantity": qty,
-                                        "total_cost": total_val,
-                                        "discount_amount": discount,
-                                        "recorded_by": u_id
-                                    }).execute()
+                                    conn.table("agent_supplies").insert(supply_data).execute()
                                     st.balloons()
-                                    st.success("Ugavi umerekodiwa!")
+                                    st.success(f"Imerekodiwa! {agent_name} amechukua {item_name}")
                                 except Exception as e:
                                     st.error(f"Hitilafu: {e}")
 
