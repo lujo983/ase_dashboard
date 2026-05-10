@@ -261,7 +261,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         menu = st.sidebar.radio("Karibu Chagua viunganishi", [
             "🏠 Home",
             "📚 Learning Materials",
-            "👥 Community Stories",
+            "👥 SAJILI WAKALA/DUKA",
             "💰 MATUMIZI/MADENI",
             "🏭 TAARIFA ZA UZALISHAJI",
             "📝 REGISTER ITEMS",
@@ -281,10 +281,17 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.subheader("Learning Materials")
             st.success("Recent Learning Materials available:")
             st.markdown("- Soap bar making\n- Liquid Soap production\n- Organic lotion production\n- Organic Skin care Cream\n- Cleaning Beeswax\n- Biomass Briquettes Production")
-        elif menu == "Community Stories":
+        elif menu == "👥 SAJILI WAKALA/DUKA":
             st.subheader("Community Stories")
-            st.markdown("**Maria from Mbulu:** 'I never thought I’d earn from making briquettes. ASE changed my life!'")
-            st.markdown("**Agnes from Hydom:** 'Now I make soap and can pay school fees for my children.'")
+            st.header("👤 Sajili Wakala Mpya")
+            with st.form("reg_form", clear_on_submit=True):
+                name = st.text_input("Jina la Wakala")
+                phone = st.text_input("Simu")
+                location = st.text_input("Eneo")
+                if st.form_submit_button("Hifadhi"):
+                    conn.table("agents").insert({"name": name, "phone": phone, "location": location, "created_by": u_id}).execute()
+                    st.success("Wakala amesajiliwa!")
+                    st.rerun()
         # Register item starts
         elif menu == "Register Items":
              st.subheader("🆕 Register New Business Item")
