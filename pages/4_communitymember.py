@@ -991,47 +991,54 @@ if st.session_state.logged_in and menu == "Dashboard":
                                     # ... insert logic ...
 
                         # Ensure user is logged in
-                        logged_in_staff_id = st.session_state.get("user_id")
+                        st.header("🚚 Rekodi Ugavi kwa Wakala")
+                        # 1. Fetch Agents & Inventory Items
+                        agents = conn.table("agents").select("id, name").execute()
+                        items = conn.table("inventory_items").select("id, item_name, selling_price").execute()
                         
-                        if not logged_in_staff_id:
-                            st.error("Tafadhali ingia kwenye mfumo kwanza (Login Required)")
+                        agents_list = {a['name']: a['id'] for a in agents.data} if agents.data else {}
+                        items_list = {i['item_name']: {'id': i['id'], 'price': i['selling_price']} for i in items.data} if items.data else {}
+                    
+                        if not agents_list or not items_list:
+                            st.warning("⚠️ Hakikisha una 'Agents' na 'Inventory Items' kwenye mfumo.")
                         else:
-                            with st.form("supply_form", clear_on_submit=True):
-                                col1, col2 = st.columns(2)
+                            # Layout columns
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                agent_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()))
+                                # Dropdown for Items
+                                item_selection = st.selectbox("Chagua Bidhaa", options=list(items_list.keys()))
+                                qty = st.number_input("Idadi (Quantity)", min_value=1, value=1)
                                 
-                                with col1:
-                                    agent_name = st.selectbox("Mchague Wakala (Agent)", options=list(agents_list.keys()))
-                                    product = st.selectbox("Chagua bidhaa", options=list(agents_list.keys()))
-                                    quantity = st.number_input("Idadi (Quantity)", min_value=1)
-                                    
-                                with col2:
-                                    total_price = st.number_input("Thamani Kamili (Total Cost)", min_value=0.0)
-                                    discount = st.number_input("Punguzo (Discount)", min_value=0.0)
-                                    date = st.date_input("Tarehe ya Ugavi")
-                        
-                                submitted = st.form_submit_button("Hifadhi Ugavi")
-                        
-                                if submitted:
-                                    agent_id = agents_list[agent_name]
-                                    
-                                    # Prepare data for agent_supplies table
-                                    supply_data = {
-                                        "agent_id": agent_id,
-                                        "product_name": product,
-                                        "quantity": quantity,
-                                        "total_cost": total_price,
+                            with col2:
+                                # Auto-calculate selling price based on selection
+                                unit_price = items_list[item_selection]['price']
+                                st.info(f"Bei ya kila moja: TSh {unit_price:,.0f}")
+                                
+                                # AUTO CALCULATION
+                                total_val = qty * unit_price
+                                st.subheader(f"Thamani Kamili: TSh {total_val:,.0f}")
+                                
+                                discount = st.number_input("Punguzo (Discount)", min_value=0.0, value=0.0)
+                                net_total = total_val - discount
+                                st.success(f"Deni Jipya: TSh {net_total:,.0f}")
+                    
+                            # Submission Button
+                            if st.button("Hifadhi na Tuma"):
+                                try:
+                                    conn.table("agent_supplies").insert({
+                                        "agent_id": agents_list[agent_name],
+                                        "product_name": item_selection,
+                                        "quantity": qty,
+                                        "total_cost": total_val,
                                         "discount_amount": discount,
-                                        "supply_date": str(date),
-                                        "recorded_by": logged_in_staff_id  # Linking to the logged-in user
-                                    }
-                        
-                                    try:
-                                        # Insert into Supabase
-                                        conn.table("agent_supplies").insert(supply_data).execute()
-                                        st.success(f"Imerekodiwa! {agent_name} amepokea bidhaa.")
-                                        st.balloons()
-                                    except Exception as e:
-                                        st.error(f"Imeshindikana kuhifadhi: {e}")
+                                        "recorded_by": u_id
+                                    }).execute()
+                                    st.balloons()
+                                    st.success("Ugavi umerekodiwa!")
+                                except Exception as e:
+                                    st.error(f"Hitilafu: {e}")
 
                             
 
