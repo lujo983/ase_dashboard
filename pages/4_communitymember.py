@@ -1084,6 +1084,8 @@ if st.session_state.logged_in and menu == "Dashboard":
                                     note = st.text_input("Maelezo (Optional)", placeholder="Mf. Malipo ya mwezi wa 5")
                                     
                                 submitted = st.form_submit_button("Hifadhi Malipo")
+                                st.balloons()
+                                st.success(f"Imerekodiwa! {agent_name} amepokea bidhaa.")
                         
                                 if submitted:
                                     if amount <= 0:
