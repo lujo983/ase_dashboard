@@ -1086,6 +1086,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                 submitted = st.form_submit_button("Hifadhi Malipo")
                                 st.success(f"Imerekodiwa! Kikamilifu.")
                                 st.balloons()
+                                st.rerun()
                                 
                         
                                 if submitted:
