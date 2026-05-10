@@ -1036,9 +1036,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                             
 
                     elif filter_muda == "💸 MADENI":
-                        st.subheader("💸 MADENI NA MALIPO")
-                        st.header("💰 Pokea Malipo (Payment Entry)")
-                        
+                        st.subheader("💰 Pokea Malipo (Payment Entry)")
                         # Fetch Agents for the selection
                         agents_res = conn.table("agents").select("id, name").execute()
                         agents_list = {item['name']: item['id'] for item in agents_res.data}
