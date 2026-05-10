@@ -1001,8 +1001,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                 
                                 with col1:
                                     agent_name = st.selectbox("Mchague Wakala (Agent)", options=list(agents_list.keys()))
-                                    product_list = conn.table("inventory_items").select("item_name").execute()
-                                    product = st.selectbox("Chagua bidhaa", options=list(product_list.keys()))
+                                    product = st.selectbox("Chagua bidhaa", options=list(agents_list.keys()))
                                     quantity = st.number_input("Idadi (Quantity)", min_value=1)
                                     
                                 with col2:
