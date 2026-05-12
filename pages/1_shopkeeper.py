@@ -920,7 +920,6 @@ if st.session_state.logged_in and menu == "Dashboard":
              # End view registerd
             # Matumizi starts here
             elif menu_Shopkeeper=="💳 REKODI MATUMIZI":
-                 st.markdown("💰 MAREJESHO NA RIPOTI YAKE")
                  st.header("💳 Rekodi Matumizi (Add Expenditure)")
                  with st.form("expenditure_form"):
                      category = st.selectbox("Aina ya Matumizi", ["Stock", "Rent", "Salaries", "Utilities", "Other"])
