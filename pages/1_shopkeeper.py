@@ -921,88 +921,32 @@ if st.session_state.logged_in and menu == "Dashboard":
             # Matumizi starts here
             elif menu_Shopkeeper=="💳 REKODI MATUMIZI":
                  st.markdown("💰 MAREJESHO NA RIPOTI YAKE")
-                 st.divider()
-                 # --- DYNAMIC TIME FILTER ---
-                 # This allows the user to choose how they want to see the charts and numbers
-                 filter_muda = st.radio(
-                     "Chagua Mpangilio WA MAREJESHO:",
-                     ["Pokea Marejesho", "Ripoti ya Marejesho"],
-                     horizontal=True
-                 )
-                 
-                 st.divider()
-                 # --- LOGIC SEPARATION ---
-                 # We will use the selected filter to aggregate our financial numbers
-                 if filter_muda == "Pokea Marejesho":
-                     st.subheader("💰 Pokea Marejesho/Malipo (Payment Entry)")
-                     # Fetch Agents for the selection
-                     agents_res = conn.table("agents").select("id, name").execute()
-                     agents_list = {item['name']: item['id'] for item in agents_res.data}
+                 st.header("💳 Rekodi Matumizi (Add Expenditure)")
+                 with st.form("expenditure_form"):
+                     category = st.selectbox("Aina ya Matumizi", ["Stock", "Rent", "Salaries", "Utilities", "Other"])
+                     amount = st.number_input("Kiasi (Amount)", min_value=0.0)
+                     description = st.text_area("Maelezo (Description)")
+                     date = st.date_input("Tarehe")
                      
-                     if not agents_list:
-                         st.warning("Hakuna mawakala waliopatikana.")
-                     else:
-                         # 1. Select Agent
-                         selected_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()), key="pay_agent_select")
-                         agent_id = agents_list[selected_name]
+                     submitted = st.form_submit_button("Hifadhi")
                      
-                         # 2. PRO FEATURE: Calculate Current Balance
-                         # Get total supplies (net_cost)
-                         supplies = conn.table("agent_supplies").select("total_cost, discount_amount").eq("agent_id", agent_id).execute()
-                         total_debt = sum((s['total_cost'] - s['discount_amount']) for s in supplies.data)
-                     
-                         # Get total payments
-                         payments = conn.table("agent_payments").select("amount_paid").eq("agent_id", agent_id).execute()
-                         total_paid = sum(p['amount_paid'] for p in payments.data)
-                     
-                         # Get total returns
-                         returns = conn.table("agent_returns").select("return_value").eq("agent_id", agent_id).execute()
-                         total_returned = sum(r['return_value'] for r in returns.data)
-                     
-                         current_balance = total_debt - total_paid - total_returned
-                     
-                         # 3. UI: Financial Summary Headers
-                         col_a, col_b, col_c = st.columns(3)
-                         col_a.metric("Jumla ya Madeni", f"TSh {total_debt:,.0f}")
-                         col_b.metric("Jumla ya Malipo", f"TSh {total_paid:,.0f}")
-                         col_c.metric("Deni Linalobaki", f"TSh {current_balance:,.0f}", delta=f"-{total_returned:,.0f} Returns", delta_color="normal")
-                     
-                         st.write("---")
-                     
-                         # 4. The Payment Form
-                         with st.form(key="pro_payment_form", clear_on_submit=True):
-                             col1, col2 = st.columns(2)
-                             with col1:
-                                 amount = st.number_input("Kiasi Anacholipa (Amount Paid)", min_value=0.0, step=500.0)
-                                 pay_method = st.selectbox("Njia ya Malipo", ["Cash", "M-Pesa", "AirtelMoney", "Tigo Pesa", "Bank Transfer"])
-                             with col2:
-                                 pay_date = st.date_input("Tarehe ya Malipo")
-                                 note = st.text_input("Maelezo (Optional)", placeholder="Mf. Malipo ya mwezi wa 5")
-                                 
-                             submitted = st.form_submit_button("Hifadhi Malipo")
-                             st.success(f"Imerekodiwa! Kikamilifu.")
-                             st.balloons()
-                     
-                             if submitted:
-                                 if amount <= 0:
-                                     st.error("Tafadhali ingiza kiasi cha malipo!")
-                                 else:
-                                     pay_data = {
-                                         "agent_id": agent_id,
-                                         "amount_paid": amount,
-                                         "payment_date": str(pay_date),
-                                         "payment_method": pay_method,
-                                         "recorded_by": st.session_state.get("user_id")
-                                     }
-                                     
-                                     try:
-                                         conn.table("agent_payments").insert(pay_data).execute()
-                                         st.success(f"Malipo ya TSh {amount:,.0f} yamepokelewa kutoka kwa {selected_name}")
-                                         st.balloons()
-                                         # Rerun to update the metrics at the top
-                                         st.rerun()
-                                     except Exception as e:
-                                         st.error(f"Hitilafu: {e}")
+                     if submitted:
+                         # Assuming user ID is stored in session state after login
+                         user_id = st.session_state.get("user_id")
+                         
+                         data = {
+                             "user_id": user_id,
+                             "category": category,
+                             "amount": amount,
+                             "description": description,
+                             "transaction_date": str(date)
+                         }
+                         
+                         try:
+                             conn.table("expenditure").insert(data).execute()
+                             st.success("Matumizi yamehifadhiwa kikamilifu!")
+                         except Exception as e:
+                             st.error(f"Hitilafu: {e}")
                      
                      
                  elif filter_muda == "Weekly (Kila Wiki)":
