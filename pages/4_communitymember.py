@@ -822,7 +822,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                             for _, row in data_frame.iterrows():
                                 table_data.append([
                                     str(row['Date']),
-                                    row['Description'],
+                                    row['Description''Increase'],
                                     f"{row['Increase']:,.0f}",
                                     f"{row['Decrease']:,.0f}",
                                     f"{row['Running Balance']:,.0f}"
