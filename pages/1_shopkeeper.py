@@ -578,7 +578,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     
              # End view registerd
              elif menu_Shopkeeper == "🚚 TUMA MZIGO":
-                        st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
+                  st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
                         # Ensure user is logged in
                                                             # --- SESSION AND CONNECTION SETUP
                         conn = st.connection("supabase", type=SupabaseConnection)
@@ -641,7 +641,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                                     st.success(f"Imerekodiwa! {agent_name} amechukua {item_name}")
                                 except Exception as e:
                                     st.error(f"Hitilafu: {e}")
-    
+          
            
          
             # Start daily reports
