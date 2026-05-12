@@ -577,75 +577,69 @@ if st.session_state.logged_in and menu == "Dashboard":
     
                 # End view registerd
              elif menu_Shopkeeper == "📋 TUMA  MZIGO":
-                 st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
-                 
-                 if "user_id" in st.session_state:
-                     try:
-                         # 1. FETCH data for the logged-in user
-                         res = conn.table("inventory_items").select("*").eq("user_id", st.session_state.user_id).execute()
+                  st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
+                         # Ensure user is logged in
+                                                             # --- SESSION AND CONNECTION SETUP
+                         conn = st.connection("supabase", type=SupabaseConnection)
                          
-                         if res.data:
-                             df_items = pd.DataFrame(res.data)
-                             
-                             # Professional Summary Metrics
-                             m1, m2 = st.columns(2)
-                             m1.metric("Total Items", len(df_items))
-                             inventory_value = (df_items['buying_price'] * df_items['current_stock']).sum()
-                             m2.metric("Inventory Value", f"Tsh {inventory_value:,.0f}")
-             
-                             # Display Table
-                             st.dataframe(
-                                 df_items[["item_name", "category", "buying_price", "selling_price", "current_stock", "unit_measure"]], 
-                                 use_container_width=True, 
-                                 hide_index=True
-                             )
-             
-                             # --- 2. UPDATE & DELETE LOGIC ---
-                             st.divider()
-                             st.markdown("### 🛠️ Manage Selected Item")
-                             
-                             # Dropdown to select which item to modify
-                             selected_name = st.selectbox("Chagua bidhaa kurekebisha au kufuta", df_items["item_name"].tolist())
-                             
-                             # Fetch specific data for the selected item using its index
-                             item_data = df_items[df_items["item_name"] == selected_name].iloc[0]
-             
-                             col_a, col_b = st.columns(2)
-                             
-                             # UPDATE SECTION
-                             with col_a:
-                                 with st.expander(f"✏️ Update Prices for {selected_name}"):
-                                     with st.form("up_form"):
-                                         up_buy = st.number_input("New Buy Price", value=float(item_data['buying_price']), step=100.0)
-                                         up_stock = st.number_input("New Stock", value=int(item_data['current_stock']), step=100)
-                                         up_sell = st.number_input("New Sell Price", value=float(item_data['selling_price']), step=100.0)
-                                         
-                                         if st.form_submit_button("Hifadhi Marekebisho"):
-                                             conn.table("inventory_items")\
-                                                 .update({"buying_price": up_buy, "current_stock": up_stock, "selling_price": up_sell })\
-                                                 .eq("id", item_data['id'])\
-                                                 .execute()
-                                             st.success("Marekebisho yamefanikiwa!")
-                                             st.rerun()
-                             
-                             # DELETE SECTION
-                             with col_b:
-                                 st.write("Danger Zone/Kuwa Makini Hapa")
-                                 if st.button(f"🗑️ Delete {selected_name}"):
-                                      #Direct delete based on unique ID
-                                     try:
-                                         conn.table("inventory_items").delete().eq("id", item_data['id']).execute()
-                                         st.success(f"{selected_name} imefutwa!")
-                                         st.rerun()
-                                     except Exception as e:
-                                         st.error(f"Futa imeshindikana: {e}")
-                                         
+                         # 1. Initialize u_id safely
+                         if "user_id" in st.session_state:
+                             u_id = st.session_state["user_id"]
                          else:
-                             st.info("Bado hujaasajili bidhaa yoyote.")
-                     except Exception as e:
-                         st.error(f"Database Error: {e}")
-                 else:
-                     st.warning("Tafadhali ingia (Login) kwanza.")
+                             st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
+                             st.stop() # Stops the rest of the app from running without a user
+                         # 1. Fetch Agents & Inventory
+                         agents_res = conn.table("agents").select("id, name").execute()
+                         items_res = conn.table("inventory_items").select("id, item_name, selling_price").execute()
+                         
+                         agents_list = {a['name']: a['id'] for a in agents_res.data} if agents_res.data else {}
+                         # Create a dictionary that stores the price for each item name
+                         items_dict = {i['item_name']: i['selling_price'] for i in items_res.data} if items_res.data else {}
+                     
+                         if not agents_list or not items_dict:
+                             st.warning("⚠️ Hakikisha una 'Agents' na 'Inventory Items' kwenye mfumo.")
+                         else:
+                             col1, col2 = st.columns(2)
+                             
+                             with col1:
+                                 agent_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()))
+                                 item_name = st.selectbox("Chagua Bidhaa", options=list(items_dict.keys()))
+                                 
+                                 # GET THE PRICE: Automatically updates when item_name changes
+                                 unit_price = items_dict[item_name]
+                                 st.info(f"Bei ya kila moja: TSh {unit_price:,.0f}")
+                     
+                             with col2:
+                                 qty = st.number_input("Idadi (Quantity)", min_value=1, value=1, step=1)
+                                 
+                                 # AUTO CALCULATION: This runs instantly whenever qty or item changes
+                                 thamani_kamili = qty * unit_price
+                                 
+                                 # Display it in a read-only number input or a metric
+                                 st.number_input("Thamani Kamili (Total Cost)", value=float(thamani_kamili), disabled=True)
+                                 
+                                 discount = st.number_input("Punguzo (Discount)", min_value=0.0, value=0.0)
+                                 net_total = thamani_kamili - discount
+                                 st.success(f"Deni la Kusajili: TSh {net_total:,.0f}")
+                     
+                             # 2. SUBMIT BUTTON (Outside the form for live updates)
+                          
+                             if st.button("Hifadhi Ugavi", use_container_width=True):
+                                 supply_data = {
+                                     "agent_id": agents_list[agent_name],
+                                     "product_name": item_name,
+                                     "quantity": qty,
+                                     "total_cost": thamani_kamili,
+                                     "discount_amount": discount,
+                                     "recorded_by": u_id
+                                 }
+                                 
+                                 try:
+                                     conn.table("agent_supplies").insert(supply_data).execute()
+                                     st.balloons()
+                                     st.success(f"Imerekodiwa! {agent_name} amechukua {item_name}")
+                                 except Exception as e:
+                                     st.error(f"Hitilafu: {e}")
     
            
          
