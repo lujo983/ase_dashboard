@@ -925,15 +925,15 @@ if st.session_state.logged_in and menu == "Dashboard":
                  # --- DYNAMIC TIME FILTER ---
                  # This allows the user to choose how they want to see the charts and numbers
                  filter_muda = st.radio(
-                     "Chagua Mpangilio WA MAREJESHO:",
-                     ["Rekodi Matumizi", "📊Ripoti ya Matumizi"],
+                     "Chagua Mpangilio WA MATUMIZI:",
+                     ["💳 Rekodi Matumizi", "📊Ripoti ya Matumizi"],
                      horizontal=True
                  )
                  
                  st.divider()
                  # --- LOGIC SEPARATION ---
                  # We will use the selected filter to aggregate our financial numbers
-                 if filter_muda == "Rekodi Matumizi":
+                 if filter_muda == "💳 Rekodi Matumizi":
                      st.header("💳 Rekodi Matumizi (Add Expenditure)")
                      with st.form("expenditure_form"):
                          category = st.selectbox("Aina ya Matumizi", ["Stock", "Rent", "Salaries", "Utilities", "Other"])
