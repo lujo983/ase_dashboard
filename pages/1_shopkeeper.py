@@ -920,7 +920,20 @@ if st.session_state.logged_in and menu == "Dashboard":
              # End view registerd
             # Matumizi starts here
             elif menu_Shopkeeper=="💳 REKODI MATUMIZI":
-                 st.header("💳 Rekodi Matumizi (Add Expenditure)")
+                 st.markdown("💰 MAREJESHO NA RIPOTI YAKE")
+                 st.divider()
+                 # --- DYNAMIC TIME FILTER ---
+                 # This allows the user to choose how they want to see the charts and numbers
+                 filter_muda = st.radio(
+                     "Chagua Mpangilio WA MAREJESHO:",
+                     ["Pokea Marejesho", "Ripoti ya Marejesho"],
+                     horizontal=True
+                 )
+                 
+                 st.divider()
+                 # --- LOGIC SEPARATION ---
+                 # We will use the selected filter to aggregate our financial numbers
+                 if filter_muda == "Pokea Marejesho":
                  
                      
                      
