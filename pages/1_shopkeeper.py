@@ -935,31 +935,31 @@ if st.session_state.logged_in and menu == "Dashboard":
                  # We will use the selected filter to aggregate our financial numbers
                  if filter_muda == "Rekodi Matumizi":
                      st.header("💳 Rekodi Matumizi (Add Expenditure)")
-                        with st.form("expenditure_form"):
-                            category = st.selectbox("Aina ya Matumizi", ["Stock", "Rent", "Salaries", "Utilities", "Other"])
-                            amount = st.number_input("Kiasi (Amount)", min_value=0.0)
-                            description = st.text_area("Maelezo (Description)")
-                            date = st.date_input("Tarehe")
-                            
-                            submitted = st.form_submit_button("Hifadhi")
-                            
-                            if submitted:
-                                # Assuming user ID is stored in session state after login
-                                user_id = st.session_state.get("user_id")
-                                
-                                data = {
-                                    "user_id": user_id,
-                                    "category": category,
-                                    "amount": amount,
-                                    "description": description,
-                                    "transaction_date": str(date)
-                                }
-                                
-                                try:
-                                    conn.table("expenditure").insert(data).execute()
-                                    st.success("Matumizi yamehifadhiwa kikamilifu!")
-                                except Exception as e:
-                                    st.error(f"Hitilafu: {e}")
+                     with st.form("expenditure_form"):
+                         category = st.selectbox("Aina ya Matumizi", ["Stock", "Rent", "Salaries", "Utilities", "Other"])
+                         amount = st.number_input("Kiasi (Amount)", min_value=0.0)
+                         description = st.text_area("Maelezo (Description)")
+                         date = st.date_input("Tarehe")
+                         
+                         submitted = st.form_submit_button("Hifadhi")
+                         
+                         if submitted:
+                             # Assuming user ID is stored in session state after login
+                             user_id = st.session_state.get("user_id")
+                             
+                             data = {
+                                 "user_id": user_id,
+                                 "category": category,
+                                 "amount": amount,
+                                 "description": description,
+                                 "transaction_date": str(date)
+                             }
+                             
+                             try:
+                                 conn.table("expenditure").insert(data).execute()
+                                 st.success("Matumizi yamehifadhiwa kikamilifu!")
+                             except Exception as e:
+                                 st.error(f"Hitilafu: {e}")
                      
                      
                  elif filter_muda == "Weekly (Kila Wiki)":
