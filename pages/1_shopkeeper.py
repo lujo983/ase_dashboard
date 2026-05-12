@@ -506,7 +506,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     
             # end sajili duka/wakala
             elif menu_Shopkeeper=="💰 MAREJESHO":
-                 st.markdown("MAREJESHO NA RIPOTI YAKE")
+                 st.markdown("💰 MAREJESHO NA RIPOTI YAKE")
                  st.divider()
                  # --- DYNAMIC TIME FILTER ---
                  # This allows the user to choose how they want to see the charts and numbers
@@ -598,8 +598,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                      
                      
                  else:
-                     st.subheader("🗓️ Ripoti ya Kila Mwezi")
-                     st.subheader("📑 Ripoti ya Mahesabu (Filtered Ledger)")
+                     st.subheader("📑 Ripoti ya Marejesho na Madeni (Filtered Ledger)")
                      from datetime import datetime, date
                      # 1. Selection & Date Filter
                      agents_res = conn.table("agents").select("id, name").execute()
