@@ -576,71 +576,8 @@ if st.session_state.logged_in and menu == "Dashboard":
                  else:
                      st.warning("Tafadhali ingia (Login) kwanza.")
     
-             # End view registerd
-            elif menu_Shopkeeper == "🚚 TUMA MZIGO":
-                 st.subheader("🚚 Rekodi Ugavi kwa Wakala (Supply Entry)")
-                        # Ensure user is logged in
-                                                            # --- SESSION AND CONNECTION SETUP
-                        conn = st.connection("supabase", type=SupabaseConnection)
-                        
-                        # 1. Initialize u_id safely
-                        if "user_id" in st.session_state:
-                            u_id = st.session_state["user_id"]
-                        else:
-                            st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
-                            st.stop() # Stops the rest of the app from running without a user
-                        # 1. Fetch Agents & Inventory
-                        agents_res = conn.table("agents").select("id, name").execute()
-                        items_res = conn.table("inventory_items").select("id, item_name, selling_price").execute()
-                        
-                        agents_list = {a['name']: a['id'] for a in agents_res.data} if agents_res.data else {}
-                        # Create a dictionary that stores the price for each item name
-                        items_dict = {i['item_name']: i['selling_price'] for i in items_res.data} if items_res.data else {}
-                    
-                        if not agents_list or not items_dict:
-                            st.warning("⚠️ Hakikisha una 'Agents' na 'Inventory Items' kwenye mfumo.")
-                        else:
-                            col1, col2 = st.columns(2)
-                            
-                            with col1:
-                                agent_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()))
-                                item_name = st.selectbox("Chagua Bidhaa", options=list(items_dict.keys()))
-                                
-                                # GET THE PRICE: Automatically updates when item_name changes
-                                unit_price = items_dict[item_name]
-                                st.info(f"Bei ya kila moja: TSh {unit_price:,.0f}")
-                    
-                            with col2:
-                                qty = st.number_input("Idadi (Quantity)", min_value=1, value=1, step=1)
-                                
-                                # AUTO CALCULATION: This runs instantly whenever qty or item changes
-                                thamani_kamili = qty * unit_price
-                                
-                                # Display it in a read-only number input or a metric
-                                st.number_input("Thamani Kamili (Total Cost)", value=float(thamani_kamili), disabled=True)
-                                
-                                discount = st.number_input("Punguzo (Discount)", min_value=0.0, value=0.0)
-                                net_total = thamani_kamili - discount
-                                st.success(f"Deni la Kusajili: TSh {net_total:,.0f}")
-                    
-                            # 2. SUBMIT BUTTON (Outside the form for live updates)
-                         
-                            if st.button("Hifadhi Ugavi", use_container_width=True):
-                                supply_data = {
-                                    "agent_id": agents_list[agent_name],
-                                    "product_name": item_name,
-                                    "quantity": qty,
-                                    "total_cost": thamani_kamili,
-                                    "discount_amount": discount,
-                                    "recorded_by": u_id
-                                }
-                                
-                                try:
-                                    conn.table("agent_supplies").insert(supply_data).execute()
-                                    st.balloons()
-                                    st.success(f"Imerekodiwa! {agent_name} amechukua {item_name}")
-                                except Exception as e:
-                                    st.error(f"Hitilafu: {e}") 
+            # End view registerd
+            
              
             # Start daily reports
             elif menu_Shopkeeper == "📊 Ripoti ya Siku":
