@@ -264,7 +264,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                 "📥 Pokea mzigo",
                 "📤 Fanya Mauzo",
                 "🆕 Sajili Bidhaa Mpya",
-                "🆕 Sajili Duka/Wakala", 
+                "👤  Sajili Duka/Wakala", 
                 "📋 My registered items",
                 "🚚 TUMA MZIGO",
                 "💳 REKODI MATUMIZI",
@@ -411,8 +411,7 @@ if st.session_state.logged_in and menu == "Dashboard":
     
             # End dashboard/ home page
  # start sajili duka/wakala
-            elif menu_Shopkeeper=="🆕 Sajili Duka/Wakala":
-                 st.subheader("📤 Pakia Bidhaa kwa Excel (Bulk Import)")
+            elif menu_Shopkeeper=="👤  Sajili Duka/Wakala":
                  st.header("👤 Sajili Wakala Mpya/Duka")
                  # --- 1. CONNECTION & SESSION SETUP ---
                  conn = st.connection("supabase", type=SupabaseConnection)
