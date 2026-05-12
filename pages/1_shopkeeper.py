@@ -926,7 +926,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  # This allows the user to choose how they want to see the charts and numbers
                  filter_muda = st.radio(
                      "Chagua Mpangilio WA MAREJESHO:",
-                     ["Rekodi Matumizi", "Ripoti ya Marejesho"],
+                     ["Rekodi Matumizi", "📊Ripoti ya Matumizi"],
                      horizontal=True
                  )
                  
@@ -969,8 +969,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                      
                      
                  else:
-                     st.subheader("📑 Ripoti ya Marejesho na Madeni (Filtered Ledger)")
-                     st.header("📊 Ripoti ya Matumizi")
+                     st.subheader("📊 Ripoti ya Matumizi")
                      # Example: Admins see all, Staff see only theirs
                      user_role = st.session_state.get("role")
                      user_id = st.session_state.get("user_id")
