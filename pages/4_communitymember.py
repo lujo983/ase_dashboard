@@ -818,11 +818,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                             # 4. TABLE DATA
                             # Prepare table headers and rows
-                            table_data = [["TAREHE", "MZIGO\n(ULIOCHUKUA)", "THAMANI\n(YA MZIGO)", "MAREJESHO\n(ULIOFANYA)", "BALANCE\n(DENI)"]]
+                            table_data = [["TAREHE", "MZIGO\n(ULIOCHUKUA)","IDADI", "THAMANI\n(YA MZIGO)", "MAREJESHO\n(ULIOFANYA)", "BALANCE\n(DENI)"]]
                             for _, row in data_frame.iterrows():
                                 table_data.append([
                                     str(row['Date']),
-                                    row['Description']row['Increase'],
+                                    row['Description'],
+                                    row['quantity'],
                                     f"{row['Increase']:,.0f}",
                                     f"{row['Decrease']:,.0f}",
                                     f"{row['Running Balance']:,.0f}"
