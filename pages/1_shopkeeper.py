@@ -413,36 +413,26 @@ if st.session_state.logged_in and menu == "Dashboard":
  # start sajili duka/wakala
             elif menu_Shopkeeper=="🆕 Sajili Duka/Wakala":
                  st.subheader("📤 Pakia Bidhaa kwa Excel (Bulk Import)")
-                 st.write("Pakia file la Excel lenye bidhaa zako zote.")
+                 st.header("👤 Sajili Wakala Mpya/Duka")
+                 # --- 1. CONNECTION & SESSION SETUP ---
+                 conn = st.connection("supabase", type=SupabaseConnection)
                  
-                 # 1. File Uploader
-                 uploaded_file = st.file_uploader("Chagua file la Excel (.xlsx)", type=["xlsx"])
-                 
-                 if uploaded_file is not None:
-                     try: 
-                         # 2. Read the Excel file
-                         df = pd.read_excel(uploaded_file)
-                         
-                         
-                         st.write("Hakiki data zako hapa chini:")
-                         st.dataframe(df.head()) # Show first 5 rows to the user
-                 
-                         if st.button("Anza Kupakia Sasa (Start Upload)"):
-                             # 3. Add the Owner's ID to every row automatically
-                             # This ensures the items belong to this specific Business Owner
-                             df['user_id'] = st.session_state.user_id
-                             
-                             # 4. Convert the DataFrame to a list of dictionaries for Supabase
-                             data_to_insert = df.to_dict(orient="records")
-                             
-                             # 5. Execute the Bulk Insert
-                             conn.table("inventory_items").insert(data_to_insert).execute()
-                             
-                             st.success(f"Hongera! Bidhaa {len(data_to_insert)} zimeingizwa kwenye kanzidata yako.")
-                             st.rerun()
-                 
-                     except Exception as e:
-                         st.error(f"Kuna tatizo kwenye file lako: {e}")
+                 # Check for user_id in session state. 
+                 # If it's not there, we set it to None to avoid the NameError.
+                 if "user_id" not in st.session_state:
+                     # Option A: If you have a login system, tell them to log in
+                     st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
+                     st.stop()
+                 else:
+                     u_id = st.session_state["user_id"]
+                 with st.form("reg_form", clear_on_submit=True):
+                     name = st.text_input("Jina la Wakala")
+                     phone = st.text_input("Simu")
+                     location = st.text_input("Eneo")
+                     if st.form_submit_button("Hifadhi"):
+                         conn.table("agents").insert({"name": name, "phone": phone, "location": location, "created_by": u_id}).execute()
+                         st.success("Wakala amesajiliwa!")
+                         st.balloons()
     
             # end sajili duka/wakala
      
