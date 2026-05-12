@@ -263,9 +263,12 @@ if st.session_state.logged_in and menu == "Dashboard":
                 "🏠 Home/Dashboard",
                 "📥 Pokea mzigo",
                 "📤 Fanya Mauzo",
-                "🆕 Sajili Bidhaa Mpya", 
+                "🆕 Sajili Bidhaa Mpya",
+                "🆕 Sajili Duka/Wakala", 
                 "📋 My registered items",
                 "🚚 TUMA MZIGO",
+                "💳 REKODI MATUMIZI",
+                "💰 MIAMALA",
                 "📊 Ripoti ya Siku",
                 "📤 Import(Excel)",
                 
