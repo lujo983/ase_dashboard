@@ -802,7 +802,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                             # 2. HEADER
                             title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], alignment=1)
-                            elements.append(Paragraph("RIPOTI YA MAHESABU (STATEMENT)", title_style))
+                            elements.append(Paragraph("RIPOTI YA MAHESABU YA UGAVI NA MAREJESHO (STATEMENT)", title_style))
                             elements.append(Spacer(1, 12))
                         
                             # 3. AGENT INFO
@@ -818,7 +818,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                         
                             # 4. TABLE DATA
                             # Prepare table headers and rows
-                            table_data = [["Date", "Description", "Increase \n(ONGEZA)", "Decrease\n(PUNGUZA)", "Balance\n(DENI)"]]
+                            table_data = [["TAREHE", "MZIGO\n(ULIOCHUKUA)", "THAMANI\n(YA MZIGO)", "MAREJESHO\n(ULIOFANYA)", "BALANCE\n(DENI)"]]
                             for _, row in data_frame.iterrows():
                                 table_data.append([
                                     str(row['Date']),
