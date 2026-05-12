@@ -920,7 +920,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              # End view registerd
             # Matumizi starts here
             elif menu_Shopkeeper=="💳 REKODI MATUMIZI":
-                 st.markdown("💰 MATUMIZI NA RIPOTI YAKE")
+                 st.markdown("💳 MATUMIZI NA RIPOTI YAKE")
                  st.divider()
                  # --- DYNAMIC TIME FILTER ---
                  # This allows the user to choose how they want to see the charts and numbers
