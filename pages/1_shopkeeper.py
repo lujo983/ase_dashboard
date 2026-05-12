@@ -267,6 +267,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                 "👤  Sajili Duka/Wakala", 
                 "📋 My registered items",
                 "🚚 TUMA MZIGO",
+                "💰 MAREJESHO",
                 "💳 REKODI MATUMIZI",
                 "💰 MIAMALA",
                 "📊 Ripoti ya Siku",
@@ -501,6 +502,30 @@ if st.session_state.logged_in and menu == "Dashboard":
                              st.error(f"Hitilafu: {e}")             
     
             # end tuma mzigo
+            # start sajili duka/wakala
+            elif menu_Shopkeeper=="💰 MAREJESHO":
+                 st.header("💰 MAREJESHO")
+                 # --- 1. CONNECTION & SESSION SETUP ---
+                 conn = st.connection("supabase", type=SupabaseConnection)
+                 
+                 # Check for user_id in session state. 
+                 # If it's not there, we set it to None to avoid the NameError.
+                 if "user_id" not in st.session_state:
+                     # Option A: If you have a login system, tell them to log in
+                     st.error("⚠️ Tafadhali ingia kwenye mfumo (Login) kwanza.")
+                     st.stop()
+                 else:
+                     u_id = st.session_state["user_id"]
+                 with st.form("reg_form", clear_on_submit=True):
+                     name = st.text_input("Jina la Wakala")
+                     phone = st.text_input("Simu")
+                     location = st.text_input("Eneo")
+                     if st.form_submit_button("Hifadhi"):
+                         conn.table("agents").insert({"name": name, "phone": phone, "location": location, "created_by": u_id}).execute()
+                         st.success("Wakala amesajiliwa!")
+                         st.balloons()
+    
+            # end sajili duka/wakala
      
                          
             # start pakia mzigo kwa mkupuo
