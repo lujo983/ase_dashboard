@@ -4,6 +4,7 @@ supabase
 st-supabase-connection
 reportlab
 openpyxl
+plotly
 
 
 
