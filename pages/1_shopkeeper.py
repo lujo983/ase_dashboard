@@ -381,7 +381,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             # End Sales form
                                         # start dashboard/ home page
             elif menu_Shopkeeper=="🏠 Home/Dashboard":
-                 st.header("📊 DASHBOARD YA BIASHARA YAKO NA USHAURI WA KITAALAMU")
+                 st.subheader("📊 MWENENDO WA BIASHARA YAKO.")
                  # 1. FETCH DATA (Filtered by RLS automatically)
                  sales = conn.table("agent_supplies").select("total_cost, discount_amount").execute()
                  expenses = conn.table("expenditure").select("amount, category").execute()
