@@ -387,7 +387,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  sales_res = conn.table("agent_supplies").select("supply_date, total_cost, discount_amount").execute()
                  exp_res = conn.table("expenditure").select("amount, category").execute()
                  pay_res = conn.table("agent_payments").select("amount_paid").execute()
-                 inv_res = conn.table("inventory_items").select("item_name, quantity, min_stock_level").execute()
+                 inv_res = conn.table("inventory_items").select("item_name, current_stock, min_stock_level").execute()
              
                  # 2. CORE CALCULATIONS
                  # Total Revenue (Net)
@@ -468,10 +468,10 @@ if st.session_state.logged_in and menu == "Dashboard":
              
                  with stock_col:
                      with st.expander("Tahadhari ya Stoku (Low Stock)", expanded=True):
-                         low_stock = [i for i in inv_res.data if i['quantity'] <= i['min_stock_level']]
+                         low_stock = [i for i in inv_res.data if i['current_stock'] <= i['min_stock_level']]
                          if low_stock:
                              for item in low_stock:
-                                 st.write(f"❌ **{item['item_name']}**: Imebaki {item['quantity']} (Chini ya Kiwango)")
+                                 st.write(f"❌ **{item['item_name']}**: Imebaki {item['current_stock']} (Chini ya Kiwango)")
                          else:
                              st.write("✅ Bidhaa zote zipo kwa wingi wa kutosha.")
           
