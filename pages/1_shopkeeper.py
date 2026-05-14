@@ -469,7 +469,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  with stock_col:
                      with st.expander("Tahadhari ya Stoku (Low Stock)", expanded=True):
                          # 1. Filter the list to include ONLY items where quantity is less than or equal to min_stock_level
-                         low_stock = [i for i in inv_res.data if i['quantity'] <= i['min_stock_level']]
+                         low_stock = [i for i in inv_res.data if i['current_stock'] <= i['min_stock_level']]
                          
                          # 2. Render UI based on whether any low stock items exist
                          if low_stock:
@@ -478,7 +478,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                              # Create a clean markdown list for better scannability
                              for item in low_stock:
                                  st.markdown(
-                                     f"* **{item['item_name']}**: Bado vipande **{item['quantity']}** pekee "
+                                     f"* **{item['item_name']}**: Bado vipande **{item['current_stock']}** pekee "
                                      f"*(Kiwango cha chini: {item['min_stock_level']})*"
                                  )
                          else:
