@@ -400,7 +400,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  total_cash = sum(p['amount_paid'] for p in pay_res.data) if pay_res.data else 0
                  debt_outside = total_sales - total_cash
                  # Net Profit
-                 net_profit = total_sales - total_expenses
+                 net_profit = total_sales2 - total_expenses
              
                  # 3. TOP METRICS (Visual Summary)
                  m1, m2, m3, m4 = st.columns(4)
@@ -413,15 +413,15 @@ if st.session_state.logged_in and menu == "Dashboard":
              
                  # 4. SALES TREND LINE (Mwenendo)
                  st.subheader("📈 Mwenendo wa Mauzo (Sales Trend)")
-                 if sales_res.data:
-                     df_sales = pd.DataFrame(sales_res.data)
-                     df_sales['supply_date'] = pd.to_datetime(df_sales['supply_date'])
-                     df_sales['net_amount'] = df_sales['total_cost'] - df_sales['discount_amount']
+                 if sales_res2.data:
+                     df_sales = pd.DataFrame(sales_res2.data)
+                     df_sales['transaction_date'] = pd.to_datetime(df_sales['transaction_date'])
+                     df_sales['net_amount'] = df_sales['total_value']
                      
                      # Grouping by day and filling missing days with 0
-                     daily_trend = df_sales.set_index('supply_date')['net_amount'].resample('D').sum().reset_index()
+                     daily_trend = df_sales.set_index('transaction_date')['net_amount'].resample('D').sum().reset_index()
                      
-                     fig_trend = px.line(daily_trend, x='supply_date', y='net_amount', markers=True,
+                     fig_trend = px.line(daily_trend, x='transaction_date', y='net_amount', markers=True,
                                          title="Mapato ya Siku", template="plotly_white")
                      fig_trend.update_traces(line_color='#00CC96')
                      st.plotly_chart(fig_trend, use_container_width=True)
