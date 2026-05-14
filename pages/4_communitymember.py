@@ -266,7 +266,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "👥 SAJILI WAKALA/DUKA",
             "💳 MATUMIZI",
             "🏭 TAARIFA ZA UZALISHAJI",
-            "💳 MAREJESHO",
+            "💰 MAREJESHO",
             "📝 REGISTER ITEMS",
             "👁️ MY REGISTERED ITEMS",
             "📥 Stock In (Manunuzi)",
