@@ -280,10 +280,52 @@ if st.session_state.logged_in and menu == "Dashboard":
             # We fetch all core tables to build the business picture
             sales_res = conn.table("agent_supplies").select("supply_date, total_cost, discount_amount").execute()
             sales_res2 = conn.table("inventory_transactions").select("type, total_value, transaction_date").execute()
-            items_res = conn.table("inventory_items").select("item_name, buying_price, selling_price").execute()
             exp_res = conn.table("expenditure").select("amount, category").execute()
             pay_res = conn.table("agent_payments").select("amount_paid").execute()
             inv_res = conn.table("inventory_items").select("item_name, current_stock, min_stock_level").execute()
+            # 1. FETCH DATA (Fetch sales transactions and the items database)
+            # Replace your previous 'sales_res' fetch line with these two requests
+            sales_res3 = conn.table("inventory_transactions").select("product_name, quantity, total_value").execute()
+            items_res = conn.table("inventory_items").select("item_name, buying_price, selling_price").execute()
+            
+            # 2. CALCULATIONS USING PANDAS JOIN
+            if sales_res3.data and items_res.data:
+                # Convert both datasets into DataFrames
+                df_sales = pd.DataFrame(sales_res3.data)
+                df_items = pd.DataFrame(items_res.data)
+                
+                # Merge (Join) the tables together on the product name column
+                # Adjust 'product_name' and 'item_name' to match your exact column names
+                df_merged = pd.merge(df_sales, df_items, left_on="product_name", right_on="item_name")
+                
+                # Calculate Profit per transaction row: (Selling Price - Buying Price) * Quantity
+                df_merged['transaction_profit'] = (df_merged['selling_price'] - df_merged['buying_price']) * df_merged['quantity']
+                
+                # Calculate Gross Profit from Sales
+                total_sales_profit = df_merged['transaction_profit'].sum()
+                
+                # Fetch Total Expenditures (Matumizi) to calculate true Net Profit
+                exp_res = conn.table("expenditure").select("amount").execute()
+                total_expenses = sum(e['amount'] for e in exp_res.data) if exp_res.data else 0
+                
+                # True Net Profit = Profit from Sales - Total Expenses
+                net_profit = total_sales_profit - total_expenses
+                
+                # Total Revenue for display
+                total_sales_revenue = df_merged['total_value'].sum()
+            else:
+                total_sales_revenue = 0
+                total_expenses = 0
+                net_profit = 0
+            
+            # --- UI DISPLAY ---
+            # Update your metric rendering cards to use these verified numbers:
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Jumla ya Mauzo", f"TSh {total_sales_revenue:,.0f}")
+            m2.metric("Matumizi (Expenses)", f"TSh {total_expenses:,.0f}", delta=f"-{total_expenses:,.0f}", delta_color="inverse")
+            m3.metric("Faida Halisi (Net Profit)", f"TSh {net_profit:,.0f}")
+
+
          
             # 2. CORE CALCULATIONS
             # Total Revenue (Net)
