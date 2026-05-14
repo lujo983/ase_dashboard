@@ -337,7 +337,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             with col_right:
                 st.subheader("Sales vs Expenses")
                 fig_bar = go.Figure(data=[
-                    go.Bar(name='Mauzo', x=['Pesa'], y=[total_sales], marker_color='#2ECC71'),
+                    go.Bar(name='Mauzo', x=['Pesa'], y=[total_sales2], marker_color='#2ECC71'),
                     go.Bar(name='Matumizi', x=['Pesa'], y=[total_expenses], marker_color='#E74C3C')
                 ])
                 fig_bar.update_layout(barmode='group', height=400)
