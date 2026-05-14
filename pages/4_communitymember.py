@@ -272,10 +272,141 @@ if st.session_state.logged_in and menu == "Dashboard":
         ])
         # Add community member content
         # Community member sees daily production form
-        if menu == "Home":
-            st.header("Community Member Dashboard")
-            st.info("Empowering our communities! Together we can make greater impacts")
-            st.markdown("- Explore Community stories\n- Learning materials\n- Resources\n- Daily production reports and \n- Your Production Entries Records.")
+        if menu == "🏠 Home":
+            st.subheader("📊 MWENENDO WA BIASHARA YAKO.")
+            # 1. FETCH DATA (Automatically filtered by your Supabase RLS)
+            # We fetch all core tables to build the business picture
+            sales_res = conn.table("agent_supplies").select("supply_date, total_cost, discount_amount").execute()
+            sales_res2 = conn.table("inventory_transactions").select("type, total_value, transaction_date").execute()
+            exp_res = conn.table("expenditure").select("amount, category").execute()
+            pay_res = conn.table("agent_payments").select("amount_paid").execute()
+            inv_res = conn.table("inventory_items").select("item_name, current_stock, min_stock_level").execute()
+        
+            # 2. CORE CALCULATIONS
+            # Total Revenue (Net)
+            total_sales = sum((s['total_cost'] - s['discount_amount']) for s in sales_res.data) if sales_res.data else 0
+            total_sales2 = sum((s['total_value']) for s in sales_res2.data) if sales_res2.data else 0
+            # Total Expenses
+            total_expenses = sum(e['amount'] for e in exp_res.data) if exp_res.data else 0
+            # Cash collected vs Debt outside
+            total_cash = sum(p['amount_paid'] for p in pay_res.data) if pay_res.data else 0
+            debt_outside = total_sales - total_cash
+            # Net Profit
+            net_profit = total_sales2 - total_expenses
+        
+            # 3. TOP METRICS (Visual Summary)
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("Mauzo Ghafi", f"{total_sales2:,.0f}")
+            m2.metric("Matumizi", f"{total_expenses:,.0f}", delta=f"-{total_expenses:,.0f}", delta_color="inverse")
+            m3.metric("Faida (Net)", f"{net_profit:,.0f}", delta=f"{((net_profit/total_sales)*100 if total_sales > 0 else 0):.1f}% Margin")
+            m4.metric("Deni la Nje", f"{debt_outside:,.0f}", delta="Kwa Mawakala")
+        
+            st.write("---")
+        
+            # 4. SALES TREND LINE (Mwenendo)
+            st.subheader("📈 Mwenendo wa Mauzo (Sales Trend)")
+            if sales_res2.data:
+                df_sales = pd.DataFrame(sales_res2.data)
+                df_sales['transaction_date'] = pd.to_datetime(df_sales['transaction_date'])
+                df_sales['net_amount'] = df_sales['total_value']
+                
+                # Grouping by day and filling missing days with 0
+                daily_trend = df_sales.set_index('transaction_date')['net_amount'].resample('D').sum().reset_index()
+                
+                fig_trend = px.line(daily_trend, x='transaction_date', y='net_amount', markers=True,
+                                    title="Mapato ya Siku", template="plotly_white")
+                fig_trend.update_traces(line_color='#00CC96')
+                st.plotly_chart(fig_trend, use_container_width=True)
+            else:
+                st.info("Ingiza mauzo kwanza ili kuona mwenendo.")
+        
+            # 5. EXPENSE PIE & REVENUE BARS
+            col_left, col_right = st.columns(2)
+        
+            with col_left:
+                st.subheader("Mchanganuo wa Matumizi")
+                if exp_res.data:
+                    df_exp = pd.DataFrame(exp_res.data)
+                    fig_pie = px.pie(df_exp, values='amount', names='category', hole=0.4)
+                    st.plotly_chart(fig_pie, use_container_width=True)
+                else:
+                    st.info("Hakuna data ya matumizi.")
+        
+            with col_right:
+                st.subheader("Sales vs Expenses")
+                fig_bar = go.Figure(data=[
+                    go.Bar(name='Mauzo', x=['Pesa'], y=[total_sales], marker_color='#2ECC71'),
+                    go.Bar(name='Matumizi', x=['Pesa'], y=[total_expenses], marker_color='#E74C3C')
+                ])
+                fig_bar.update_layout(barmode='group', height=400)
+                st.plotly_chart(fig_bar, use_container_width=True)
+        
+            # 6. PRO ADVICE ENGINE & STOCK ALERTS
+            st.write("---")
+            st.subheader("💡 Ushauri na Tahadhari (Business Intelligence)")
+            
+            adv_col, stock_col = st.columns(2)
+        
+            with adv_col:
+                with st.expander("Ushauri wa Kibiashara", expanded=True):
+                    if total_sales2 > 0:
+                        exp_ratio = total_expenses / total_sales2
+                        if exp_ratio > 0.5:
+                            st.error(f"🚨 **Punguza Matumizi:** Matumizi ni {exp_ratio:.0%} ya mauzo. Hii ni hatari kwa faida!")
+                        elif debt_outside > (total_sales2 * 0.4):
+                            st.warning("⚠️ **Kusanya Madeni:** Mawakala wana deni kubwa. Punguza kutoa mzigo kwa mkopo.")
+                        else:
+                            st.success("✅ **Afya ya Biashara:** Mzunguko wako wa pesa unaonekana kuwa mzuri ongeza juhudi katika uwekezaji.")
+                    else:
+                        st.info("Data haitoshi kutoa ushauri.")
+        
+            with stock_col:
+                with st.expander("Tahadhari ya Stoku (Low Stock)", expanded=True):
+                    if inv_res.data:
+                        # 1. Convert to DataFrame for fast filtering and searching
+                        df_inv = pd.DataFrame(inv_res.data)
+                        
+                        # 2. Filter down to ONLY low stock items first
+                        df_low = df_inv[df_inv['current_stock'] <= df_inv['min_stock_level']]
+                        
+                        if not df_low.empty:
+                            # 3. ADD SEARCH BOX
+                            search_query = st.text_input("🔍 Tafuta Bidhaa...", key="stock_search", placeholder="Andika jina la bidhaa...")
+                            
+                            if search_query:
+                                # Case-insensitive search match
+                                df_low = df_low[df_low['item_name'].str.contains(search_query, case=False, na=False)]
+                            
+                            total_items = len(df_low)
+                            
+                            if total_items > 0:
+                                # 4. PAGINATION CALCULATIONS
+                                items_per_page = 5
+                                # Calculate total pages needed
+                                total_pages = (total_items - 1) // items_per_page + 1
+                                
+                                # Page selection dropdown or number input
+                                current_page = st.number_input("Kurasa (Page)", min_value=1, max_value=total_pages, value=1, step=1)
+                                
+                                # Slice data to show exactly 5 items for the active page
+                                start_idx = (current_page - 1) * items_per_page
+                                end_idx = start_idx + items_per_page
+                                page_df = df_low.iloc[start_idx:end_idx]
+                                
+                                st.error(f"⚠️ Matokeo {total_items} yamepatikana (Ukurasa {current_page} kati ya {total_pages})")
+                                
+                                # 5. RENDER THE 5 ITEMS Safely
+                                for _, item in page_df.iterrows():
+                                    st.markdown(
+                                        f"* **{item['item_name']}**: Bado zipo **{int(item['current_stock'])}** pekee "
+                                        f"*(Kiwango cha chini: {int(item['min_stock_level'])})*"
+                                    )
+                            else:
+                                st.info("Hakuna bidhaa ya chini ya kiwango inayolingana na utafutaji wako.")
+                        else:
+                            st.success("✅ Bidhaa zote zipo kwa wingi wa kutosha. Stoku ipo salama!")
+                    else:
+                        st.info("Hakuna taarifa zozote za stoku kwenye mfumo bado.")
 
         elif menu == "Learning Materials":
             st.subheader("Learning Materials")
