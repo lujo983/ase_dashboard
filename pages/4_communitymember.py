@@ -278,7 +278,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             st.subheader("📊 MWENENDO WA BIASHARA YAKO.")
             # 1. FETCH DATA (Automatically filtered by your Supabase RLS)
             # We fetch all core tables to build the business picture
-            sales_res0 = conn.table("agent_supplies").select("supply_date, total_cost, discount_amount").execute()
+            sales_res = conn.table("agent_supplies").select("supply_date, total_cost, discount_amount").execute()
             sales_res2 = conn.table("inventory_transactions").select("type, total_value, transaction_date").execute()
             items_res = conn.table("inventory_items").select("item_name, buying_price, selling_price").execute()
             exp_res = conn.table("expenditure").select("amount, category").execute()
