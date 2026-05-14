@@ -890,247 +890,248 @@ if st.session_state.logged_in and menu == "Dashboard":
                         st.subheader("💰 Madeni")
 
            # MAREJESHO STARTS HERE
-        elif menu=="💰 MAREJESHO":
-                    st.markdown("💰 MAREJESHO NA RIPOTI YAKE ")
-                    st.divider()
-                    # --- DYNAMIC TIME FILTER ---
-                    # This allows the user to choose how they want to see the charts and numbers
-                    filter_muda = st.radio(
-                        "Chagua Mpangilio wa Muda (Select Timeframe):",
-                        ["💰 Pokea Marejesho", "📊 Ripoti ya Marejesho"],
-                        horizontal=True
-                    )
-                    
-                    st.divider()
-                    # --- LOGIC SEPARATION ---
-                    # We will use the selected filter to aggregate our financial numbers
-                    if filter_muda == "💰 Pokea Marejesho":
-                        st.subheader("💰 Pokea Marejesho/Malipo (Payment Entry)")
-                        # Fetch Agents for the selection
-                        agents_res = conn.table("agents").select("id, name").execute()
-                        agents_list = {item['name']: item['id'] for item in agents_res.data}
-                        
-                        if not agents_list:
-                            st.warning("Hakuna mawakala waliopatikana.")
-                        else:
-                            # 1. Select Agent
-                            selected_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()), key="pay_agent_select")
-                            agent_id = agents_list[selected_name]
-                        
-                            # 2. PRO FEATURE: Calculate Current Balance
-                            # Get total supplies (net_cost)
-                            supplies = conn.table("agent_supplies").select("total_cost, discount_amount").eq("agent_id", agent_id).execute()
-                            total_debt = sum((s['total_cost'] - s['discount_amount']) for s in supplies.data)
-                        
-                            # Get total payments
-                            payments = conn.table("agent_payments").select("amount_paid").eq("agent_id", agent_id).execute()
-                            total_paid = sum(p['amount_paid'] for p in payments.data)
-                        
-                            # Get total returns
-                            returns = conn.table("agent_returns").select("return_value").eq("agent_id", agent_id).execute()
-                            total_returned = sum(r['return_value'] for r in returns.data)
-                        
-                            current_balance = total_debt - total_paid - total_returned
-                        
-                            # 3. UI: Financial Summary Headers
-                            col_a, col_b, col_c = st.columns(3)
-                            col_a.metric("Jumla ya Madeni", f"TSh {total_debt:,.0f}")
-                            col_b.metric("Jumla ya Malipo", f"TSh {total_paid:,.0f}")
-                            col_c.metric("Deni Linalobaki", f"TSh {current_balance:,.0f}", delta=f"-{total_returned:,.0f} Returns", delta_color="normal")
-                        
-                            st.write("---")
-                        
-                            # 4. The Payment Form
-                            with st.form(key="pro_payment_form", clear_on_submit=True):
-                                col1, col2 = st.columns(2)
-                                with col1:
-                                    amount = st.number_input("Kiasi Anacholipa (Amount Paid)", min_value=0.0, step=500.0)
-                                    pay_method = st.selectbox("Njia ya Malipo", ["Cash", "M-Pesa", "AirtelMoney", "Tigo Pesa", "Bank Transfer"])
-                                with col2:
-                                    pay_date = st.date_input("Tarehe ya Malipo")
-                                    note = st.text_input("Maelezo (Optional)", placeholder="Mf. Malipo ya mwezi wa 5")
-                                    
-                                submitted = st.form_submit_button("Hifadhi Malipo")
-                                st.success(f"Imerekodiwa! Kikamilifu.")
-                                st.balloons()
-                        
-                                if submitted:
-                                    if amount <= 0:
-                                        st.error("Tafadhali ingiza kiasi cha malipo!")
-                                    else:
-                                        pay_data = {
-                                            "agent_id": agent_id,
-                                            "amount_paid": amount,
-                                            "payment_date": str(pay_date),
-                                            "payment_method": pay_method,
-                                            "recorded_by": st.session_state.get("user_id")
-                                        }
-                                        
-                                        try:
-                                            conn.table("agent_payments").insert(pay_data).execute()
-                                            st.success(f"Malipo ya TSh {amount:,.0f} yamepokelewa kutoka kwa {selected_name}")
-                                            st.balloons()
-                                            # Rerun to update the metrics at the top
-                                            st.rerun()
-                                        except Exception as e:
-                                            st.error(f"Hitilafu: {e}")
-                        
-                        
-                        
-                    elif filter_muda == "📊 Ripoti ya Marejesho":
-                        
-                        
-                        
-                    else:
-                        st.subheader("💰 Mengineyo")
-                        from datetime import datetime, date
-                           # 1. Selection & Date Filter
-                           agents_res = conn.table("agents").select("id, name").execute()
-                           
-                           if agents_res.data:
-                               agents_dict = {item['name']: item['id'] for item in agents_res.data}
-                               
-                               col_agent, col_date = st.columns([1, 1])
-                               
-                               with col_agent:
-                                   selected_agent_name = st.selectbox("Chagua Wakala", options=list(agents_dict.keys()))
-                                   a_id = agents_dict[selected_agent_name]
-                               
-                               with col_date:
-                                   # Date range picker (Default to start of month to today)
-                                   today = date.today()
-                                   first_day = today.replace(day=1)
-                                   date_range = st.date_input("Chagua Muda (Date Range)", value=(first_day, today))
-                           
-                               # 2. Fetch Data
-                               # We fetch all data first to ensure the 'Running Balance' starts from the beginning of time, 
-                               # but we filter the display based on the selected dates.
-                               supp_res = conn.table("agent_supplies").select("supply_date, product_name, total_cost, discount_amount").eq("agent_id", a_id).execute()
-                               pay_res = conn.table("agent_payments").select("payment_date, amount_paid, payment_method").eq("agent_id", a_id).execute()
-                               ret_res = conn.table("agent_returns").select("return_date, product_name, return_value").eq("agent_id", a_id).execute()
-                           
-                               ledger_data = []
-                               for s in supp_res.data:
-                                   ledger_data.append({"Date": s['supply_date'], "Description": f"Ugavi: {s['product_name']}", "Increase": s['total_cost'] - s['discount_amount'], "Decrease": 0})
-                               for p in pay_res.data:
-                                   ledger_data.append({"Date": p['payment_date'], "Description": f"Malipo: {p['payment_method']}", "Increase": 0, "Decrease": p['amount_paid']})
-                               for r in ret_res.data:
-                                   ledger_data.append({"Date": r['return_date'], "Description": f"Kurudisha: {r['product_name']}", "Increase": 0, "Decrease": r['return_value']})
-                           
-                               if ledger_data:
-                                   df = pd.DataFrame(ledger_data)
-                                   df['Date'] = pd.to_datetime(df['Date']).dt.date # Ensure date format
-                                   df = df.sort_values(by="Date")
-                                   
-                                   # Calculate Running Balance BEFORE filtering (Crucial for accounting accuracy)
-                                   df["Running Balance"] = (df["Increase"] - df["Decrease"]).cumsum()
-                           
-                                   # 3. Apply the Date Filter
-                                   if len(date_range) == 2:
-                                       start_date, end_date = date_range
-                                       filtered_df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
-                                       
-                                       # Summary Metrics for the filtered period
-                                       total_in = filtered_df["Increase"].sum()
-                                       total_out = filtered_df["Decrease"].sum()
-                                       final_bal = df["Running Balance"].iloc[-1] # Total debt overall
-                           
-                                       m1, m2, m3 = st.columns(3)
-                                       m1.metric("Jumla ya Ugavi", f"{total_in:,.0f}")
-                                       m2.metric("Jumla ya Malipo", f"{total_out:,.0f}")
-                                       m3.metric("Deni la Sasa", f"{final_bal:,.0f}")
-                           
-                                       st.write(f"Showing transactions from **{start_date}** to **{end_date}**")
-                                       
-                                       # 4. Display
-                                       st.dataframe(
-                                           filtered_df.style.format({"Increase": "{:,.0f}", "Decrease": "{:,.0f}", "Running Balance": "{:,.0f}"}),
-                                           use_container_width=True,
-                                           hide_index=True
-                                       )
-                               else:
-                                   st.info("Hakuna miamala iliyopatikana.")
-                           else:
-                               st.error("Sajili wakala kwanza.")
-                            # pdf generation for agent
-                           import io
-                           from reportlab.lib import colors
-                           from reportlab.lib.pagesizes import A4
-                           from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
-                           from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-                           
-                           def generate_pdf(data_frame, agent_name, start_date, end_date):
-                               buffer = io.BytesIO()
-                               doc = SimpleDocTemplate(buffer, pagesize=A4)
-                               elements = []
-                               styles = getSampleStyleSheet()
-                               
-                               # 1. ADD LOGO (Optional)
-                               # If you have 'logo.png' in your folder, uncomment below:
-                               logo = Image("bm_logo_edited.png", width=100, height=50)
-                               elements.append(logo)
-                           
-                               # 2. HEADER
-                               title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], alignment=1)
-                               elements.append(Paragraph("RIPOTI YA MAHESABU YA UGAVI NA MAREJESHO (STATEMENT)", title_style))
-                               elements.append(Spacer(1, 12))
-                           
-                               # 3. AGENT INFO
-                               elements.append(Paragraph(f"<b>Wakala:</b> {agent_name}", styles['Normal']))
-                               elements.append(Paragraph(f"<b>Kipindi:</b> {start_date} mpaka {end_date}", styles['Normal']))
-                               elements.append(Paragraph(f"<b>Tarehe ya Ripoti:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
-                               elements.append(Spacer(1, 10))
-                               elements.append(Paragraph(f"<b>Jumla ya ugavi: TZS.</b> {total_in:,.0f} /=", styles['Normal']))
-                               elements.append(Paragraph(f"<b>Jumla ya Malipo: TZS.</b> {total_out:,.0f} /=", styles['Normal']))
-                               elements.append(Paragraph(f"<b>Deni la Sasa: TZS.</b> {final_bal:,.0f} /=", styles['Normal']))
-                               elements.append(Spacer(1, 20))
-                               elements.append(Paragraph(f"<b>HISTORIA YA KUCHUKUA MZIGO NA MALIPO.</b> ", styles['Normal']))
-                           
-                               # 4. TABLE DATA
-                               # Prepare table headers and rows
-                               table_data = [["TAREHE", "MZIGO\n(ULIOCHUKUA)", "THAMANI\n(YA MZIGO)", "MAREJESHO\n(ULIOFANYA)", "BALANCE\n(DENI)"]]
-                               for _, row in data_frame.iterrows():
-                                   table_data.append([
-                                       str(row['Date']),
-                                       row['Description'],
-                                       f"{row['Increase']:,.0f}",
-                                       f"{row['Decrease']:,.0f}",
-                                       f"{row['Running Balance']:,.0f}"
-                                   ])
-                           
-                               # 5. TABLE STYLING
-                               t = Table(table_data, colWidths=[70, 200, 80, 80, 80])
-                               t.setStyle(TableStyle([
-                                   ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                                   ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                   ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                                   ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                                   ('FONTSIZE', (0, 0), (-1, 0), 12),
-                                   ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                                   ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                                   ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                                   ('ALIGN', (2, 1), (-1, -1), 'RIGHT'), # Align money columns to right
-                               ]))
-                               elements.append(t)
-                               
-                               # Build PDF
-                               doc.build(elements)
-                               buffer.seek(0)
-                               return buffer
-                           
-                           # --- INSIDE YOUR STREAMLIT UI ---
-                           # Add this button after displaying the dataframe
-                           
-                           if not filtered_df.empty:
-                               pdf_file = generate_pdf(filtered_df, selected_agent_name, start_date, end_date)
-                               st.download_button(
-                                   label="📄 Pakua Ripoti ya PDF (Pro)",
-                                   data=pdf_file,
-                                   file_name=f"Statement_{selected_agent_name}_{start_date}.pdf",
-                                   mime="application/pdf"
-                               )
-   
-                           # end of pdf gene
+        elif menu_Shopkeeper=="💰 MAREJESHO":
+                 st.markdown("💰 MAREJESHO NA RIPOTI YAKE")
+                 st.divider()
+                 # --- DYNAMIC TIME FILTER ---
+                 # This allows the user to choose how they want to see the charts and numbers
+                 filter_muda = st.radio(
+                     "Chagua Mpangilio WA MAREJESHO:",
+                     ["Pokea Marejesho", "Ripoti ya Marejesho"],
+                     horizontal=True
+                 )
+                 
+                 st.divider()
+                 # --- LOGIC SEPARATION ---
+                 # We will use the selected filter to aggregate our financial numbers
+                 if filter_muda == "Pokea Marejesho":
+                     st.subheader("💰 Pokea Marejesho/Malipo (Payment Entry)")
+                     # Fetch Agents for the selection
+                     agents_res = conn.table("agents").select("id, name").execute()
+                     agents_list = {item['name']: item['id'] for item in agents_res.data}
+                     
+                     if not agents_list:
+                         st.warning("Hakuna mawakala waliopatikana.")
+                     else:
+                         # 1. Select Agent
+                         selected_name = st.selectbox("Mchague Wakala", options=list(agents_list.keys()), key="pay_agent_select")
+                         agent_id = agents_list[selected_name]
+                     
+                         # 2. PRO FEATURE: Calculate Current Balance
+                         # Get total supplies (net_cost)
+                         supplies = conn.table("agent_supplies").select("total_cost, discount_amount").eq("agent_id", agent_id).execute()
+                         total_debt = sum((s['total_cost'] - s['discount_amount']) for s in supplies.data)
+                     
+                         # Get total payments
+                         payments = conn.table("agent_payments").select("amount_paid").eq("agent_id", agent_id).execute()
+                         total_paid = sum(p['amount_paid'] for p in payments.data)
+                     
+                         # Get total returns
+                         returns = conn.table("agent_returns").select("return_value").eq("agent_id", agent_id).execute()
+                         total_returned = sum(r['return_value'] for r in returns.data)
+                     
+                         current_balance = total_debt - total_paid - total_returned
+                     
+                         # 3. UI: Financial Summary Headers
+                         col_a, col_b, col_c = st.columns(3)
+                         col_a.metric("Jumla ya Madeni", f"TSh {total_debt:,.0f}")
+                         col_b.metric("Jumla ya Malipo", f"TSh {total_paid:,.0f}")
+                         col_c.metric("Deni Linalobaki", f"TSh {current_balance:,.0f}", delta=f"-{total_returned:,.0f} Returns", delta_color="normal")
+                     
+                         st.write("---")
+                     
+                         # 4. The Payment Form
+                         with st.form(key="pro_payment_form", clear_on_submit=True):
+                             col1, col2 = st.columns(2)
+                             with col1:
+                                 amount = st.number_input("Kiasi Anacholipa (Amount Paid)", min_value=0.0, step=500.0)
+                                 pay_method = st.selectbox("Njia ya Malipo", ["Cash", "M-Pesa", "AirtelMoney", "Tigo Pesa", "Bank Transfer"])
+                             with col2:
+                                 pay_date = st.date_input("Tarehe ya Malipo")
+                                 note = st.text_input("Maelezo (Optional)", placeholder="Mf. Malipo ya mwezi wa 5")
+                                 
+                             submitted = st.form_submit_button("Hifadhi Malipo")
+                             st.success(f"Imerekodiwa! Kikamilifu.")
+                             st.balloons()
+                     
+                             if submitted:
+                                 if amount <= 0:
+                                     st.error("Tafadhali ingiza kiasi cha malipo!")
+                                 else:
+                                     pay_data = {
+                                         "agent_id": agent_id,
+                                         "amount_paid": amount,
+                                         "payment_date": str(pay_date),
+                                         "payment_method": pay_method,
+                                         "recorded_by": st.session_state.get("user_id")
+                                     }
+                                     
+                                     try:
+                                         conn.table("agent_payments").insert(pay_data).execute()
+                                         st.success(f"Malipo ya TSh {amount:,.0f} yamepokelewa kutoka kwa {selected_name}")
+                                         st.balloons()
+                                         # Rerun to update the metrics at the top
+                                         st.rerun()
+                                     except Exception as e:
+                                         st.error(f"Hitilafu: {e}")
+                     
+                     
+                 elif filter_muda == "Weekly (Kila Wiki)":
+                     st.subheader("📆 Ripoti ya Kila Wiki")
+                 elif filter_muda == "Chagua muda wako":
+                     st.subheader("🕐 Ripoti ya Muda uliochagua")
+                     
+                     
+                 else:
+                     st.subheader("📑 Ripoti ya Marejesho na Madeni (Filtered Ledger)")
+                     from datetime import datetime, date
+                     # 1. Selection & Date Filter
+                     agents_res = conn.table("agents").select("id, name").execute()
+                     
+                     if agents_res.data:
+                         agents_dict = {item['name']: item['id'] for item in agents_res.data}
+                         
+                         col_agent, col_date = st.columns([1, 1])
+                         
+                         with col_agent:
+                             selected_agent_name = st.selectbox("Chagua Wakala", options=list(agents_dict.keys()))
+                             a_id = agents_dict[selected_agent_name]
+                         
+                         with col_date:
+                             # Date range picker (Default to start of month to today)
+                             today = date.today()
+                             first_day = today.replace(day=1)
+                             date_range = st.date_input("Chagua Muda (Date Range)", value=(first_day, today))
+                     
+                         # 2. Fetch Data
+                         # We fetch all data first to ensure the 'Running Balance' starts from the beginning of time, 
+                         # but we filter the display based on the selected dates.
+                         supp_res = conn.table("agent_supplies").select("supply_date, product_name, total_cost, discount_amount").eq("agent_id", a_id).execute()
+                         pay_res = conn.table("agent_payments").select("payment_date, amount_paid, payment_method").eq("agent_id", a_id).execute()
+                         ret_res = conn.table("agent_returns").select("return_date, product_name, return_value").eq("agent_id", a_id).execute()
+                     
+                         ledger_data = []
+                         for s in supp_res.data:
+                             ledger_data.append({"Date": s['supply_date'], "Description": f"Ugavi: {s['product_name']}", "Increase": s['total_cost'] - s['discount_amount'], "Decrease": 0})
+                         for p in pay_res.data:
+                             ledger_data.append({"Date": p['payment_date'], "Description": f"Malipo: {p['payment_method']}", "Increase": 0, "Decrease": p['amount_paid']})
+                         for r in ret_res.data:
+                             ledger_data.append({"Date": r['return_date'], "Description": f"Kurudisha: {r['product_name']}", "Increase": 0, "Decrease": r['return_value']})
+                     
+                         if ledger_data:
+                             df = pd.DataFrame(ledger_data)
+                             df['Date'] = pd.to_datetime(df['Date']).dt.date # Ensure date format
+                             df = df.sort_values(by="Date")
+                             
+                             # Calculate Running Balance BEFORE filtering (Crucial for accounting accuracy)
+                             df["Running Balance"] = (df["Increase"] - df["Decrease"]).cumsum()
+                     
+                             # 3. Apply the Date Filter
+                             if len(date_range) == 2:
+                                 start_date, end_date = date_range
+                                 filtered_df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
+                                 
+                                 # Summary Metrics for the filtered period
+                                 total_in = filtered_df["Increase"].sum()
+                                 total_out = filtered_df["Decrease"].sum()
+                                 final_bal = df["Running Balance"].iloc[-1] # Total debt overall
+                     
+                                 m1, m2, m3 = st.columns(3)
+                                 m1.metric("Jumla ya Ugavi", f"{total_in:,.0f}")
+                                 m2.metric("Jumla ya Malipo", f"{total_out:,.0f}")
+                                 m3.metric("Deni la Sasa", f"{final_bal:,.0f}")
+                     
+                                 st.write(f"Showing transactions from **{start_date}** to **{end_date}**")
+                                 
+                                 # 4. Display
+                                 st.dataframe(
+                                     filtered_df.style.format({"Increase": "{:,.0f}", "Decrease": "{:,.0f}", "Running Balance": "{:,.0f}"}),
+                                     use_container_width=True,
+                                     hide_index=True
+                                 )
+                         else:
+                             st.info("Hakuna miamala iliyopatikana.")
+                     else:
+                         st.error("Sajili wakala kwanza.")
+                      # pdf generation for agent
+                     import io
+                     from reportlab.lib import colors
+                     from reportlab.lib.pagesizes import A4
+                     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+                     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+                     
+                     def generate_pdf(data_frame, agent_name, start_date, end_date):
+                         buffer = io.BytesIO()
+                         doc = SimpleDocTemplate(buffer, pagesize=A4)
+                         elements = []
+                         styles = getSampleStyleSheet()
+                         
+                         # 1. ADD LOGO (Optional)
+                         # If you have 'logo.png' in your folder, uncomment below:
+                         logo = Image("bm_logo_edited.png", width=100, height=50)
+                         elements.append(logo)
+                     
+                         # 2. HEADER
+                         title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], alignment=1)
+                         elements.append(Paragraph("RIPOTI YA MAHESABU YA UGAVI NA MAREJESHO (STATEMENT)", title_style))
+                         elements.append(Spacer(1, 12))
+                     
+                         # 3. AGENT INFO
+                         elements.append(Paragraph(f"<b>Wakala:</b> {agent_name}", styles['Normal']))
+                         elements.append(Paragraph(f"<b>Kipindi:</b> {start_date} mpaka {end_date}", styles['Normal']))
+                         elements.append(Paragraph(f"<b>Tarehe ya Ripoti:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+                         elements.append(Spacer(1, 10))
+                         elements.append(Paragraph(f"<b>Jumla ya ugavi: TZS.</b> {total_in:,.0f} /=", styles['Normal']))
+                         elements.append(Paragraph(f"<b>Jumla ya Malipo: TZS.</b> {total_out:,.0f} /=", styles['Normal']))
+                         elements.append(Paragraph(f"<b>Deni la Sasa: TZS.</b> {final_bal:,.0f} /=", styles['Normal']))
+                         elements.append(Spacer(1, 20))
+                         elements.append(Paragraph(f"<b>HISTORIA YA KUCHUKUA MZIGO NA MALIPO.</b> ", styles['Normal']))
+                     
+                         # 4. TABLE DATA
+                         # Prepare table headers and rows
+                         table_data = [["TAREHE", "MZIGO\n(ULIOCHUKUA)", "THAMANI\n(YA MZIGO)", "MAREJESHO\n(ULIOFANYA)", "BALANCE\n(DENI)"]]
+                         for _, row in data_frame.iterrows():
+                             table_data.append([
+                                 str(row['Date']),
+                                 row['Description'],
+                                 f"{row['Increase']:,.0f}",
+                                 f"{row['Decrease']:,.0f}",
+                                 f"{row['Running Balance']:,.0f}"
+                             ])
+                     
+                         # 5. TABLE STYLING
+                         t = Table(table_data, colWidths=[70, 200, 80, 80, 80])
+                         t.setStyle(TableStyle([
+                             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                             ('FONTSIZE', (0, 0), (-1, 0), 12),
+                             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                             ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                             ('ALIGN', (2, 1), (-1, -1), 'RIGHT'), # Align money columns to right
+                         ]))
+                         elements.append(t)
+                         
+                         # Build PDF
+                         doc.build(elements)
+                         buffer.seek(0)
+                         return buffer
+                     
+                     # --- INSIDE YOUR STREAMLIT UI ---
+                     # Add this button after displaying the dataframe
+                     
+                     if not filtered_df.empty:
+                         pdf_file = generate_pdf(filtered_df, selected_agent_name, start_date, end_date)
+                         st.download_button(
+                             label="📄 Pakua Ripoti ya PDF (Pro)",
+                             data=pdf_file,
+                             file_name=f"Statement_{selected_agent_name}_{start_date}.pdf",
+                             mime="application/pdf"
+                         )
+
+                     # end of pdf gene            
                # MAREJESHO END HERE
         # End of Matumizi/MAREJESHO NA MADENI
         elif menu=="🏭 TAARIFA ZA UZALISHAJI": 
