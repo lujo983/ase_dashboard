@@ -264,7 +264,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             "🏠 Home",
             "📚 Learning Materials",
             "👥 SAJILI WAKALA/DUKA",
-            "💳 MATUMIZI",
+            "💳 REKODI MATUMIZI",
             "🏭 TAARIFA ZA UZALISHAJI",
             "💰 MAREJESHO",
             "📝 REGISTER ITEMS",
@@ -668,7 +668,92 @@ if st.session_state.logged_in and menu == "Dashboard":
 
 
 
-        # End Sales form
+         # End Sales form
+        elif menu=="💳 REKODI MATUMIZI":
+                 st.markdown("💳 MATUMIZI NA RIPOTI YAKE")
+                 st.divider()
+                 # --- DYNAMIC TIME FILTER ---
+                 # This allows the user to choose how they want to see the charts and numbers
+                 filter_muda = st.radio(
+                     "Chagua Mpangilio WA MATUMIZI:",
+                     ["💳 Rekodi Matumizi", "📊Ripoti ya Matumizi"],
+                     horizontal=True
+                 )
+                 
+                 st.divider()
+                 # --- LOGIC SEPARATION ---
+                 # We will use the selected filter to aggregate our financial numbers
+                 if filter_muda == "💳 Rekodi Matumizi":
+                     st.header("💳 Rekodi Matumizi (Add Expenditure)")
+                     with st.form("expenditure_form"):
+                         category = st.selectbox("Aina ya Matumizi", ["Stock", "Rent", "Salaries", "Utilities", "Other"])
+                         amount = st.number_input("Kiasi (Amount)", min_value=0.0)
+                         description = st.text_area("Maelezo (Description)")
+                         date = st.date_input("Tarehe")
+                         
+                         submitted = st.form_submit_button("Hifadhi")
+                         
+                         if submitted:
+                             # Assuming user ID is stored in session state after login
+                             user_id = st.session_state.get("user_id")
+                             
+                             data = {
+                                 "user_id": user_id,
+                                 "category": category,
+                                 "amount": amount,
+                                 "description": description,
+                                 "transaction_date": str(date)
+                             }
+                             
+                             try:
+                                 conn.table("expenditure").insert(data).execute()
+                                 st.success("Matumizi yamehifadhiwa kikamilifu!")
+                             except Exception as e:
+                                 st.error(f"Hitilafu: {e}")
+                     
+                     
+                 elif filter_muda == "Weekly (Kila Wiki)":
+                     st.subheader("📆 Ripoti ya Kila Wiki")
+                 elif filter_muda == "Chagua muda wako":
+                     st.subheader("🕐 Ripoti ya Muda uliochagua")
+                     
+                     
+                 else:
+                     st.subheader("📊 Ripoti ya Matumizi")
+                     # Example: Admins see all, Staff see only theirs
+                     user_role = st.session_state.get("role")
+                     user_id = st.session_state.get("user_id")
+                     
+                     if user_role == "admin":
+                         # Fetch all records
+                         response = conn.table("expenditure").select("*").execute()
+                     else:
+                         # Fetch only current user's records
+                         response = conn.table("expenditure").select("transaction_date, category, amount, description").eq("user_id", user_id).execute()
+                         # 1. Fetch the data
+                         response = conn.table("expenditure").select("category, amount, description").eq("user_id", user_id).execute()
+                         
+                         if response.data:
+                             # 2. Convert to DataFrame
+                             df = pd.DataFrame(response.data)
+                             
+                             # 3. Calculate Total
+                             total_matumizi = df["amount"].sum()
+                             
+                             # 4. Display the Total at the top using a metric for visibility
+                             st.metric(label="Jumla ya Matumizi (Total)", value=f"TSh {total_matumizi:,.2f}")
+                             
+                             # 5. Display the Table with nice headers
+                             st.write("### Orodha ya Matumizi")
+                             display_df = df.rename(columns={
+                                 "category": "Aina",
+                                 "amount": "Kiasi",
+                                 "description": "Maelezo"
+                             })
+                             st.dataframe(display_df, use_container_width=True)
+                             
+                         else:
+                             st.info("Hakuna matumizi yaliyopatikana.")
         # Start daily reports
         elif menu == "📊 Daily Report":
              st.title("📅 Daily Business Summary")
@@ -793,6 +878,7 @@ if st.session_state.logged_in and menu == "Dashboard":
 
 
         # End daily reports
+       
 
       
 
