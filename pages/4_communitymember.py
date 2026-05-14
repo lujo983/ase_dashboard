@@ -323,7 +323,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             # --- UI DISPLAY ---
             # Update your metric rendering cards to use these verified numbers:
             m1, m2, m3 = st.columns(3)
-            m1.metric("Jumla ya Mauzo", f"TSh {total_sales_revenue:,.0f}")
+            m1.metric("Jumla ya Mauzoo", f"TSh {total_sales_revenue:,.0f}")
             m2.metric("Matumizi (Expenses)", f"TSh {total_expenses:,.0f}", delta=f"-{total_expenses:,.0f}", delta_color="inverse")
             m3.metric("Faida Halisi (Net Profit)", f"TSh {net_profit:,.0f}")
 
