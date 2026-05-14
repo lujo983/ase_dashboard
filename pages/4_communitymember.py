@@ -296,7 +296,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                 
                 # Merge (Join) the tables together on the product name column
                 # Adjust 'product_name' and 'item_name' to match your exact column names
-                df_merged = pd.merge(df_sales, df_items, left_on="product_name", right_on="item_name")
+                df_merged = pd.merge(df_sales, df_items, left_on="item_name", right_on="item_name")
                 
                 # Calculate Profit per transaction row: (Selling Price - Buying Price) * Quantity
                 df_merged['transaction_profit'] = (df_merged['selling_price'] - df_merged['buying_price']) * df_merged['quantity']
