@@ -548,7 +548,7 @@ if st.session_state.logged_in and menu == "Dashboard":
         # End view registerd
 
         # Start Stockin                                                                 
-        elif menu == "Stock In (Manunuzi)":
+        elif menu == "📥 Stock In (Manunuzi)":
              st.subheader("📥 Ingiza Bidhaa (Stock In / Purchase)")
          
              # 1. Fetch current items
@@ -608,7 +608,7 @@ if st.session_state.logged_in and menu == "Dashboard":
      
      
         # Start Sales                  
-        elif menu == "Stock Out (Mauzo)":
+        elif menu == "📤 Stock Out (Mauzo)":
              st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
          
              res = conn.table("inventory_items").select("id, item_name, current_stock, selling_price").eq("user_id", st.session_state.user_id).execute()
