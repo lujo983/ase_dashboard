@@ -385,6 +385,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  # 1. FETCH DATA (Automatically filtered by your Supabase RLS)
                  # We fetch all core tables to build the business picture
                  sales_res = conn.table("agent_supplies").select("supply_date, total_cost, discount_amount").execute()
+                 sales_res2 = conn.table("inventory_transactions").select("type, total_value, transaction_date").execute()
                  exp_res = conn.table("expenditure").select("amount, category").execute()
                  pay_res = conn.table("agent_payments").select("amount_paid").execute()
                  inv_res = conn.table("inventory_items").select("item_name, current_stock, min_stock_level").execute()
@@ -392,6 +393,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                  # 2. CORE CALCULATIONS
                  # Total Revenue (Net)
                  total_sales = sum((s['total_cost'] - s['discount_amount']) for s in sales_res.data) if sales_res.data else 0
+                 total_sales2 = sum((s['total_value']) for s in sales_res2.data) if sales_res2.data else 0
                  # Total Expenses
                  total_expenses = sum(e['amount'] for e in exp_res.data) if exp_res.data else 0
                  # Cash collected vs Debt outside
@@ -402,7 +404,7 @@ if st.session_state.logged_in and menu == "Dashboard":
              
                  # 3. TOP METRICS (Visual Summary)
                  m1, m2, m3, m4 = st.columns(4)
-                 m1.metric("Mauzo Ghafi", f"{total_sales:,.0f}")
+                 m1.metric("Mauzo Ghafi", f"{total_sales2:,.0f}")
                  m2.metric("Matumizi", f"{total_expenses:,.0f}", delta=f"-{total_expenses:,.0f}", delta_color="inverse")
                  m3.metric("Faida (Net)", f"{net_profit:,.0f}", delta=f"{((net_profit/total_sales)*100 if total_sales > 0 else 0):.1f}% Margin")
                  m4.metric("Deni la Nje", f"{debt_outside:,.0f}", delta="Kwa Mawakala")
