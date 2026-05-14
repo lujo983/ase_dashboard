@@ -264,8 +264,9 @@ if st.session_state.logged_in and menu == "Dashboard":
             "🏠 Home",
             "📚 Learning Materials",
             "👥 SAJILI WAKALA/DUKA",
-            "💰 MATUMIZI/MADENI",
+            "💳 MATUMIZI",
             "🏭 TAARIFA ZA UZALISHAJI",
+            "💳 MAREJESHO",
             "📝 REGISTER ITEMS",
             "👁️ MY REGISTERED ITEMS",
             "📥 Stock In (Manunuzi)",
@@ -797,9 +798,8 @@ if st.session_state.logged_in and menu == "Dashboard":
 
                  
                                             # MATUMIZI/MAREJESHO/MADENI
-        elif menu=="💰 MATUMIZI/MADENI":
-                    st.title("💰💳💸 MATUMIZI/MAREJESHO/MADENI")
-                    st.markdown("MATUMIZI/MAREJESHO/MADENI NA MWENENDO WA BIASHARA YAKO")
+        elif menu=="💳 MATUMIZI":
+                    st.markdown("💳 REKODI YA MATUMIZI ")
                     st.divider()
                     # --- DYNAMIC TIME FILTER ---
                     # This allows the user to choose how they want to see the charts and numbers
