@@ -438,7 +438,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                     st.success("Wakala amesajiliwa!")
                     st.balloons()
         # Register item starts
-        elif menu == "Register Items":
+        elif menu == "📝 REGISTER ITEMS":
              st.subheader("🆕 Register New Business Item")
              
              with st.form("item_reg_form", clear_on_submit=True):
@@ -475,7 +475,7 @@ if st.session_state.logged_in and menu == "Dashboard":
                              st.error(f"Hitilafu: {e}")
         # End register items
         # startsView registerd 
-        elif menu == "My registered items":
+        elif menu == "👁️ MY REGISTERED ITEMS":
              st.subheader("📋 Orodha ya Bidhaa Zako (Your Item Catalog)")
              
              if "user_id" in st.session_state:
