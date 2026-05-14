@@ -457,14 +457,14 @@ if st.session_state.logged_in and menu == "Dashboard":
              
                  with adv_col:
                      with st.expander("Ushauri wa Kibiashara", expanded=True):
-                         if total_sales > 0:
-                             exp_ratio = total_expenses / total_sales
+                         if total_sales2 > 0:
+                             exp_ratio = total_expenses / total_sales2
                              if exp_ratio > 0.5:
                                  st.error(f"🚨 **Punguza Matumizi:** Matumizi ni {exp_ratio:.0%} ya mauzo. Hii ni hatari kwa faida!")
-                             elif debt_outside > (total_sales * 0.4):
+                             elif debt_outside > (total_sales2 * 0.4):
                                  st.warning("⚠️ **Kusanya Madeni:** Mawakala wana deni kubwa. Punguza kutoa mzigo kwa mkopo.")
                              else:
-                                 st.success("✅ **Afya ya Biashara:** Mzunguko wako wa pesa unaonekana kuwa mzuri.")
+                                 st.success("✅ **Afya ya Biashara:** Mzunguko wako wa pesa unaonekana kuwa mzuri ongeza juhudi katika uwekezaji.")
                          else:
                              st.info("Data haitoshi kutoa ushauri.")
              
