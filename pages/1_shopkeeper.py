@@ -468,22 +468,52 @@ if st.session_state.logged_in and menu == "Dashboard":
              
                  with stock_col:
                      with st.expander("Tahadhari ya Stoku (Low Stock)", expanded=True):
-                         # 1. Filter the list to include ONLY items where quantity is less than or equal to min_stock_level
-                         low_stock = [i for i in inv_res.data if i['current_stock'] <= i['min_stock_level']]
-                         
-                         # 2. Render UI based on whether any low stock items exist
-                         if low_stock:
-                             st.error(f"⚠️ Kuna bidhaa ({len(low_stock)}) zilizopo chini ya kiwango:")
+                         if inv_res.data:
+                             # 1. Convert to DataFrame for fast filtering and searching
+                             df_inv = pd.DataFrame(inv_res.data)
                              
-                             # Create a clean markdown list for better scannability
-                             for item in low_stock:
-                                 st.markdown(
-                                     f"* **{item['item_name']}**: Bado vipande **{item['current_stock']}** pekee "
-                                     f"*(Kiwango cha chini: {item['min_stock_level']})*"
-                                 )
+                             # 2. Filter down to ONLY low stock items first
+                             df_low = df_inv[df_inv['current_stock'] <= df_inv['min_stock_level']]
+                             
+                             if not df_low.empty:
+                                 # 3. ADD SEARCH BOX
+                                 search_query = st.text_input("🔍 Tafuta Bidhaa...", key="stock_search", placeholder="Andika jina la bidhaa...")
+                                 
+                                 if search_query:
+                                     # Case-insensitive search match
+                                     df_low = df_low[df_low['item_name'].str.contains(search_query, case=False, na=False)]
+                                 
+                                 total_items = len(df_low)
+                                 
+                                 if total_items > 0:
+                                     # 4. PAGINATION CALCULATIONS
+                                     items_per_page = 5
+                                     # Calculate total pages needed
+                                     total_pages = (total_items - 1) // items_per_page + 1
+                                     
+                                     # Page selection dropdown or number input
+                                     current_page = st.number_input("Kurasa (Page)", min_value=1, max_value=total_pages, value=1, step=1)
+                                     
+                                     # Slice data to show exactly 5 items for the active page
+                                     start_idx = (current_page - 1) * items_per_page
+                                     end_idx = start_idx + items_per_page
+                                     page_df = df_low.iloc[start_idx:end_idx]
+                                     
+                                     st.error(f"⚠️ Matokeo {total_items} yamepatikana (Ukurasa {current_page} kati ya {total_pages})")
+                                     
+                                     # 5. RENDER THE 5 ITEMS Safely
+                                     for _, item in page_df.iterrows():
+                                         st.markdown(
+                                             f"* **{item['item_name']}**: Bado zipo **{int(item['current_stock'])}** pekee "
+                                             f"*(Kiwango cha chini: {int(item['min_stock_level'])})*"
+                                         )
+                                 else:
+                                     st.info("Hakuna bidhaa ya chini ya kiwango inayolingana na utafutaji wako.")
+                             else:
+                                 st.success("✅ Bidhaa zote zipo kwa wingi wa kutosha. Stoku ipo salama!")
                          else:
-                             # This message will only show if everything is safe and above the threshold
-                             st.success("✅ Bidhaa zote zipo kwa wingi wa kutosha. Stoku ipo salama!")
+                             st.info("Hakuna taarifa zozote za stoku kwenye mfumo bado.")
+
 
           
     
