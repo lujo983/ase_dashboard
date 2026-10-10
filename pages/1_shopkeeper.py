@@ -326,78 +326,59 @@ if st.session_state.logged_in and menu == "Dashboard":
                  #scanner
                  st.title("📱 Tumia Camera ku scan bar au qr code ya bidhaa bidhaa ")
                  
-                 # 1. Session state to hold the captured barcode
+                 st.title("📱 Biashara Yako Mkononi Mwako - Scanner")
+                 
                  if "scanned_barcode" not in st.session_state:
                      st.session_state.scanned_barcode = ""
                  
-                 # 2. Embedded HTML/JS Barcode Scanner Component
+                 # Improved JS Scanner with camera selection support
                  scanner_html = """
                  <div style="text-align: center;">
                      <div id="reader" style="width: 100%; max-width: 400px; margin: auto; border-radius: 10px; overflow: hidden;"></div>
-                     <p id="scanner-status" style="margin-top: 10px; font-weight: bold; color: #555;">Point camera at a barcode...</p>
+                     <p id="scanner-status" style="margin-top: 10px; font-weight: bold; color: #333;">Inatafuta kamera...</p>
                  </div>
                  
                  <script src="https://unpkg.com/html5-qrcode"></script>
                  <script>
                  function onScanSuccess(decodedText, decodedResult) {
-                     document.getElementById('scanner-status').innerText = "Scanned: " + decodedText;
+                     document.getElementById('scanner-status').innerText = "Imesoma: " + decodedText;
                      const url = new URL(window.location.href);
                      url.searchParams.set('scanned_code', decodedText);
                      window.location.href = url.toString();
                  }
                  
-                 let html5QrCode = new Html5Qrcode("reader");
-                 html5QrCode.start(
-                     { facingMode: "environment" },
-                     { fps: 15, qrbox: { width: 250, height: 150 } },
-                     onScanSuccess
-                 ).catch(err => {
-                     document.getElementById('scanner-status').innerText = "Camera access denied or unavailable.";
+                 // Jaribu kufungua back camera moja kwa moja, ikishindikana ifungue kamera yoyote iliyopo
+                 Html5Qrcode.getCameras().cameras => {
+                     if (cameras && cameras.length > 0) {
+                         // Chagua kamera ya nyuma (environment) kama ipo, la sivyo chagua ya kwanza
+                         let selectedCamera = cameras.find(c => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('rear')) || cameras[cameras.length - 1];
+                         
+                         let html5QrCode = new Html5Qrcode("reader");
+                         html5QrCode.start(
+                             selectedCamera.id,
+                             { fps: 10, qrbox: { width: 250, height: 150 } },
+                             onScanSuccess
+                         ).catch(err => {
+                             document.getElementById('scanner-status').innerText = "Imeshindwa kuwasha kamera.";
+                         });
+                     } else {
+                         document.getElementById('scanner-status').innerText = "Hakuna kamera iliyogunduliwa.";
+                     }
+                 }).catch(err => {
+                     document.getElementById('scanner-status').innerText = "Hitilafu ya ruhusa ya kamera.";
                  });
                  </script>
                  """
                  
-                 # Render scanner
-                 components.html(scanner_html, height=350)
+                 components.html(scanner_html, height=400)
                  
-                 # 3. Capture the scanned code from query parameters
                  query_params = st.query_params
                  if "scanned_code" in query_params:
                      st.session_state.scanned_barcode = query_params["scanned_code"]
                  
-                 # Editable text input for the barcode (allows manual typing if needed)
                  scanned_code = st.text_input("Active Barcode / QR Code:", value=st.session_state.scanned_barcode)
                  
-                 # 4. Choose Mode / Workflow
-                 if scanned_code:
-                     st.info(f"Current Code: **{scanned_code}**")
-                     
-                     # Choose what you want to do with this scanned item
-                     workflow = st.selectbox("Select Action:", ["Choose an action...", "Stock In (Add)", "Stock Out (Reduce)", "Register New Product"])
-                     
-                     if workflow == "Stock In (Add)":
-                         st.subheader("📥 Stock In")
-                         qty_in = st.number_input("Quantity to Add:", min_value=1, value=1)
-                         if st.button("Confirm Stock In"):
-                             # 👉 Insert your Supabase 'Stock In' update logic here using `scanned_code` and `qty_in`
-                             st.success(f"Successfully added {qty_in} units for code {scanned_code}!")
-                             
-                     elif workflow == "Stock Out (Reduce)":
-                         st.subheader("📤 Stock Out")
-                         qty_out = st.number_input("Quantity to Remove/Sell:", min_value=1, value=1)
-                         if st.button("Confirm Stock Out"):
-                             # 👉 Insert your Supabase 'Stock Out' update logic here using `scanned_code` and `qty_out`
-                             st.success(f"Successfully removed {qty_out} units for code {scanned_code}!")
-                             
-                     elif workflow == "Register New Product":
-                         st.subheader("✨ Register New Product")
-                         prod_name = st.text_input("Product Name")
-                         unit_price = st.number_input("Unit Price", min_value=0.0, format="%.2f")
-                         initial_stock = st.number_input("Initial Opening Stock", min_value=0, value=0)
-                         
-                         if st.button("Save New Product"):
-                             # 👉 Insert your Supabase 'Insert' logic here using `scanned_code`, `prod_name`, `unit_price`, and `initial_stock`
-                             st.success(f"Product '{prod_name}' registered successfully with barcode {scanned_code}!")
+                 
                  #scanner
              
                  res = conn.table("inventory_items").select("id, item_name, current_stock, selling_price").eq("user_id", st.session_state.user_id).execute()
