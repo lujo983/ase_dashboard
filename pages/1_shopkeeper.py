@@ -324,7 +324,7 @@ if st.session_state.logged_in and menu == "Dashboard":
             elif menu_Shopkeeper == "📤 Fanya Mauzo":
                  st.subheader("📤 Uza Bidhaa (Stock Out / Sales)")
                  #scanner
-                 st.title("📱 Biashara Yako Mkononi Mwako - Stock Manager")
+                 st.title("📱 Tumia Camera ku scan bar au qr code ya bidhaa bidhaa ")
                  
                  # 1. Session state to hold the captured barcode
                  if "scanned_barcode" not in st.session_state:
